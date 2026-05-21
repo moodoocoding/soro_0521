@@ -1,4 +1,12 @@
 // ====================================================
+// GOOGLE SPREADSHEET DATABASE CONFIGURATION (Vercel Cloud Setup)
+// ====================================================
+// [가이드] 구글 스프레드시트 연동 완료 후, 아래 공란에 구글 Apps Script 웹앱 배포 URL을 입력해 주세요.
+// 예시: "https://script.google.com/macros/s/AKfycbz.../exec"
+// 이 주소가 비어있는 동안에는 브라우저의 localStorage 로컬 DB 모드로 즉시 원활히 시뮬레이션 작동합니다.
+const GOOGLE_SHEET_API_URL = ""; 
+
+// ====================================================
 // CONTEST DATA AND INLINE ILLUSTRATIONS (SVG)
 // ====================================================
 const CONTESTS_DATA = [
@@ -148,7 +156,7 @@ const CONTESTS_DATA = [
 // ====================================================
 // STATE MANAGEMENT & USER SESSION CONFIGURATION
 // ====================================================
-let currentVirtualMonth = 5; // Default is May (5월)
+let currentVirtualMonth = 5; 
 let activeContest = null;
 let uploadBase64Data = null; 
 
@@ -254,7 +262,6 @@ function setVirtualMonth(month) {
   renderContestGrid();
   updateLiveCounters();
   
-  // If contest drawer is currently open, refresh status layout
   if (activeContest) {
     openContestDetails(activeContest.id);
   }
@@ -284,10 +291,10 @@ function updateUIForLoggedInState() {
   const profileBadge = document.getElementById("user-profile-badge");
   const infoText = document.getElementById("user-info-text");
   
-  infoText.textContent = `${currentUser.school} ${currentUser.grade}학년 ${currentUser.classNum}반 ${currentUser.name} 학생`;
+  // Format: 학년-반 번호 이름
+  infoText.textContent = `${currentUser.grade}-${currentUser.classNum} ${currentUser.number}번 ${currentUser.name}`;
   profileBadge.style.display = "inline-flex";
   
-  // Close Auth Drawer if it is open
   closeAuthDrawer();
 }
 
@@ -304,7 +311,6 @@ function executeLogout() {
   updateUIForLoggedOutState();
   updateLiveCounters();
   
-  // If contest drawer is open, force redraw
   if (activeContest) {
     openContestDetails(activeContest.id);
   }
@@ -312,51 +318,126 @@ function executeLogout() {
   showToast("로그아웃 되었습니다.", "info");
 }
 
-function handleSignUp(username, password, name, phone, school, grade, classNum, number) {
-  const users = JSON.parse(localStorage.getItem("soro_users") || "[]");
+// REST API or Local Sign Up
+async function handleSignUp(grade, classNum, number, name, password) {
+  const userKey = `${grade}_${classNum}_${number}_${name}`; // Unique Identifier Key
   
-  // Username overlap verification
-  const exists = users.find(u => u.username.toLowerCase() === username.toLowerCase());
+  const payload = {
+    action: "signUp",
+    userKey: userKey,
+    grade: grade,
+    classNum: classNum,
+    number: number,
+    name: name,
+    password: password
+  };
+  
+  // 1. Remote DB Cloud Mode (Google Sheets Apps Script API URL active)
+  if (GOOGLE_SHEET_API_URL) {
+    showToast("클라우드 서버에 등록하고 있습니다...", "info");
+    try {
+      const response = await fetch(GOOGLE_SHEET_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json();
+      
+      if (result.status === "error") {
+        showToast(result.message, "error");
+        return false;
+      }
+      
+      const loggedUser = { userKey, grade, classNum, number, name };
+      currentUser = loggedUser;
+      localStorage.setItem("soro_current_user", JSON.stringify(loggedUser));
+      updateUIForLoggedInState();
+      updateLiveCounters();
+      if (activeContest) openContestDetails(activeContest.id);
+      showToast(`${name} 학생의 가입과 로그인이 완료되었습니다! 🎉`, "success");
+      return true;
+    } catch (error) {
+      console.error(error);
+      showToast("원격 구글 서버 접속이 원활하지 않습니다. 로컬 저장을 이용합니다.", "error");
+    }
+  }
+  
+  // 2. Fallback Local Mode
+  const users = JSON.parse(localStorage.getItem("soro_users") || "[]");
+  const exists = users.find(u => u.userKey === userKey);
   if (exists) {
-    showToast("이미 존재하는 아이디입니다. 다른 아이디를 입력해주세요.", "error");
+    showToast("이미 동일한 정보로 가입된 학생 계정이 존재합니다.", "error");
     return false;
   }
   
   const newUser = {
-    username: username,
-    password: password,
-    name: name,
-    phone: phone,
-    school: school,
+    userKey: userKey,
     grade: grade,
     classNum: classNum,
-    number: number
+    number: number,
+    name: name,
+    password: password
   };
   
   users.push(newUser);
   localStorage.setItem("soro_users", JSON.stringify(users));
   
-  // Log in immediately
   currentUser = newUser;
   localStorage.setItem("soro_current_user", JSON.stringify(newUser));
   updateUIForLoggedInState();
   updateLiveCounters();
   
-  // If drawer is open, refresh forms
-  if (activeContest) {
-    openContestDetails(activeContest.id);
-  }
-  
+  if (activeContest) openContestDetails(activeContest.id);
   showToast(`${name} 학생의 가입과 로그인이 완료되었습니다! 🎉`, "success");
   return true;
 }
 
-function handleLogin(username, password) {
+// REST API or Local Login
+async function handleLogin(grade, classNum, number, name, password) {
+  const userKey = `${grade}_${classNum}_${number}_${name}`;
+  
+  const payload = {
+    action: "login",
+    userKey: userKey,
+    password: password
+  };
+
+  // 1. Remote DB Cloud Mode
+  if (GOOGLE_SHEET_API_URL) {
+    showToast("보안 서버에서 로그인 확인 중...", "info");
+    try {
+      const response = await fetch(GOOGLE_SHEET_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json();
+      
+      if (result.status === "error") {
+        showToast(result.message, "error");
+        return false;
+      }
+      
+      const loggedUser = { userKey, grade, classNum, number, name };
+      currentUser = loggedUser;
+      localStorage.setItem("soro_current_user", JSON.stringify(loggedUser));
+      updateUIForLoggedInState();
+      updateLiveCounters();
+      if (activeContest) openContestDetails(activeContest.id);
+      showToast(`${name} 학생, 로그인 성공을 환영합니다! 🚀`, "success");
+      return true;
+    } catch (error) {
+      console.error(error);
+      showToast("구글 클라우드 접속 지연. 로컬 저장소를 활용합니다.", "error");
+    }
+  }
+
+  // 2. Fallback Local Mode
   const users = JSON.parse(localStorage.getItem("soro_users") || "[]");
-  const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+  const user = users.find(u => u.userKey === userKey && u.password === password);
   
   if (!user) {
-    showToast("아이디 혹은 비밀번호가 일치하지 않습니다.", "error");
+    showToast("학년/반/번호/이름 또는 비밀번호가 일치하지 않습니다.", "error");
     return false;
   }
   
@@ -365,11 +446,7 @@ function handleLogin(username, password) {
   updateUIForLoggedInState();
   updateLiveCounters();
   
-  // If drawer is open, refresh forms
-  if (activeContest) {
-    openContestDetails(activeContest.id);
-  }
-  
+  if (activeContest) openContestDetails(activeContest.id);
   showToast(`${user.name} 학생, 로그인 성공을 환영합니다! 🚀`, "success");
   return true;
 }
@@ -479,16 +556,6 @@ function renderContestGrid() {
   document.getElementById("stat-active-contests").textContent = `${activeCount}개`;
 }
 
-function getContestStatus(contestMonth) {
-  if (currentVirtualMonth < contestMonth) {
-    return "pending";
-  } else if (currentVirtualMonth === contestMonth) {
-    return "active";
-  } else {
-    return "closed";
-  }
-}
-
 // ====================================================
 // CONTEST DRAWER DETAILS & LOGGED-IN CONDITIONAL FORM
 // ====================================================
@@ -537,23 +604,17 @@ function openContestDetails(contestId) {
     formContainer.style.display = "block";
     noticeContainer.style.display = "none";
     
-    // Check Authentication state
     if (currentUser) {
-      // Show Submission Form
       authNotice.style.display = "none";
       subForm.style.display = "block";
       
-      // Auto-fill student profile info
       document.getElementById("student-name").value = currentUser.name;
-      document.getElementById("student-phone").value = currentUser.phone;
-      document.getElementById("student-school").value = currentUser.school;
       document.getElementById("student-grade").value = `${currentUser.grade}학년`;
-      document.getElementById("student-class").value = currentUser.classNum;
-      document.getElementById("student-number").value = currentUser.number;
+      document.getElementById("student-class").value = `${currentUser.classNum}반`;
+      document.getElementById("student-number").value = `${currentUser.number}번`;
       
       setupDynamicFormFields(contest);
     } else {
-      // Hide form & prompt login
       authNotice.style.display = "flex";
       subForm.style.display = "none";
     }
@@ -792,17 +853,13 @@ function setupFileUploader() {
 // EVENT LISTENERS & ROUTINGS
 // ====================================================
 function setupEventListeners() {
-  // Theme Toggle Button
   document.getElementById("theme-toggle-btn").addEventListener("click", toggleTheme);
   
-  // Contest Drawer overlay / close
   document.getElementById("contest-drawer-overlay").addEventListener("click", closeContestDrawer);
   document.getElementById("contest-drawer-close").addEventListener("click", closeContestDrawer);
   
-  // Authentication Trigger Drawers
   document.getElementById("auth-trigger-btn").addEventListener("click", () => openAuthDrawer("login"));
   document.getElementById("auth-redirect-btn").addEventListener("click", () => {
-    // If clicked redirect inside drawer
     closeContestDrawer();
     openAuthDrawer("login");
   });
@@ -810,20 +867,15 @@ function setupEventListeners() {
   document.getElementById("auth-drawer-overlay").addEventListener("click", closeAuthDrawer);
   document.getElementById("auth-drawer-close").addEventListener("click", closeAuthDrawer);
   
-  // Login / Signup tab switching triggers
   document.getElementById("tab-login-btn").addEventListener("click", () => switchAuthTab("login"));
   document.getElementById("tab-signup-btn").addEventListener("click", () => switchAuthTab("signup"));
   
-  // Logout Trigger
   document.getElementById("logout-btn").addEventListener("click", executeLogout);
   
-  // My Submissions lookup drawer controls
   const lookupDrawer = document.getElementById("lookup-drawer");
   document.getElementById("lookup-toggle-btn").addEventListener("click", () => {
     lookupDrawer.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
-    
-    // Instantly execute query for currently logged in student
     executeLoggedInLookup();
   });
   document.getElementById("lookup-drawer-overlay").addEventListener("click", closeLookupDrawer);
@@ -834,7 +886,6 @@ function setupEventListeners() {
     document.body.style.overflow = "";
   }
   
-  // Time-travel simulated month selector buttons
   const monthButtons = document.querySelectorAll(".month-btn");
   monthButtons.forEach(btn => {
     btn.addEventListener("click", () => {
@@ -843,35 +894,34 @@ function setupEventListeners() {
     });
   });
 
-  // Handle Auth Form Submission (Login & Sign Up)
+  // Handle Login submission
   const loginForm = document.getElementById("login-form");
   loginForm.addEventListener("submit", (e) => {
     e.preventDefault();
     if (validateLoginForm()) {
-      const user = document.getElementById("login-username").value.trim();
+      const grade = document.getElementById("login-grade").value;
+      const classNum = document.getElementById("login-class").value.trim();
+      const number = document.getElementById("login-number").value.trim();
+      const name = document.getElementById("login-name").value.trim();
       const pass = document.getElementById("login-password").value;
-      handleLogin(user, pass);
+      handleLogin(grade, classNum, number, name, pass);
     }
   });
   
+  // Handle Signup submission
   const signupForm = document.getElementById("signup-form");
   signupForm.addEventListener("submit", (e) => {
     e.preventDefault();
     if (validateSignupForm()) {
-      const user = document.getElementById("signup-username").value.trim();
-      const pass = document.getElementById("signup-password").value;
-      const name = document.getElementById("signup-name").value.trim();
-      const phone = document.getElementById("signup-phone").value.trim();
-      const school = document.getElementById("signup-school").value.trim();
       const grade = document.getElementById("signup-grade").value;
-      const classNum = document.getElementById("signup-class").value;
-      const number = document.getElementById("signup-number").value;
-      
-      handleSignUp(user, pass, name, phone, school, grade, classNum, number);
+      const classNum = document.getElementById("signup-class").value.trim();
+      const number = document.getElementById("signup-number").value.trim();
+      const name = document.getElementById("signup-name").value.trim();
+      const pass = document.getElementById("signup-password").value;
+      handleSignUp(grade, classNum, number, name, pass);
     }
   });
 
-  // Handle Contest Submission Form
   const subForm = document.getElementById("submission-form");
   subForm.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -886,13 +936,29 @@ function setupEventListeners() {
 // ====================================================
 function validateLoginForm() {
   let isValid = true;
-  const user = document.getElementById("login-username");
+  
+  const grade = document.getElementById("login-grade");
+  const classNum = document.getElementById("login-class");
+  const number = document.getElementById("login-number");
+  const name = document.getElementById("login-name");
   const pass = document.getElementById("login-password");
   
   document.querySelectorAll("#login-form .form-group").forEach(g => g.classList.remove("has-error"));
   
-  if (!user.value.trim()) {
-    user.parentElement.classList.add("has-error");
+  if (!grade.value) {
+    grade.parentElement.classList.add("has-error");
+    isValid = false;
+  }
+  if (!classNum.value || classNum.value < 1) {
+    classNum.parentElement.classList.add("has-error");
+    isValid = false;
+  }
+  if (!number.value || number.value < 1) {
+    number.parentElement.classList.add("has-error");
+    isValid = false;
+  }
+  if (!name.value.trim()) {
+    name.parentElement.classList.add("has-error");
     isValid = false;
   }
   if (!pass.value) {
@@ -906,40 +972,14 @@ function validateLoginForm() {
 function validateSignupForm() {
   let isValid = true;
   
-  const user = document.getElementById("signup-username");
-  const pass = document.getElementById("signup-password");
-  const name = document.getElementById("signup-name");
-  const phone = document.getElementById("signup-phone");
-  const school = document.getElementById("signup-school");
   const grade = document.getElementById("signup-grade");
   const classNum = document.getElementById("signup-class");
   const number = document.getElementById("signup-number");
+  const name = document.getElementById("signup-name");
+  const pass = document.getElementById("signup-password");
   
   document.querySelectorAll("#signup-form .form-group").forEach(g => g.classList.remove("has-error"));
   
-  if (!user.value.trim() || user.value.trim().length < 4) {
-    user.parentElement.classList.add("has-error");
-    isValid = false;
-  }
-  if (!pass.value || pass.value.length < 4) {
-    pass.parentElement.classList.add("has-error");
-    isValid = false;
-  }
-  if (!name.value.trim()) {
-    name.parentElement.classList.add("has-error");
-    isValid = false;
-  }
-  
-  const phoneRegex = /^[0-9]{3}-[0-9]{3,4}-[0-9]{4}$/;
-  if (!phoneRegex.test(phone.value)) {
-    phone.parentElement.classList.add("has-error");
-    isValid = false;
-  }
-  
-  if (!school.value.trim()) {
-    school.parentElement.classList.add("has-error");
-    isValid = false;
-  }
   if (!grade.value) {
     grade.parentElement.classList.add("has-error");
     isValid = false;
@@ -952,14 +992,20 @@ function validateSignupForm() {
     number.parentElement.classList.add("has-error");
     isValid = false;
   }
+  if (!name.value.trim()) {
+    name.parentElement.classList.add("has-error");
+    isValid = false;
+  }
+  if (!pass.value || pass.value.length < 4) {
+    pass.parentElement.classList.add("has-error");
+    isValid = false;
+  }
   
   return isValid;
 }
 
 function validateSubmissionForm() {
   let isValid = true;
-  
-  // Clear previous errors
   document.querySelectorAll("#submission-form .form-group").forEach(g => g.classList.remove("has-error"));
 
   if (activeContest.submissionType === "image") {
@@ -1003,19 +1049,18 @@ function validateSubmissionForm() {
 // ====================================================
 // EXECUTE CONTEST SUBMISSION ACTION
 // ====================================================
-function executeSubmit() {
-  if (!currentUser) return; // Prevent submissions if logged out
+async function executeSubmit() {
+  if (!currentUser) return; 
   
   const contestId = document.getElementById("form-contest-id").value;
+  const entryId = `${activeContest.id}_${Date.now()}`;
 
   const newEntry = {
-    id: `${activeContest.id}_${Date.now()}`,
+    id: entryId,
     contestId: contestId,
     contestTitle: activeContest.title,
-    studentUsername: currentUser.username, // Secure relation map to current user
+    studentUsername: currentUser.userKey, 
     studentName: currentUser.name,
-    studentPhone: currentUser.phone,
-    studentSchool: currentUser.school,
     studentGrade: currentUser.grade,
     studentClass: currentUser.classNum,
     studentNumber: currentUser.number,
@@ -1044,30 +1089,88 @@ function executeSubmit() {
     }
   }
 
+  // 1. Remote DB Cloud Mode
+  if (GOOGLE_SHEET_API_URL) {
+    showToast("작품을 구글 클라우드 시트에 업로드 중...", "info");
+    const payload = {
+      action: "submitContest",
+      entry: newEntry
+    };
+    try {
+      const response = await fetch(GOOGLE_SHEET_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json();
+      
+      if (result.status === "error") {
+        showToast(result.message, "error");
+        return;
+      }
+      
+      showToast(`${activeContest.title} 대회의 작품 접수가 성공적으로 구글 시트에 기록되었습니다! 🎨`, "success");
+      closeContestDrawer();
+      updateLiveCounters();
+      return;
+    } catch (e) {
+      console.error(e);
+      showToast("원격 구글 서버 연동 지연. 로컬 브라우저에 임시 백업됩니다.", "error");
+    }
+  }
+
+  // 2. Fallback Local Mode
   const allSubmissions = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
   allSubmissions.push(newEntry);
   localStorage.setItem("soro_submissions", JSON.stringify(allSubmissions));
 
   showToast(`${activeContest.title} 대회의 작품 접수가 성공적으로 완료되었습니다! 🎨`, "success");
-  
   closeContestDrawer();
   updateLiveCounters();
 }
 
 // ====================================================
-// LOOKUP REGISTERED SUBMISSIONS FOR CURRENT LOGGED-IN USER
+// LOOKUP SUBMISSIONS FROM REMOTE OR LOCAL DB
 // ====================================================
-function executeLoggedInLookup() {
+async function executeLoggedInLookup() {
   if (!currentUser) return;
   
-  const allSubmissions = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
-  
-  // Filter submissions made by currently active logged-in user
-  const mySubmissions = allSubmissions.filter(entry => 
-    entry.studentUsername.toLowerCase() === currentUser.username.toLowerCase()
-  );
-
   const container = document.getElementById("results-container");
+  container.innerHTML = `<div class="empty-results">내역을 안전하게 불러오고 있습니다...</div>`;
+
+  let mySubmissions = [];
+
+  // 1. Remote DB Cloud Mode
+  if (GOOGLE_SHEET_API_URL) {
+    const payload = {
+      action: "getSubmissions",
+      studentUsername: currentUser.userKey
+    };
+    try {
+      const response = await fetch(GOOGLE_SHEET_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json();
+      if (result.status === "success") {
+        mySubmissions = result.data;
+      }
+    } catch (e) {
+      console.error(e);
+      showToast("원격 서버 데이터 수신 실패. 로컬 백업을 조회합니다.", "error");
+      GOOGLE_SHEET_API_URL_error = true;
+    }
+  }
+
+  // 2. Fallback Local Mode
+  if (!GOOGLE_SHEET_API_URL || mySubmissions.length === 0) {
+    const allSubmissions = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
+    mySubmissions = allSubmissions.filter(entry => 
+      entry.studentUsername.toLowerCase() === currentUser.userKey.toLowerCase()
+    );
+  }
+
   container.innerHTML = "";
 
   if (mySubmissions.length === 0) {
@@ -1087,25 +1190,28 @@ function executeLoggedInLookup() {
     
     let contentHtml = "";
     
-    if (entry.data.image) {
+    // Parse data structure depending on how it was stored
+    const entryData = typeof entry.data === "string" ? JSON.parse(entry.data) : entry.data;
+    
+    if (entryData.image) {
       contentHtml += `
         <div><strong>제출한 이미지 시안:</strong></div>
-        <img class="submission-thumbnail" src="${entry.data.image}" alt="제출 이미지">
+        <img class="submission-thumbnail" src="${entryData.image}" alt="제출 이미지">
       `;
     } 
     
-    else if (entry.data["book-title"]) {
+    else if (entryData["book-title"]) {
       contentHtml += `
-        <div><strong>추천 도서:</strong> ${entry.data["book-title"]} (${entry.data["book-author"] || "저자 미상"})</div>
-        <div><strong>추천 사유 & 평점:</strong> "${entry.data["book-review"]}"</div>
+        <div><strong>추천 도서:</strong> ${entryData["book-title"]} (${entryData["book-author"] || "저자 미상"})</div>
+        <div><strong>추천 사유 & 평점:</strong> "${entryData["book-review"]}"</div>
       `;
     } 
     
-    else if (entry.data.type === "text") {
+    else if (entryData.type === "text") {
       contentHtml += `
         <div><strong>필사 텍스트 구절:</strong></div>
         <div style="font-family: serif; white-space: pre-line; background: var(--bg-tertiary); padding: 12px; border-radius: 6px; margin-top: 4px; border: 1px solid var(--border-color); color: var(--text-primary);">
-          ${entry.data.text}
+          ${entryData.text}
         </div>
       `;
     }
@@ -1118,7 +1224,7 @@ function executeLoggedInLookup() {
         </div>
       </div>
       <div class="submitted-card-body">
-        <div><strong>소속 인적 사항:</strong> ${entry.studentSchool} ${entry.studentGrade}학년 ${entry.studentClass}반 ${entry.studentNumber}번</div>
+        <div><strong>소속 인적 사항:</strong> ${entry.studentGrade}학년 ${entry.studentClass} ${entry.studentNumber}</div>
         ${contentHtml}
       </div>
       <div class="submitted-card-footer">
@@ -1135,12 +1241,38 @@ function executeLoggedInLookup() {
   });
 }
 
-// Global hook for secure cancellation
-window.confirmDeleteEntry = function(entryId) {
+// Global deletion call (Supports Remote/Local)
+window.confirmDeleteEntry = async function(entryId) {
   if (confirm("정말 이 작품의 접수를 취소하고 삭제하시겠습니까? 한 번 지워진 접수 데이터는 복구할 수 없습니다.")) {
+    
+    // 1. Remote DB Cloud Mode
+    if (GOOGLE_SHEET_API_URL) {
+      showToast("원격 구글 스프레드시트에서 접수를 파기하고 있습니다...", "info");
+      const payload = {
+        action: "deleteSubmission",
+        id: entryId
+      };
+      try {
+        const response = await fetch(GOOGLE_SHEET_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        
+        if (result.status === "error") {
+          showToast(result.message, "error");
+          return;
+        }
+      } catch (e) {
+        console.error(e);
+        showToast("원격 서버 통신 지연. 로컬 삭제를 실행합니다.", "error");
+      }
+    }
+
+    // 2. Fallback Local Mode
     const allSubmissions = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
     const updatedSubmissions = allSubmissions.filter(entry => entry.id !== entryId);
-    
     localStorage.setItem("soro_submissions", JSON.stringify(updatedSubmissions));
     
     const element = document.getElementById(`entry-${entryId}`);
@@ -1162,7 +1294,7 @@ window.confirmDeleteEntry = function(entryId) {
       }, 300);
     }
     
-    showToast("작품 접수 정보가 정상적으로 파기되었습니다.", "success");
+    showToast("작품 접수 정보가 성공적으로 취소 및 삭제 처리되었습니다.", "success");
     updateLiveCounters();
   }
 };
@@ -1170,15 +1302,39 @@ window.confirmDeleteEntry = function(entryId) {
 // ====================================================
 // COUNTERS & TOAST NOTIFICATION UTILITIES
 // ====================================================
-function updateLiveCounters() {
-  const allSubmissions = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
+async function updateLiveCounters() {
+  let count = 0;
   
   if (currentUser) {
-    // Only count active logged-in user's entries
+    if (GOOGLE_SHEET_API_URL) {
+      // Quietly query count from Google Sheets
+      const payload = {
+        action: "getSubmissions",
+        studentUsername: currentUser.userKey
+      };
+      try {
+        const response = await fetch(GOOGLE_SHEET_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        if (result.status === "success") {
+          count = result.data.length;
+          document.getElementById("stat-my-submissions").textContent = `${count}개`;
+          return;
+        }
+      } catch (e) {
+        // Fallback silently to local
+      }
+    }
+    
+    const allSubmissions = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
     const mySubmissions = allSubmissions.filter(entry => 
-      entry.studentUsername.toLowerCase() === currentUser.username.toLowerCase()
+      entry.studentUsername.toLowerCase() === currentUser.userKey.toLowerCase()
     );
-    document.getElementById("stat-my-submissions").textContent = `${mySubmissions.length}개`;
+    count = mySubmissions.length;
+    document.getElementById("stat-my-submissions").textContent = `${count}개`;
   } else {
     document.getElementById("stat-my-submissions").textContent = "0개";
   }
@@ -1208,3 +1364,164 @@ function showToast(message, type = "info") {
     setTimeout(() => toast.remove(), 400);
   }, 4000);
 }
+
+/*
+========================================================================
+[원클릭 연동] GOOGLE APPS SCRIPT 백엔드 소스코드 가이드라인
+========================================================================
+구글 스프레드시트를 생성하고 [확장 프로그램] -> [Apps Script]를 클릭한 뒤,
+기존 코드를 모두 삭제하고 아래 코드를 복사해서 붙여넣으세요!
+
+1. 스프레드시트에 "Users" 시트와 "Submissions" 시트를 각각 새 탭으로 추가해 주세요.
+2. 아래 코드를 붙여넣은 뒤, 상단의 [배포] -> [새 배포]를 클릭합니다.
+3. 유형 선택에서 [웹 앱]을 선택합니다.
+4. 설명에 "SORO DB API" 입력 후, [액세스 권한이 있는 사용자]를 [모든 사용자(Anyone)]로 설정하고 배포합니다.
+5. 배포 완료 시 생성되는 "웹 앱 URL"을 복사하여 본 app.js 파일의 최상단 'GOOGLE_SHEET_API_URL'에 붙여넣으세요.
+
+====================== 복사할 Apps Script 코드 시작 ======================
+
+function doPost(e) {
+  var response = { status: "error", message: "알 수 없는 요청" };
+  
+  try {
+    var requestData = JSON.parse(e.postData.contents);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    
+    // 1. 회원가입 액션 (Users 시트)
+    if (requestData.action === "signUp") {
+      var sheet = ss.getSheetByName("Users");
+      if (!sheet) {
+        sheet = ss.insertSheet("Users");
+        sheet.appendRow(["UserKey", "Grade", "ClassNum", "Number", "Name", "Password"]);
+      }
+      
+      var data = sheet.getDataRange().getValues();
+      var exists = false;
+      for (var i = 1; i < data.length; i++) {
+        if (data[i][0] === requestData.userKey) {
+          exists = true;
+          break;
+        }
+      }
+      
+      if (exists) {
+        response = { status: "error", message: "이미 동일한 정보로 가입된 계정이 존재합니다." };
+      } else {
+        sheet.appendRow([
+          requestData.userKey,
+          requestData.grade,
+          requestData.classNum,
+          requestData.number,
+          requestData.name,
+          requestData.password
+        ]);
+        response = { status: "success", message: "가입 완료" };
+      }
+    }
+    
+    // 2. 로그인 액션 (Users 시트 검증)
+    else if (requestData.action === "login") {
+      var sheet = ss.getSheetByName("Users");
+      var authenticated = false;
+      
+      if (sheet) {
+        var data = sheet.getDataRange().getValues();
+        for (var i = 1; i < data.length; i++) {
+          if (data[i][0] === requestData.userKey && String(data[i][5]) === String(requestData.password)) {
+            authenticated = true;
+            break;
+          }
+        }
+      }
+      
+      if (authenticated) {
+        response = { status: "success", message: "인증 성공" };
+      } else {
+        response = { status: "error", message: "학년/반/번호/이름 또는 비밀번호가 틀렸습니다." };
+      }
+    }
+    
+    // 3. 작품 응모 액션 (Submissions 시트)
+    else if (requestData.action === "submitContest") {
+      var sheet = ss.getSheetByName("Submissions");
+      if (!sheet) {
+        sheet = ss.insertSheet("Submissions");
+        sheet.appendRow(["ID", "ContestID", "ContestTitle", "StudentUsername", "StudentName", "StudentGrade", "StudentClass", "StudentNumber", "Timestamp", "DataJSON"]);
+      }
+      
+      var entry = requestData.entry;
+      sheet.appendRow([
+        entry.id,
+        entry.contestId,
+        entry.contestTitle,
+        entry.studentUsername,
+        entry.studentName,
+        entry.studentGrade,
+        entry.studentClass,
+        entry.studentNumber,
+        entry.timestamp,
+        JSON.stringify(entry.data)
+      ]);
+      response = { status: "success", message: "접수 성공" };
+    }
+    
+    // 4. 작품 내역 조회 액션 (Submissions 시트)
+    else if (requestData.action === "getSubmissions") {
+      var sheet = ss.getSheetByName("Submissions");
+      var results = [];
+      
+      if (sheet) {
+        var data = sheet.getDataRange().getValues();
+        for (var i = 1; i < data.length; i++) {
+          if (data[i][3] === requestData.studentUsername) {
+            results.push({
+              id: data[i][0],
+              contestId: data[i][1],
+              contestTitle: data[i][2],
+              studentUsername: data[i][3],
+              studentName: data[i][4],
+              studentGrade: data[i][5],
+              studentClass: data[i][6],
+              studentNumber: data[i][7],
+              timestamp: data[i][8],
+              data: JSON.parse(data[i][9])
+            });
+          }
+        }
+      }
+      response = { status: "success", data: results };
+    }
+    
+    // 5. 작품 접수 취소 액션 (Submissions 시트 행 삭제)
+    else if (requestData.action === "deleteSubmission") {
+      var sheet = ss.getSheetByName("Submissions");
+      var deleted = false;
+      
+      if (sheet) {
+        var data = sheet.getDataRange().getValues();
+        for (var i = data.length - 1; i >= 1; i--) {
+          if (data[i][0] === requestData.id) {
+            sheet.deleteRow(i + 1);
+            deleted = true;
+          }
+        }
+      }
+      
+      if (deleted) {
+        response = { status: "success", message: "삭제 완료" };
+      } else {
+        response = { status: "error", message: "삭제 대상을 찾을 수 없음" };
+      }
+    }
+    
+  } catch (error) {
+    response = { status: "error", message: error.toString() };
+  }
+  
+  // CORS 우회 응답 설정
+  return ContentService.createTextOutput(JSON.stringify(response))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+====================== 복사할 Apps Script 코드 끝 ======================
+*/

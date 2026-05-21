@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="학생들을 위한 6대 연간 공모전 및 이벤트 접수 포털. 회원가입 후 간편하게 키링 공모전, 안전사고 예방 컷툰, 디지털 필사 등 다양한 대회에 응모해보세요.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="학생들을 위한 6대 연간 공모전 및 이벤트 접수 포털. 간편하게 학년, 반, 번호로 가입 후 키링 공모전, 안전사고 예방 컷툰, 디지털 필사 등 다양한 대회에 응모해보세요.">
   <title>SORO | 학생 연간 이벤트 공모전 포털</title>
   
   <!-- Preconnect and Load Premium Web Fonts -->
@@ -31,7 +31,7 @@
       <div class="header-controls">
         <div id="user-profile-badge" class="user-badge" style="display: none;">
           <span class="user-avatar">👤</span>
-          <span id="user-info-text" class="user-info">소로중 3-2 홍길동 학생</span>
+          <span id="user-info-text" class="user-info">3-2 15번 홍길동 학생</span>
         </div>
         
         <button id="lookup-toggle-btn" class="btn btn-secondary" aria-label="내 접수 확인하기" style="display: none;">
@@ -73,7 +73,7 @@
       <h1 class="hero-title">상상력을 현실로,<br><span class="highlight">SORO 학생 공모전</span></h1>
       <p class="hero-subtitle">
         매달 새롭게 열리는 6개의 창의 대회를 통해 여러분의 재능을 마음껏 펼쳐보세요. 
-        간편하게 회원가입 후 단 한 번의 클릭으로 신속하게 작품을 응모할 수 있습니다.
+        학년, 반, 번호로 간편하게 가입 후 단 한 번의 마우스 클릭으로 신속하게 작품을 응모할 수 있습니다.
       </p>
       
       <div class="live-stats">
@@ -152,25 +152,17 @@
                 <input type="text" id="student-name" readonly placeholder="홍길동" class="readonly-field">
               </div>
               <div class="form-group">
-                <label for="student-phone">연락처</label>
-                <input type="tel" id="student-phone" readonly placeholder="010-1234-5678" class="readonly-field">
-              </div>
-            </div>
-
-            <div class="form-group-row school-fields">
-              <div class="form-group">
-                <label for="student-school">학교명</label>
-                <input type="text" id="student-school" readonly placeholder="소로중학교" class="readonly-field">
-              </div>
-              <div class="form-group size-small">
                 <label for="student-grade">학년</label>
                 <input type="text" id="student-grade" readonly placeholder="3학년" class="readonly-field">
               </div>
-              <div class="form-group size-small">
+            </div>
+
+            <div class="form-group-row school-fields" style="grid-template-columns: 1fr 1fr;">
+              <div class="form-group">
                 <label for="student-class">반</label>
                 <input type="text" id="student-class" readonly placeholder="2" class="readonly-field">
               </div>
-              <div class="form-group size-small">
+              <div class="form-group">
                 <label for="student-number">번호</label>
                 <input type="text" id="student-number" readonly placeholder="15" class="readonly-field">
               </div>
@@ -234,19 +226,49 @@
         <!-- 1. LOGIN PANEL -->
         <div id="login-panel" class="auth-panel">
           <h2 class="auth-panel-title">소로 학생 로그인</h2>
-          <p class="auth-panel-desc">가입하신 아이디와 비밀번호로 로그인해 주세요.</p>
+          <p class="auth-panel-desc">가입 시 등록한 학급 정보와 비밀번호로 로그인해 주세요.</p>
           
           <form id="login-form" novalidate>
-            <div class="form-group">
-              <label for="login-username">아이디</label>
-              <input type="text" id="login-username" required placeholder="아이디 입력" autocomplete="username">
-              <span class="error-message">아이디를 입력해주세요.</span>
+            <div class="form-group-row">
+              <div class="form-group">
+                <label for="login-grade">학년</label>
+                <select id="login-grade" required>
+                  <option value="" disabled selected>선택</option>
+                  <option value="1">1학년</option>
+                  <option value="2">2학년</option>
+                  <option value="3">3학년</option>
+                  <option value="4">4학년</option>
+                  <option value="5">5학년</option>
+                  <option value="6">6학년</option>
+                </select>
+                <span class="error-message">선택</span>
+              </div>
+              <div class="form-group">
+                <label for="login-class">반</label>
+                <input type="number" id="login-class" required min="1" max="25" placeholder="2">
+                <span class="error-message">입력</span>
+              </div>
             </div>
+            
+            <div class="form-group-row">
+              <div class="form-group">
+                <label for="login-number">번호</label>
+                <input type="number" id="login-number" required min="1" max="45" placeholder="15">
+                <span class="error-message">입력</span>
+              </div>
+              <div class="form-group">
+                <label for="login-name">이름</label>
+                <input type="text" id="login-name" required placeholder="홍길동" autocomplete="name">
+                <span class="error-message">입력</span>
+              </div>
+            </div>
+
             <div class="form-group">
               <label for="login-password">비밀번호</label>
               <input type="password" id="login-password" required placeholder="비밀번호 입력" autocomplete="current-password">
               <span class="error-message">비밀번호를 입력해주세요.</span>
             </div>
+            
             <button type="submit" class="btn btn-primary btn-block">로그인 완료</button>
           </form>
         </div>
@@ -254,38 +276,11 @@
         <!-- 2. SIGN UP PANEL -->
         <div id="signup-panel" class="auth-panel" style="display: none;">
           <h2 class="auth-panel-title">신규 회원가입</h2>
-          <p class="auth-panel-desc">아래의 참가 정보를 정확하게 입력해 주세요.</p>
+          <p class="auth-panel-desc">아래의 가입 정보를 정확하게 입력해 주세요.</p>
           
           <form id="signup-form" novalidate>
-            <div class="form-group">
-              <label for="signup-username">사용자 아이디 (영문/숫자)</label>
-              <input type="text" id="signup-username" required placeholder="예) student123" autocomplete="username">
-              <span class="error-message">아이디를 4자 이상 입력해주세요.</span>
-            </div>
-            <div class="form-group">
-              <label for="signup-password">비밀번호</label>
-              <input type="password" id="signup-password" required placeholder="비밀번호 입력" autocomplete="new-password">
-              <span class="error-message">비밀번호를 입력해주세요.</span>
-            </div>
             <div class="form-group-row">
               <div class="form-group">
-                <label for="signup-name">학생 이름</label>
-                <input type="text" id="signup-name" required placeholder="홍길동" autocomplete="name">
-                <span class="error-message">이름을 입력해주세요.</span>
-              </div>
-              <div class="form-group">
-                <label for="signup-phone">연락처</label>
-                <input type="tel" id="signup-phone" required placeholder="010-1234-5678">
-                <span class="error-message">010-1234-5678 형식을 유지해주세요.</span>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="signup-school">소속 학교명</label>
-              <input type="text" id="signup-school" required placeholder="예) 소로중학교">
-              <span class="error-message">학교명을 정확하게 적어주세요.</span>
-            </div>
-            <div class="form-group-row school-fields">
-              <div class="form-group size-small">
                 <label for="signup-grade">학년</label>
                 <select id="signup-grade" required>
                   <option value="" disabled selected>선택</option>
@@ -298,17 +293,32 @@
                 </select>
                 <span class="error-message">선택</span>
               </div>
-              <div class="form-group size-small">
+              <div class="form-group">
                 <label for="signup-class">반</label>
                 <input type="number" id="signup-class" required min="1" max="25" placeholder="2">
                 <span class="error-message">입력</span>
               </div>
-              <div class="form-group size-small">
+            </div>
+
+            <div class="form-group-row">
+              <div class="form-group">
                 <label for="signup-number">번호</label>
                 <input type="number" id="signup-number" required min="1" max="45" placeholder="15">
                 <span class="error-message">입력</span>
               </div>
+              <div class="form-group">
+                <label for="signup-name">학생 이름</label>
+                <input type="text" id="signup-name" required placeholder="홍길동" autocomplete="name">
+                <span class="error-message">입력</span>
+              </div>
             </div>
+
+            <div class="form-group">
+              <label for="signup-password">비밀번호 설정</label>
+              <input type="password" id="signup-password" required placeholder="비밀번호 입력" autocomplete="new-password">
+              <span class="error-message">비밀번호를 입력해주세요.</span>
+            </div>
+            
             <button type="submit" class="btn btn-primary btn-block">가입 및 계정 생성</button>
           </form>
         </div>
