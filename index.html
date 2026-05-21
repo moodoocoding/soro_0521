@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="학생들을 위한 6대 연간 공모전 및 이벤트 접수 포털. 회원가입 후 간편하게 키링 공모전, 안전사고 예방 컷툰, 디지털 필사 등 다양한 대회에 응모해보세요.">
+  <title>SORO | 학생 연간 이벤트 공모전 포털</title>
+  
+  <!-- Preconnect and Load Premium Web Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Outfit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+  <!-- Dynamic Noise Overlay for aesthetic texture -->
+  <div class="bg-noise"></div>
+
+  <!-- Header Section -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="logo-area">
+        <span class="logo-text">SORO</span>
+        <span class="logo-divider">/</span>
+        <span class="logo-sub">STUDENTS</span>
+      </div>
+      
+      <!-- Dynamic Header Controls (Auth State Managed) -->
+      <div class="header-controls">
+        <div id="user-profile-badge" class="user-badge" style="display: none;">
+          <span class="user-avatar">👤</span>
+          <span id="user-info-text" class="user-info">소로중 3-2 홍길동 학생</span>
+        </div>
+        
+        <button id="lookup-toggle-btn" class="btn btn-secondary" aria-label="내 접수 확인하기" style="display: none;">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          내 접수 내역
+        </button>
+
+        <button id="auth-trigger-btn" class="btn btn-primary">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13 12H3"></path>
+          </svg>
+          로그인 / 회원가입
+        </button>
+        
+        <button id="logout-btn" class="btn btn-secondary" style="display: none;">
+          로그아웃
+        </button>
+
+        <button id="theme-toggle-btn" class="btn btn-icon" aria-label="테마 전환">
+          <svg id="theme-icon" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Hero Section -->
+  <main class="main-content">
+    <section class="hero">
+      <div class="hero-tag">ANNUAL CONTEST PORTAL</div>
+      <h1 class="hero-title">상상력을 현실로,<br><span class="highlight">SORO 학생 공모전</span></h1>
+      <p class="hero-subtitle">
+        매달 새롭게 열리는 6개의 창의 대회를 통해 여러분의 재능을 마음껏 펼쳐보세요. 
+        간편하게 회원가입 후 단 한 번의 클릭으로 신속하게 작품을 응모할 수 있습니다.
+      </p>
+      
+      <div class="live-stats">
+        <div class="stat-item">
+          <span class="stat-label">현재 가동 월</span>
+          <span id="stat-current-month" class="stat-value">5월</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">진행 중인 대회</span>
+          <span id="stat-active-contests" class="stat-value">0개</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">내 총 제출작</span>
+          <span id="stat-my-submissions" class="stat-value">0개</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contest Cards Grid Section -->
+    <section class="contest-section">
+      <div class="section-header">
+        <h2 class="section-title">2026 연간 라인업</h2>
+        <p class="section-desc">각 대회 카드를 선택하여 공모 요강을 확인하고 응모해 보세요.</p>
+      </div>
+
+      <div id="contests-grid" class="contests-grid">
+        <div class="loading-placeholder">대회 일정을 로드하고 있습니다...</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Sliding Drawer for Contest details & Application -->
+  <div id="contest-drawer" class="drawer" aria-hidden="true">
+    <div class="drawer-overlay" id="contest-drawer-overlay"></div>
+    <div class="drawer-content">
+      <button class="drawer-close-btn" id="contest-drawer-close" aria-label="닫기">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6 6 18M6 6l12 12"></path>
+        </svg>
+      </button>
+      
+      <div class="drawer-body">
+        <div class="drawer-header-visual" id="drawer-visual"></div>
+
+        <div class="drawer-meta">
+          <span id="drawer-badge" class="badge">6월</span>
+          <span id="drawer-status" class="status-indicator">접수 중</span>
+        </div>
+
+        <h2 id="drawer-title" class="drawer-title">키링 공모전</h2>
+        <p id="drawer-summary" class="drawer-summary">나만의 예쁜 키링 디자인을 설계하고 실제 키링 굿즈로 탄생시킬 특별한 기회!</p>
+
+        <!-- Contest Info Tab -->
+        <div class="contest-guide">
+          <h3>공모 요강</h3>
+          <ul class="guide-list" id="drawer-guide-list"></ul>
+        </div>
+
+        <!-- Application Form Area -->
+        <div class="submission-area" id="submission-form-container">
+          <h3 class="form-title">작품 접수하기</h3>
+          
+          <!-- Not Logged In Alert Notice -->
+          <div id="auth-required-notice" class="auth-notice-box" style="display: none;">
+            <div class="auth-notice-icon">🔒</div>
+            <p>공모전 참가 및 접수는 로그인 후에 가능합니다.</p>
+            <button id="auth-redirect-btn" class="btn btn-primary">지금 로그인 / 회원가입하기</button>
+          </div>
+
+          <form id="submission-form" novalidate style="display: none;">
+            <input type="hidden" id="form-contest-id" name="contestId">
+
+            <div class="form-group-row">
+              <div class="form-group">
+                <label for="student-name">참가자 이름</label>
+                <input type="text" id="student-name" readonly placeholder="홍길동" class="readonly-field">
+              </div>
+              <div class="form-group">
+                <label for="student-phone">연락처</label>
+                <input type="tel" id="student-phone" readonly placeholder="010-1234-5678" class="readonly-field">
+              </div>
+            </div>
+
+            <div class="form-group-row school-fields">
+              <div class="form-group">
+                <label for="student-school">학교명</label>
+                <input type="text" id="student-school" readonly placeholder="소로중학교" class="readonly-field">
+              </div>
+              <div class="form-group size-small">
+                <label for="student-grade">학년</label>
+                <input type="text" id="student-grade" readonly placeholder="3학년" class="readonly-field">
+              </div>
+              <div class="form-group size-small">
+                <label for="student-class">반</label>
+                <input type="text" id="student-class" readonly placeholder="2" class="readonly-field">
+              </div>
+              <div class="form-group size-small">
+                <label for="student-number">번호</label>
+                <input type="text" id="student-number" readonly placeholder="15" class="readonly-field">
+              </div>
+            </div>
+
+            <!-- Dynamic content area depending on submission type -->
+            <div id="dynamic-fields-container" class="form-group"></div>
+
+            <button type="submit" id="submit-btn" class="btn btn-primary btn-block">작품 제출 완료하기</button>
+          </form>
+        </div>
+
+        <div class="submission-disabled-notice" id="submission-notice" style="display: none;">
+          <div class="notice-icon">🔒</div>
+          <p id="submission-notice-text">지금은 이 대회의 접수 기간이 아닙니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sliding Drawer for Looking up Submissions (Logged-in Only) -->
+  <div id="lookup-drawer" class="drawer" aria-hidden="true">
+    <div class="drawer-overlay" id="lookup-drawer-overlay"></div>
+    <div class="drawer-content">
+      <button class="drawer-close-btn" id="lookup-drawer-close" aria-label="닫기">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6 6 18M6 6l12 12"></path>
+        </svg>
+      </button>
+
+      <div class="drawer-body">
+        <h2 class="drawer-title">내 접수 내역 확인</h2>
+        <p class="drawer-summary">회원님께서 현재까지 접수 완료하신 소중한 공모 작품 리스트입니다. 실시간 관리 및 취소가 가능합니다.</p>
+
+        <div id="lookup-results" class="lookup-results">
+          <div id="results-container" class="results-container">
+            <!-- Dynamic entries results here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sliding Drawer for Authentication (Login / Sign Up) -->
+  <div id="auth-drawer" class="drawer" aria-hidden="true">
+    <div class="drawer-overlay" id="auth-drawer-overlay"></div>
+    <div class="drawer-content">
+      <button class="drawer-close-btn" id="auth-drawer-close" aria-label="닫기">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6 6 18M6 6l12 12"></path>
+        </svg>
+      </button>
+
+      <div class="drawer-body">
+        <!-- Tab Headers -->
+        <div class="auth-tabs">
+          <button id="tab-login-btn" class="auth-tab-btn active">로그인</button>
+          <button id="tab-signup-btn" class="auth-tab-btn">회원가입</button>
+        </div>
+
+        <!-- 1. LOGIN PANEL -->
+        <div id="login-panel" class="auth-panel">
+          <h2 class="auth-panel-title">소로 학생 로그인</h2>
+          <p class="auth-panel-desc">가입하신 아이디와 비밀번호로 로그인해 주세요.</p>
+          
+          <form id="login-form" novalidate>
+            <div class="form-group">
+              <label for="login-username">아이디</label>
+              <input type="text" id="login-username" required placeholder="아이디 입력" autocomplete="username">
+              <span class="error-message">아이디를 입력해주세요.</span>
+            </div>
+            <div class="form-group">
+              <label for="login-password">비밀번호</label>
+              <input type="password" id="login-password" required placeholder="비밀번호 입력" autocomplete="current-password">
+              <span class="error-message">비밀번호를 입력해주세요.</span>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">로그인 완료</button>
+          </form>
+        </div>
+
+        <!-- 2. SIGN UP PANEL -->
+        <div id="signup-panel" class="auth-panel" style="display: none;">
+          <h2 class="auth-panel-title">신규 회원가입</h2>
+          <p class="auth-panel-desc">아래의 참가 정보를 정확하게 입력해 주세요.</p>
+          
+          <form id="signup-form" novalidate>
+            <div class="form-group">
+              <label for="signup-username">사용자 아이디 (영문/숫자)</label>
+              <input type="text" id="signup-username" required placeholder="예) student123" autocomplete="username">
+              <span class="error-message">아이디를 4자 이상 입력해주세요.</span>
+            </div>
+            <div class="form-group">
+              <label for="signup-password">비밀번호</label>
+              <input type="password" id="signup-password" required placeholder="비밀번호 입력" autocomplete="new-password">
+              <span class="error-message">비밀번호를 입력해주세요.</span>
+            </div>
+            <div class="form-group-row">
+              <div class="form-group">
+                <label for="signup-name">학생 이름</label>
+                <input type="text" id="signup-name" required placeholder="홍길동" autocomplete="name">
+                <span class="error-message">이름을 입력해주세요.</span>
+              </div>
+              <div class="form-group">
+                <label for="signup-phone">연락처</label>
+                <input type="tel" id="signup-phone" required placeholder="010-1234-5678">
+                <span class="error-message">010-1234-5678 형식을 유지해주세요.</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="signup-school">소속 학교명</label>
+              <input type="text" id="signup-school" required placeholder="예) 소로중학교">
+              <span class="error-message">학교명을 정확하게 적어주세요.</span>
+            </div>
+            <div class="form-group-row school-fields">
+              <div class="form-group size-small">
+                <label for="signup-grade">학년</label>
+                <select id="signup-grade" required>
+                  <option value="" disabled selected>선택</option>
+                  <option value="1">1학년</option>
+                  <option value="2">2학년</option>
+                  <option value="3">3학년</option>
+                  <option value="4">4학년</option>
+                  <option value="5">5학년</option>
+                  <option value="6">6학년</option>
+                </select>
+                <span class="error-message">선택</span>
+              </div>
+              <div class="form-group size-small">
+                <label for="signup-class">반</label>
+                <input type="number" id="signup-class" required min="1" max="25" placeholder="2">
+                <span class="error-message">입력</span>
+              </div>
+              <div class="form-group size-small">
+                <label for="signup-number">번호</label>
+                <input type="number" id="signup-number" required min="1" max="45" placeholder="15">
+                <span class="error-message">입력</span>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">가입 및 계정 생성</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Time-travel Admin Bar (Simulated Calendar) -->
+  <div class="admin-calendar-bar">
+    <div class="admin-inner">
+      <span class="admin-tag">TEST TOOL</span>
+      <span class="admin-desc">대회 상태 변경 테스트를 위해 가상의 현재 날짜(월)를 변경해보세요:</span>
+      <div class="month-selector-buttons">
+        <button class="month-btn" data-month="5">5월</button>
+        <button class="month-btn" data-month="6">6월</button>
+        <button class="month-btn" data-month="7">7월</button>
+        <button class="month-btn" data-month="8">8월</button>
+        <button class="month-btn" data-month="9">9월</button>
+        <button class="month-btn" data-month="10">10월</button>
+        <button class="month-btn" data-month="11">11월</button>
+        <button class="month-btn" data-month="12">12월</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Main JavaScript -->
+  <script src="app.js"></script>
+</body>
+</html>
