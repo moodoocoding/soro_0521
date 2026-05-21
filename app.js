@@ -4,7 +4,7 @@
 // [가이드] 구글 스프레드시트 연동 완료 후, 아래 공란에 구글 Apps Script 웹앱 배포 URL을 입력해 주세요.
 // 예시: "https://script.google.com/macros/s/AKfycbz.../exec"
 // 이 주소가 비어있는 동안에는 브라우저의 localStorage 로컬 DB 모드로 즉시 원활히 시뮬레이션 작동합니다.
-const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxE1kAeZ9inLbkhQiQ-SA3DLWf8uW59GLL02421-I-_gJLgCnDrWxXihkOfSlmpitb2Vg/exec"; 
+const GOOGLE_SHEET_API_URL = "";
 
 // ====================================================
 // CONTEST DATA AND INLINE ILLUSTRATIONS (SVG)
@@ -156,9 +156,20 @@ const CONTESTS_DATA = [
 // ====================================================
 // STATE MANAGEMENT & USER SESSION CONFIGURATION
 // ====================================================
-let currentVirtualMonth = 5; 
+let currentVirtualMonth = new Date().getMonth() + 1;
+
+function getContestStatus(contestMonth) {
+  if (contestMonth === currentVirtualMonth) {
+    return "active";
+  } else if (contestMonth > currentVirtualMonth) {
+    return "pending";
+  } else {
+    return "closed";
+  }
+}
+
 let activeContest = null;
-let uploadBase64Data = null; 
+let uploadBase64Data = null;
 
 // User Authentication States
 let currentUser = null;
@@ -178,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function initTheme() {
   const savedTheme = localStorage.getItem("soro_theme") || "dark";
   const body = document.body;
-  
+
   if (savedTheme === "light") {
     body.classList.remove("dark-theme");
     body.classList.add("light-theme");
@@ -193,7 +204,7 @@ function initTheme() {
 function toggleTheme() {
   const body = document.body;
   let newTheme = "dark";
-  
+
   if (body.classList.contains("dark-theme")) {
     body.classList.remove("dark-theme");
     body.classList.add("light-theme");
@@ -203,7 +214,7 @@ function toggleTheme() {
     body.classList.add("dark-theme");
     newTheme = "dark";
   }
-  
+
   localStorage.setItem("soro_theme", newTheme);
   updateThemeIcon(newTheme);
   showToast(`${newTheme === "dark" ? "다크 테마" : "라이트 테마"}로 변경되었습니다.`, "info");
@@ -211,6 +222,7 @@ function toggleTheme() {
 
 function updateThemeIcon(theme) {
   const themeIcon = document.getElementById("theme-icon");
+  if (!themeIcon) return;
   if (theme === "light") {
     themeIcon.innerHTML = `
       <path d="M12 3a6.79 6.79 0 0 0-6.79 6.79A6.79 6.79 0 0 0 12 16.58a6.59 6.59 0 0 0 4.13-1.45l.13-.1 1.62 1.62.1.13A9.76 9.76 0 0 1 12 21a9 9 0 1 1 0-18Z"></path>
@@ -231,41 +243,28 @@ function initVirtualTime() {
   if (savedMonth) {
     currentVirtualMonth = parseInt(savedMonth, 10);
   }
-  
-  const buttons = document.querySelectorAll(".month-btn");
-  buttons.forEach(btn => {
-    const monthVal = parseInt(btn.getAttribute("data-month"), 10);
-    if (monthVal === currentVirtualMonth) {
-      btn.classList.add("active");
-    } else {
-      btn.classList.remove("active");
-    }
-  });
 
-  document.getElementById("stat-current-month").textContent = `${currentVirtualMonth}월`;
+  const statMonthEl = document.getElementById("stat-current-month");
+  if (statMonthEl) {
+    statMonthEl.textContent = `${currentVirtualMonth}월`;
+  }
 }
 
 function setVirtualMonth(month) {
   currentVirtualMonth = month;
   sessionStorage.setItem("soro_virtual_month", month);
-  
-  document.querySelectorAll(".month-btn").forEach(btn => {
-    const monthVal = parseInt(btn.getAttribute("data-month"), 10);
-    if (monthVal === currentVirtualMonth) {
-      btn.classList.add("active");
-    } else {
-      btn.classList.remove("active");
-    }
-  });
-  
-  document.getElementById("stat-current-month").textContent = `${currentVirtualMonth}월`;
+
+  const statMonthEl = document.getElementById("stat-current-month");
+  if (statMonthEl) {
+    statMonthEl.textContent = `${currentVirtualMonth}월`;
+  }
   renderContestGrid();
   updateLiveCounters();
-  
+
   if (activeContest) {
     openContestDetails(activeContest.id);
   }
-  
+
   showToast(`가상의 현재 날짜가 [${month}월]로 변경되었습니다.`, "info");
 }
 
@@ -287,14 +286,14 @@ function updateUIForLoggedInState() {
   document.getElementById("auth-trigger-btn").style.display = "none";
   document.getElementById("logout-btn").style.display = "inline-flex";
   document.getElementById("lookup-toggle-btn").style.display = "inline-flex";
-  
+
   const profileBadge = document.getElementById("user-profile-badge");
   const infoText = document.getElementById("user-info-text");
-  
+
   // Format: 학년-반 번호 이름
   infoText.textContent = `${currentUser.grade}-${currentUser.classNum} ${currentUser.number}번 ${currentUser.name}`;
   profileBadge.style.display = "inline-flex";
-  
+
   closeAuthDrawer();
 }
 
@@ -310,18 +309,18 @@ function executeLogout() {
   currentUser = null;
   updateUIForLoggedOutState();
   updateLiveCounters();
-  
+
   if (activeContest) {
     openContestDetails(activeContest.id);
   }
-  
+
   showToast("로그아웃 되었습니다.", "info");
 }
 
 // REST API or Local Sign Up
 async function handleSignUp(grade, classNum, number, name, password) {
   const userKey = `${grade}_${classNum}_${number}_${name}`; // Unique Identifier Key
-  
+
   const payload = {
     action: "signUp",
     userKey: userKey,
@@ -331,7 +330,7 @@ async function handleSignUp(grade, classNum, number, name, password) {
     name: name,
     password: password
   };
-  
+
   // 1. Remote DB Cloud Mode (Google Sheets Apps Script API URL active)
   if (GOOGLE_SHEET_API_URL) {
     showToast("클라우드 서버에 등록하고 있습니다...", "info");
@@ -342,12 +341,12 @@ async function handleSignUp(grade, classNum, number, name, password) {
         body: JSON.stringify(payload)
       });
       const result = await response.json();
-      
+
       if (result.status === "error") {
         showToast(result.message, "error");
         return false;
       }
-      
+
       const loggedUser = { userKey, grade, classNum, number, name };
       currentUser = loggedUser;
       localStorage.setItem("soro_current_user", JSON.stringify(loggedUser));
@@ -361,7 +360,7 @@ async function handleSignUp(grade, classNum, number, name, password) {
       showToast("원격 구글 서버 접속이 원활하지 않습니다. 로컬 저장을 이용합니다.", "error");
     }
   }
-  
+
   // 2. Fallback Local Mode
   const users = JSON.parse(localStorage.getItem("soro_users") || "[]");
   const exists = users.find(u => u.userKey === userKey);
@@ -369,7 +368,7 @@ async function handleSignUp(grade, classNum, number, name, password) {
     showToast("이미 동일한 정보로 가입된 학생 계정이 존재합니다.", "error");
     return false;
   }
-  
+
   const newUser = {
     userKey: userKey,
     grade: grade,
@@ -378,15 +377,15 @@ async function handleSignUp(grade, classNum, number, name, password) {
     name: name,
     password: password
   };
-  
+
   users.push(newUser);
   localStorage.setItem("soro_users", JSON.stringify(users));
-  
+
   currentUser = newUser;
   localStorage.setItem("soro_current_user", JSON.stringify(newUser));
   updateUIForLoggedInState();
   updateLiveCounters();
-  
+
   if (activeContest) openContestDetails(activeContest.id);
   showToast(`${name} 학생의 가입과 로그인이 완료되었습니다! 🎉`, "success");
   return true;
@@ -395,7 +394,7 @@ async function handleSignUp(grade, classNum, number, name, password) {
 // REST API or Local Login
 async function handleLogin(grade, classNum, number, name, password) {
   const userKey = `${grade}_${classNum}_${number}_${name}`;
-  
+
   const payload = {
     action: "login",
     userKey: userKey,
@@ -412,12 +411,12 @@ async function handleLogin(grade, classNum, number, name, password) {
         body: JSON.stringify(payload)
       });
       const result = await response.json();
-      
+
       if (result.status === "error") {
         showToast(result.message, "error");
         return false;
       }
-      
+
       const loggedUser = { userKey, grade, classNum, number, name };
       currentUser = loggedUser;
       localStorage.setItem("soro_current_user", JSON.stringify(loggedUser));
@@ -435,17 +434,17 @@ async function handleLogin(grade, classNum, number, name, password) {
   // 2. Fallback Local Mode
   const users = JSON.parse(localStorage.getItem("soro_users") || "[]");
   const user = users.find(u => u.userKey === userKey && u.password === password);
-  
+
   if (!user) {
     showToast("학년/반/번호/이름 또는 비밀번호가 일치하지 않습니다.", "error");
     return false;
   }
-  
+
   currentUser = user;
   localStorage.setItem("soro_current_user", JSON.stringify(user));
   updateUIForLoggedInState();
   updateLiveCounters();
-  
+
   if (activeContest) openContestDetails(activeContest.id);
   showToast(`${user.name} 학생, 로그인 성공을 환영합니다! 🚀`, "success");
   return true;
@@ -458,7 +457,7 @@ function openAuthDrawer(defaultTab = "login") {
   const drawer = document.getElementById("auth-drawer");
   drawer.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
-  
+
   switchAuthTab(defaultTab);
 }
 
@@ -466,7 +465,7 @@ function closeAuthDrawer() {
   const drawer = document.getElementById("auth-drawer");
   drawer.setAttribute("aria-hidden", "true");
   document.body.style.overflow = "";
-  
+
   document.getElementById("login-form").reset();
   document.getElementById("signup-form").reset();
   document.querySelectorAll(".auth-panel .form-group.has-error").forEach(g => g.classList.remove("has-error"));
@@ -477,7 +476,7 @@ function switchAuthTab(tabName) {
   const tabSignup = document.getElementById("tab-signup-btn");
   const panelLogin = document.getElementById("login-panel");
   const panelSignup = document.getElementById("signup-panel");
-  
+
   if (tabName === "login") {
     tabLogin.classList.add("active");
     tabSignup.classList.remove("active");
@@ -503,7 +502,7 @@ function renderContestGrid() {
     const status = getContestStatus(contest.month);
     let statusClass = "status-pending";
     let statusLabel = "접수 대기";
-    
+
     if (status === "active") {
       statusClass = "status-active";
       statusLabel = "접수 중";
@@ -516,7 +515,7 @@ function renderContestGrid() {
     const card = document.createElement("div");
     card.className = "contest-card";
     card.setAttribute("data-id", contest.id);
-    
+
     card.innerHTML = `
       <div class="card-top">
         <div class="card-meta">
@@ -540,7 +539,7 @@ function renderContestGrid() {
         </button>
       </div>
     `;
-    
+
     card.addEventListener("mousemove", (e) => {
       const rect = card.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -548,11 +547,11 @@ function renderContestGrid() {
       card.style.setProperty("--mouse-x", `${x}px`);
       card.style.setProperty("--mouse-y", `${y}px`);
     });
-    
+
     card.addEventListener("click", () => openContestDetails(contest.id));
     grid.appendChild(card);
   });
-  
+
   document.getElementById("stat-active-contests").textContent = `${activeCount}개`;
 }
 
@@ -562,57 +561,57 @@ function renderContestGrid() {
 function openContestDetails(contestId) {
   const contest = CONTESTS_DATA.find(c => c.id === contestId);
   if (!contest) return;
-  
+
   activeContest = contest;
-  uploadBase64Data = null; 
-  
+  uploadBase64Data = null;
+
   const drawer = document.getElementById("contest-drawer");
   const drawerTitle = document.getElementById("drawer-title");
   const drawerSummary = document.getElementById("drawer-summary");
   const drawerBadge = document.getElementById("drawer-badge");
   const drawerStatus = document.getElementById("drawer-status");
   const guideList = document.getElementById("drawer-guide-list");
-  
+
   const formContainer = document.getElementById("submission-form-container");
   const noticeContainer = document.getElementById("submission-notice");
   const noticeText = document.getElementById("submission-notice-text");
-  
+
   const subForm = document.getElementById("submission-form");
   const authNotice = document.getElementById("auth-required-notice");
 
   drawerBadge.textContent = contest.monthText;
   drawerTitle.textContent = contest.title;
   drawerSummary.textContent = contest.description;
-  
+
   const visualHeader = document.getElementById("drawer-visual");
   visualHeader.style.background = getGradientForContest(contest.id);
   visualHeader.innerHTML = contest.icon;
-  
+
   guideList.innerHTML = "";
   contest.rules.forEach(rule => {
     const li = document.createElement("li");
     li.textContent = rule;
     guideList.appendChild(li);
   });
-  
+
   const status = getContestStatus(contest.month);
   document.getElementById("form-contest-id").value = contest.id;
-  
+
   if (status === "active") {
     drawerStatus.textContent = "접수 진행 중 (Active)";
     drawerStatus.className = "status-indicator status-active";
     formContainer.style.display = "block";
     noticeContainer.style.display = "none";
-    
+
     if (currentUser) {
       authNotice.style.display = "none";
       subForm.style.display = "block";
-      
+
       document.getElementById("student-name").value = currentUser.name;
       document.getElementById("student-grade").value = `${currentUser.grade}학년`;
       document.getElementById("student-class").value = `${currentUser.classNum}반`;
       document.getElementById("student-number").value = `${currentUser.number}번`;
-      
+
       setupDynamicFormFields(contest);
     } else {
       authNotice.style.display = "flex";
@@ -631,7 +630,7 @@ function openContestDetails(contestId) {
     noticeContainer.style.display = "block";
     noticeText.innerHTML = `🔒 <strong>이 대회의 접수가 종료되었습니다.</strong><br>2026년 ${contest.month}월 한 달 간 진행되었던 작품 접수가 완료되었습니다.`;
   }
-  
+
   drawer.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
 }
@@ -640,19 +639,19 @@ function closeContestDrawer() {
   const drawer = document.getElementById("contest-drawer");
   drawer.setAttribute("aria-hidden", "true");
   document.body.style.overflow = "";
-  
+
   document.getElementById("submission-form").reset();
   document.querySelectorAll("#submission-form .form-group.has-error").forEach(e => e.classList.remove("has-error"));
 }
 
 function getGradientForContest(id) {
   const gradients = {
-    keyring: "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",      
-    cuttoon: "linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)",      
-    library: "linear-gradient(135deg, #10b981 0%, #3b82f6 100%)",      
+    keyring: "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
+    cuttoon: "linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)",
+    library: "linear-gradient(135deg, #10b981 0%, #3b82f6 100%)",
     transcription: "linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)",
-    pixelart: "linear-gradient(135deg, #ec4899 0%, #f43f5e 100%)",     
-    friendship: "linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)"    
+    pixelart: "linear-gradient(135deg, #ec4899 0%, #f43f5e 100%)",
+    friendship: "linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)"
   };
   return gradients[id] || "linear-gradient(135deg, #374151 0%, #111827 100%)";
 }
@@ -663,7 +662,7 @@ function getGradientForContest(id) {
 function setupDynamicFormFields(contest) {
   const container = document.getElementById("dynamic-fields-container");
   container.innerHTML = "";
-  
+
   if (contest.submissionType === "image") {
     container.innerHTML = `
       <label>${contest.inputLabel}</label>
@@ -681,8 +680,8 @@ function setupDynamicFormFields(contest) {
       <span class="error-message">응모할 디자인 시안 이미지를 꼭 업로드해 주세요.</span>
     `;
     setupFileUploader();
-  } 
-  
+  }
+
   else if (contest.submissionType === "text_fields") {
     let html = "";
     contest.textFields.forEach(field => {
@@ -706,7 +705,7 @@ function setupDynamicFormFields(contest) {
     });
     container.innerHTML = html;
   }
-  
+
   else if (contest.submissionType === "image_or_text") {
     container.innerHTML = `
       <label style="margin-bottom: 8px;">제출 방식 선택</label>
@@ -736,14 +735,14 @@ function setupDynamicFormFields(contest) {
         <span class="error-message">필사 감상평을 최소 10자 이상 채워주세요.</span>
       </div>
     `;
-    
+
     setupFileUploader();
-    
+
     const btnFile = document.getElementById("toggle-method-file");
     const btnText = document.getElementById("toggle-method-text");
     const cFile = document.getElementById("method-file-container");
     const cText = document.getElementById("method-text-container");
-    
+
     btnFile.addEventListener("click", () => {
       btnFile.classList.add("active");
       btnFile.classList.replace("btn-secondary", "btn-primary");
@@ -754,7 +753,7 @@ function setupDynamicFormFields(contest) {
       uploadBase64Data = null;
       document.getElementById("sub-transcribe-text").value = "";
     });
-    
+
     btnText.addEventListener("click", () => {
       btnText.classList.add("active");
       btnText.classList.replace("btn-secondary", "btn-primary");
@@ -776,28 +775,28 @@ function setupFileUploader() {
   const dropzone = document.getElementById("file-dropzone");
   const fileInput = document.getElementById("submission-file");
   const previewWrapper = document.getElementById("upload-preview-wrapper");
-  
+
   if (!dropzone || !fileInput) return;
-  
+
   dropzone.addEventListener("click", () => fileInput.click());
-  
+
   ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
     dropzone.addEventListener(eventName, preventDefaults, false);
   });
-  
-  function preventDefaults (e) {
+
+  function preventDefaults(e) {
     e.preventDefault();
     e.stopPropagation();
   }
-  
+
   ['dragenter', 'dragover'].forEach(eventName => {
     dropzone.addEventListener(eventName, () => dropzone.classList.add('dragover'), false);
   });
-  
+
   ['dragleave', 'drop'].forEach(eventName => {
     dropzone.addEventListener(eventName, () => dropzone.classList.remove('dragover'), false);
   });
-  
+
   dropzone.addEventListener('drop', (e) => {
     const dt = e.dataTransfer;
     const files = dt.files;
@@ -806,7 +805,7 @@ function setupFileUploader() {
       handleFileSelected(files[0]);
     }
   });
-  
+
   fileInput.addEventListener('change', (e) => {
     if (fileInput.files.length) {
       handleFileSelected(fileInput.files[0]);
@@ -818,7 +817,7 @@ function setupFileUploader() {
       showToast("이미지 형식의 파일만 업로드할 수 있습니다.", "error");
       return;
     }
-    
+
     if (file.size > 5 * 1024 * 1024) {
       showToast("파일 크기는 최대 5MB를 초과할 수 없습니다.", "error");
       return;
@@ -828,7 +827,7 @@ function setupFileUploader() {
     reader.readAsDataURL(file);
     reader.onloadend = () => {
       uploadBase64Data = reader.result;
-      
+
       previewWrapper.innerHTML = `
         <div class="preview-container">
           <img class="preview-image" src="${uploadBase64Data}" alt="업로드 이미지 시안">
@@ -837,7 +836,7 @@ function setupFileUploader() {
       `;
       previewWrapper.style.display = "block";
       dropzone.style.display = "none";
-      
+
       previewWrapper.querySelector(".remove-preview-btn").addEventListener("click", () => {
         uploadBase64Data = null;
         fileInput.value = "";
@@ -853,25 +852,23 @@ function setupFileUploader() {
 // EVENT LISTENERS & ROUTINGS
 // ====================================================
 function setupEventListeners() {
-  document.getElementById("theme-toggle-btn").addEventListener("click", toggleTheme);
-  
   document.getElementById("contest-drawer-overlay").addEventListener("click", closeContestDrawer);
   document.getElementById("contest-drawer-close").addEventListener("click", closeContestDrawer);
-  
+
   document.getElementById("auth-trigger-btn").addEventListener("click", () => openAuthDrawer("login"));
   document.getElementById("auth-redirect-btn").addEventListener("click", () => {
     closeContestDrawer();
     openAuthDrawer("login");
   });
-  
+
   document.getElementById("auth-drawer-overlay").addEventListener("click", closeAuthDrawer);
   document.getElementById("auth-drawer-close").addEventListener("click", closeAuthDrawer);
-  
+
   document.getElementById("tab-login-btn").addEventListener("click", () => switchAuthTab("login"));
   document.getElementById("tab-signup-btn").addEventListener("click", () => switchAuthTab("signup"));
-  
+
   document.getElementById("logout-btn").addEventListener("click", executeLogout);
-  
+
   const lookupDrawer = document.getElementById("lookup-drawer");
   document.getElementById("lookup-toggle-btn").addEventListener("click", () => {
     lookupDrawer.setAttribute("aria-hidden", "false");
@@ -880,19 +877,11 @@ function setupEventListeners() {
   });
   document.getElementById("lookup-drawer-overlay").addEventListener("click", closeLookupDrawer);
   document.getElementById("lookup-drawer-close").addEventListener("click", closeLookupDrawer);
-  
+
   function closeLookupDrawer() {
     lookupDrawer.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
   }
-  
-  const monthButtons = document.querySelectorAll(".month-btn");
-  monthButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const month = parseInt(btn.getAttribute("data-month"), 10);
-      setVirtualMonth(month);
-    });
-  });
 
   // Handle Login submission
   const loginForm = document.getElementById("login-form");
@@ -907,7 +896,7 @@ function setupEventListeners() {
       handleLogin(grade, classNum, number, name, pass);
     }
   });
-  
+
   // Handle Signup submission
   const signupForm = document.getElementById("signup-form");
   signupForm.addEventListener("submit", (e) => {
@@ -936,15 +925,15 @@ function setupEventListeners() {
 // ====================================================
 function validateLoginForm() {
   let isValid = true;
-  
+
   const grade = document.getElementById("login-grade");
   const classNum = document.getElementById("login-class");
   const number = document.getElementById("login-number");
   const name = document.getElementById("login-name");
   const pass = document.getElementById("login-password");
-  
+
   document.querySelectorAll("#login-form .form-group").forEach(g => g.classList.remove("has-error"));
-  
+
   if (!grade.value) {
     grade.parentElement.classList.add("has-error");
     isValid = false;
@@ -965,21 +954,21 @@ function validateLoginForm() {
     pass.parentElement.classList.add("has-error");
     isValid = false;
   }
-  
+
   return isValid;
 }
 
 function validateSignupForm() {
   let isValid = true;
-  
+
   const grade = document.getElementById("signup-grade");
   const classNum = document.getElementById("signup-class");
   const number = document.getElementById("signup-number");
   const name = document.getElementById("signup-name");
   const pass = document.getElementById("signup-password");
-  
+
   document.querySelectorAll("#signup-form .form-group").forEach(g => g.classList.remove("has-error"));
-  
+
   if (!grade.value) {
     grade.parentElement.classList.add("has-error");
     isValid = false;
@@ -1000,7 +989,7 @@ function validateSignupForm() {
     pass.parentElement.classList.add("has-error");
     isValid = false;
   }
-  
+
   return isValid;
 }
 
@@ -1014,8 +1003,8 @@ function validateSubmissionForm() {
       dropzone.parentElement.classList.add("has-error");
       isValid = false;
     }
-  } 
-  
+  }
+
   else if (activeContest.submissionType === "text_fields") {
     activeContest.textFields.forEach(field => {
       const element = document.getElementById(`sub-${field.id}`);
@@ -1025,7 +1014,7 @@ function validateSubmissionForm() {
       }
     });
   }
-  
+
   else if (activeContest.submissionType === "image_or_text") {
     const isFileActive = document.getElementById("toggle-method-file").classList.contains("active");
     if (isFileActive) {
@@ -1050,8 +1039,8 @@ function validateSubmissionForm() {
 // EXECUTE CONTEST SUBMISSION ACTION
 // ====================================================
 async function executeSubmit() {
-  if (!currentUser) return; 
-  
+  if (!currentUser) return;
+
   const contestId = document.getElementById("form-contest-id").value;
   const entryId = `${activeContest.id}_${Date.now()}`;
 
@@ -1059,7 +1048,7 @@ async function executeSubmit() {
     id: entryId,
     contestId: contestId,
     contestTitle: activeContest.title,
-    studentUsername: currentUser.userKey, 
+    studentUsername: currentUser.userKey,
     studentName: currentUser.name,
     studentGrade: currentUser.grade,
     studentClass: currentUser.classNum,
@@ -1070,14 +1059,14 @@ async function executeSubmit() {
 
   if (activeContest.submissionType === "image") {
     newEntry.data.image = uploadBase64Data;
-  } 
-  
+  }
+
   else if (activeContest.submissionType === "text_fields") {
     activeContest.textFields.forEach(field => {
       newEntry.data[field.id] = document.getElementById(`sub-${field.id}`).value.trim();
     });
-  } 
-  
+  }
+
   else if (activeContest.submissionType === "image_or_text") {
     const isFileActive = document.getElementById("toggle-method-file").classList.contains("active");
     if (isFileActive) {
@@ -1103,12 +1092,12 @@ async function executeSubmit() {
         body: JSON.stringify(payload)
       });
       const result = await response.json();
-      
+
       if (result.status === "error") {
         showToast(result.message, "error");
         return;
       }
-      
+
       showToast(`${activeContest.title} 대회의 작품 접수가 성공적으로 구글 시트에 기록되었습니다! 🎨`, "success");
       closeContestDrawer();
       updateLiveCounters();
@@ -1134,7 +1123,7 @@ async function executeSubmit() {
 // ====================================================
 async function executeLoggedInLookup() {
   if (!currentUser) return;
-  
+
   const container = document.getElementById("results-container");
   container.innerHTML = `<div class="empty-results">내역을 안전하게 불러오고 있습니다...</div>`;
 
@@ -1166,7 +1155,7 @@ async function executeLoggedInLookup() {
   // 2. Fallback Local Mode
   if (!GOOGLE_SHEET_API_URL || mySubmissions.length === 0) {
     const allSubmissions = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
-    mySubmissions = allSubmissions.filter(entry => 
+    mySubmissions = allSubmissions.filter(entry =>
       entry.studentUsername.toLowerCase() === currentUser.userKey.toLowerCase()
     );
   }
@@ -1187,26 +1176,26 @@ async function executeLoggedInLookup() {
     const card = document.createElement("div");
     card.className = "submitted-card";
     card.setAttribute("id", `entry-${entry.id}`);
-    
+
     let contentHtml = "";
-    
+
     // Parse data structure depending on how it was stored
     const entryData = typeof entry.data === "string" ? JSON.parse(entry.data) : entry.data;
-    
+
     if (entryData.image) {
       contentHtml += `
         <div><strong>제출한 이미지 시안:</strong></div>
         <img class="submission-thumbnail" src="${entryData.image}" alt="제출 이미지">
       `;
-    } 
-    
+    }
+
     else if (entryData["book-title"]) {
       contentHtml += `
         <div><strong>추천 도서:</strong> ${entryData["book-title"]} (${entryData["book-author"] || "저자 미상"})</div>
         <div><strong>추천 사유 & 평점:</strong> "${entryData["book-review"]}"</div>
       `;
-    } 
-    
+    }
+
     else if (entryData.type === "text") {
       contentHtml += `
         <div><strong>필사 텍스트 구절:</strong></div>
@@ -1236,15 +1225,15 @@ async function executeLoggedInLookup() {
         </button>
       </div>
     `;
-    
+
     container.appendChild(card);
   });
 }
 
 // Global deletion call (Supports Remote/Local)
-window.confirmDeleteEntry = async function(entryId) {
+window.confirmDeleteEntry = async function (entryId) {
   if (confirm("정말 이 작품의 접수를 취소하고 삭제하시겠습니까? 한 번 지워진 접수 데이터는 복구할 수 없습니다.")) {
-    
+
     // 1. Remote DB Cloud Mode
     if (GOOGLE_SHEET_API_URL) {
       showToast("원격 구글 스프레드시트에서 접수를 파기하고 있습니다...", "info");
@@ -1259,7 +1248,7 @@ window.confirmDeleteEntry = async function(entryId) {
           body: JSON.stringify(payload)
         });
         const result = await response.json();
-        
+
         if (result.status === "error") {
           showToast(result.message, "error");
           return;
@@ -1274,7 +1263,7 @@ window.confirmDeleteEntry = async function(entryId) {
     const allSubmissions = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
     const updatedSubmissions = allSubmissions.filter(entry => entry.id !== entryId);
     localStorage.setItem("soro_submissions", JSON.stringify(updatedSubmissions));
-    
+
     const element = document.getElementById(`entry-${entryId}`);
     if (element) {
       element.style.transition = "all 0.3s ease";
@@ -1282,7 +1271,7 @@ window.confirmDeleteEntry = async function(entryId) {
       element.style.transform = "translateY(15px)";
       setTimeout(() => {
         element.remove();
-        
+
         const container = document.getElementById("results-container");
         if (container.children.length === 0) {
           container.innerHTML = `
@@ -1293,7 +1282,7 @@ window.confirmDeleteEntry = async function(entryId) {
         }
       }, 300);
     }
-    
+
     showToast("작품 접수 정보가 성공적으로 취소 및 삭제 처리되었습니다.", "success");
     updateLiveCounters();
   }
@@ -1304,7 +1293,7 @@ window.confirmDeleteEntry = async function(entryId) {
 // ====================================================
 async function updateLiveCounters() {
   let count = 0;
-  
+
   if (currentUser) {
     if (GOOGLE_SHEET_API_URL) {
       // Quietly query count from Google Sheets
@@ -1328,9 +1317,9 @@ async function updateLiveCounters() {
         // Fallback silently to local
       }
     }
-    
+
     const allSubmissions = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
-    const mySubmissions = allSubmissions.filter(entry => 
+    const mySubmissions = allSubmissions.filter(entry =>
       entry.studentUsername.toLowerCase() === currentUser.userKey.toLowerCase()
     );
     count = mySubmissions.length;
@@ -1342,23 +1331,23 @@ async function updateLiveCounters() {
 
 function showToast(message, type = "info") {
   const container = document.getElementById("toast-container");
-  
+
   const toast = document.createElement("div");
   toast.className = `toast toast-${type}`;
-  
+
   let iconHtml = "ℹ️";
   if (type === "success") iconHtml = "✨";
   if (type === "error") iconHtml = "⚠️";
-  
+
   toast.innerHTML = `
     <span style="font-size: 1.25rem;">${iconHtml}</span>
     <span class="toast-message">${message}</span>
   `;
-  
+
   container.appendChild(toast);
-  
+
   setTimeout(() => toast.classList.add("show"), 10);
-  
+
   setTimeout(() => {
     toast.classList.remove("show");
     setTimeout(() => toast.remove(), 400);
@@ -1367,7 +1356,7 @@ function showToast(message, type = "info") {
 
 /*
 ========================================================================
-[원클릭 연동] GOOGLE APPS SCRIPT 백엔드 소스코드 가이드라인
+[원클릭 연동] GOOGLE APPS SCRIPT 백엔드 소스코드 가이드라인 (드라이브 이미지 저장 기능 강화)
 ========================================================================
 구글 스프레드시트를 생성하고 [확장 프로그램] -> [Apps Script]를 클릭한 뒤,
 기존 코드를 모두 삭제하고 아래 코드를 복사해서 붙여넣으세요!
@@ -1377,6 +1366,7 @@ function showToast(message, type = "info") {
 3. 유형 선택에서 [웹 앱]을 선택합니다.
 4. 설명에 "SORO DB API" 입력 후, [액세스 권한이 있는 사용자]를 [모든 사용자(Anyone)]로 설정하고 배포합니다.
 5. 배포 완료 시 생성되는 "웹 앱 URL"을 복사하여 본 app.js 파일의 최상단 'GOOGLE_SHEET_API_URL'에 붙여넣으세요.
+※ 이 스크립트는 학생들이 업로드한 대용량 그림 파일(Base64)을 자동으로 본인 구글 드라이브의 "SORO_Submissions" 폴더에 저장하고, 시트에는 해당 이미지의 다운로드/뷰어 링크만 깔끔하게 저장하여 구글 시트의 셀 용량 제한(5만자) 에러를 방지하고 편리하게 관리할 수 있게 해줍니다.
 
 ====================== 복사할 Apps Script 코드 시작 ======================
 
@@ -1441,7 +1431,7 @@ function doPost(e) {
       }
     }
     
-    // 3. 작품 응모 액션 (Submissions 시트)
+    // 3. 작품 응모 액션 (Submissions 시트 + 구글 드라이브 이미지 저장)
     else if (requestData.action === "submitContest") {
       var sheet = ss.getSheetByName("Submissions");
       if (!sheet) {
@@ -1450,6 +1440,18 @@ function doPost(e) {
       }
       
       var entry = requestData.entry;
+      
+      // [핵심] 만약 이미지(Base64) 데이터가 존재한다면, 구글 드라이브에 파일을 생성하고 시트에는 URL 링크만 기입
+      if (entry.data && entry.data.image && entry.data.image.indexOf("data:image/") === 0) {
+        var fileExtension = getExtensionFromBase64(entry.data.image);
+        var customFileName = entry.contestTitle + "_" + entry.studentGrade + "학년" + entry.studentClass + "반" + entry.studentNumber + "번_" + entry.studentName + "_" + entry.id + fileExtension;
+        
+        var uploadedFileUrl = saveBase64ToDrive(entry.data.image, customFileName);
+        if (uploadedFileUrl) {
+          entry.data.image = uploadedFileUrl; // Base64 스트링 대신 구글 드라이브 링크 대입!
+        }
+      }
+      
       sheet.appendRow([
         entry.id,
         entry.contestId,
@@ -1521,6 +1523,48 @@ function doPost(e) {
   // CORS 우회 응답 설정
   return ContentService.createTextOutput(JSON.stringify(response))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+// [헬퍼] Base64 데이터를 파싱하여 구글 드라이브에 이미지로 저장하는 함수
+function saveBase64ToDrive(base64Data, fileName) {
+  try {
+    var split = base64Data.split(',');
+    var contentType = split[0].match(/:(.*?);/)[1];
+    var base64String = split[1];
+    var decodedBytes = Utilities.base64Decode(base64String);
+    var fileBlob = Utilities.newBlob(decodedBytes, contentType, fileName);
+    
+    var folderName = "SORO_Submissions";
+    var folders = DriveApp.getFoldersByName(folderName);
+    var folder;
+    
+    if (folders.hasNext()) {
+      folder = folders.next();
+    } else {
+      folder = DriveApp.createFolder(folderName);
+    }
+    
+    var createdFile = folder.createFile(fileBlob);
+    // 외부 링크가 있는 누구나 뷰어로 조회할 수 있도록 권한 부여
+    createdFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    return createdFile.getUrl();
+  } catch (err) {
+    Logger.log("Error in saveBase64ToDrive: " + err.toString());
+    return null;
+  }
+}
+
+// [헬퍼] Base64 데이터의 마임타입을 감지하여 확장자를 반환하는 함수
+function getExtensionFromBase64(base64Data) {
+  try {
+    var match = base64Data.match(/data:image\/(.*?);base64/);
+    if (match && match[1]) {
+      var ext = match[1];
+      if (ext === "jpeg") return ".jpg";
+      return "." + ext;
+    }
+  } catch (e) {}
+  return ".png";
 }
 
 ====================== 복사할 Apps Script 코드 끝 ======================
