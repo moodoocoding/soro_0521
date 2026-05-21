@@ -536,6 +536,63 @@ h1, h2, h3, h4, .logo-text, .logo-sub, .badge, .stat-value, .month-btn, .auth-ta
   border-color: var(--text-primary);
 }
 
+/* ====================================================
+   SIGNATURE YELLOW HIGHLIGHT FOR ACTIVE CONTEST (Stark Minimalist Style)
+   ==================================================== */
+.contest-card.active-contest {
+  background-color: #ffe600 !important;
+  border-color: #000000 !important;
+  color: #000000 !important;
+}
+
+.contest-card.active-contest .card-title,
+.contest-card.active-contest .card-desc,
+.contest-card.active-contest .card-period {
+  color: #000000 !important;
+}
+
+.contest-card.active-contest .badge {
+  border-color: rgba(0, 0, 0, 0.2) !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #000000 !important;
+}
+
+.contest-card.active-contest .status-badge.status-active {
+  border-color: #000000 !important;
+  background: #000000 !important;
+  color: #ffe600 !important;
+}
+
+.contest-card.active-contest .card-visual-svg {
+  color: #000000 !important;
+  opacity: 0.75 !important;
+}
+
+.contest-card.active-contest:hover .card-visual-svg {
+  opacity: 1.0 !important;
+}
+
+.contest-card.active-contest .card-bottom {
+  border-top-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+.contest-card.active-contest .card-action-icon {
+  border-color: #000000 !important;
+  color: #000000 !important;
+  background: transparent !important;
+}
+
+.contest-card.active-contest:hover {
+  background-color: #ffd600 !important; /* Slightly darker gold/yellow on hover */
+  border-color: #000000 !important;
+}
+
+.contest-card.active-contest:hover .card-action-icon {
+  background: #000000 !important;
+  color: #ffe600 !important;
+  border-color: #000000 !important;
+}
+
 /* ----------------------------------------------------
    SLIDING DRAWER SYSTEM (CRISP MONOCHROME DRAWER)
    ---------------------------------------------------- */

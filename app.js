@@ -156,7 +156,7 @@ const CONTESTS_DATA = [
 // ====================================================
 // STATE MANAGEMENT & USER SESSION CONFIGURATION
 // ====================================================
-let currentVirtualMonth = new Date().getMonth() + 1;
+let currentVirtualMonth = 6;
 
 function getContestStatus(contestMonth) {
   if (contestMonth === currentVirtualMonth) {
@@ -513,7 +513,7 @@ function renderContestGrid() {
     }
 
     const card = document.createElement("div");
-    card.className = "contest-card";
+    card.className = "contest-card" + (status === "active" ? " active-contest" : "");
     card.setAttribute("data-id", contest.id);
 
     card.innerHTML = `
