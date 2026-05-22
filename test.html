@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SORO | Stark 테스트 및 디버깅 대시보드</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Outfit:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  
+  <style>
+    /* Stark Test Dashboard Unique Styles overriding core typography */
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      padding: 40px 20px;
+      font-family: 'Noto Sans KR', 'Outfit', sans-serif;
+    }
+
+    .test-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      position: relative;
+    }
+
+    .test-header {
+      padding: 30px;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .test-title-area h1 {
+      font-size: 1.8rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      margin: 0 0 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .test-title-badge {
+      font-size: 0.65rem;
+      background: #ffe600;
+      color: #000000;
+      font-weight: 800;
+      padding: 2px 8px;
+      letter-spacing: 0.05em;
+    }
+
+    .test-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .test-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    @media (max-width: 768px) {
+      .test-grid {
+        grid-template-columns: 1fr;
+      }
+      .test-grid > div:first-child {
+        border-right: none !important;
+        border-bottom: 1px solid var(--border-color);
+      }
+    }
+
+    .test-col {
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .test-col:first-child {
+      border-right: 1px solid var(--border-color);
+    }
+
+    .test-section-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin: 0 0 16px 0;
+      border-left: 3px solid #ffe600;
+      padding-left: 10px;
+      letter-spacing: -0.01em;
+    }
+
+    .status-panel-box {
+      border: 1px solid var(--border-color);
+      background: var(--bg-tertiary);
+      padding: 16px;
+      font-size: 0.85rem;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed var(--border-color);
+    }
+    .status-row:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .status-val {
+      font-family: 'Outfit', monospace;
+      font-weight: 700;
+    }
+
+    .status-val.success { color: #00ff66; }
+    .status-val.warning { color: #ffe600; }
+    .status-val.danger { color: #ff3366; }
+
+    .test-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-stark {
+      border: 1px solid var(--border-color);
+      background: transparent;
+      color: var(--text-primary);
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all var(--transition-fast);
+    }
+
+    .btn-stark:hover {
+      background: var(--text-primary);
+      color: var(--bg-primary);
+      border-color: var(--text-primary);
+    }
+
+    .btn-stark.btn-yellow {
+      background: #ffe600;
+      color: #000000;
+      border-color: #ffe600;
+    }
+    .btn-stark.btn-yellow:hover {
+      background: #ffd600;
+      border-color: #ffd600;
+    }
+
+    .btn-stark.btn-danger {
+      border-color: rgba(255, 51, 102, 0.4);
+    }
+    .btn-stark.btn-danger:hover {
+      background: #ff3366;
+      color: #ffffff;
+      border-color: #ff3366;
+    }
+
+    .log-box {
+      border: 1px solid var(--border-color);
+      background: #000000;
+      color: #00ff66;
+      padding: 16px;
+      font-family: 'Outfit', monospace;
+      font-size: 0.75rem;
+      min-height: 180px;
+      max-height: 250px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    .log-entry {
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+    .log-entry.log-err { color: #ff3366; }
+    .log-entry.log-warn { color: #ffe600; }
+    .log-entry.log-info { color: #00e5ff; }
+
+    .test-footer {
+      padding: 20px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-back-main {
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 0.8rem;
+      border-bottom: 1px solid var(--text-primary);
+      transition: color var(--transition-fast);
+    }
+    .btn-back-main:hover {
+      color: #ffe600;
+      border-color: #ffe600;
+    }
+  </style>
+</head>
+<body class="dark-theme">
+  <!-- Aesthetic Dynamic Noise Overlay -->
+  <div class="bg-noise"></div>
+
+  <div class="test-container">
+    <!-- Header -->
+    <header class="test-header">
+      <div class="test-title-area">
+        <h1>🛠️ SORO Sandbox Panel <span class="test-title-badge">ADMIN</span></h1>
+        <p class="test-subtitle">데이터베이스 상태 모니터링, 가상 학생 로그인 시뮬레이터 및 API 통신 검증 도구</p>
+      </div>
+      <a href="index.html" class="btn-back-main">◀ 메인 포털로 가기</a>
+    </header>
+
+    <!-- Grid Layout -->
+    <main class="test-grid">
+      <!-- Left Column: DB Status & Simulators -->
+      <div class="test-col">
+        <div>
+          <h2 class="test-section-title">📊 DB & API Status Tracker</h2>
+          <div class="status-panel-box">
+            <div class="status-row">
+              <span>구글 Apps Script API 연동 여부</span>
+              <span id="stat-api-status" class="status-val warning">불러오는 중...</span>
+            </div>
+            <div class="status-row">
+              <span>현재 가입된 총 학생 수 (로컬)</span>
+              <span id="stat-local-users" class="status-val">0명</span>
+            </div>
+            <div class="status-row">
+              <span>제출된 임시 작품 수 (로컬)</span>
+              <span id="stat-local-subs" class="status-val">0개</span>
+            </div>
+            <div class="status-row" style="margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 12px;">
+              <span style="font-weight: 700;">API URL 주소</span>
+              <span id="stat-api-url" class="status-val" style="word-break: break-all; font-size: 0.75rem; color: var(--text-secondary);">확인 중...</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h2 class="test-section-title">👤 Quick Session Simulator</h2>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin: -10px 0 16px 0; line-height: 1.4;">
+            복잡한 가입 과정 없이 임의의 3~6학년 학생 프로필을 즉석 생성하고 즉시 로그인 세션을 맺어 메인 포털과 싱크합니다.
+          </p>
+          <div class="test-btn-group">
+            <button id="btn-sim-user" class="btn-stark btn-yellow">
+              <span>원클릭 가상 학생 계정 로그인하기</span>
+              <span>⚡</span>
+            </button>
+            <button id="btn-sim-logout" class="btn-stark">
+              <span>현재 세션 로그아웃 처리</span>
+              <span>🔒</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: API Direct Sender & Cleaners -->
+      <div class="test-col">
+        <div>
+          <h2 class="test-section-title">🎨 API Direct Sender</h2>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin: -10px 0 16px 0; line-height: 1.4;">
+            설정된 구글 시트 API로 직접 임의의 컷툰 접수 데이터를 쏘아 올려 딜레이와 CORS 수신 데이터가 정상인지 확인합니다.
+          </p>
+          <div class="test-btn-group">
+            <button id="btn-send-test-sub" class="btn-stark">
+              <span>구글 시트 연동 다이렉트 전송 테스트</span>
+              <span>📤</span>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <h2 class="test-section-title">🧹 Storage Sanitizer</h2>
+          <div class="test-btn-group">
+            <button id="btn-clear-local" class="btn-stark btn-danger">
+              <span>로컬 스토리지 데이터 완전 초기화 (공장 초기화)</span>
+              <span>🗑️</span>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <h2 class="test-section-title">🖥️ 실시간 디버그 로그 (Logger)</h2>
+          <div id="debug-log" class="log-box">
+            <div class="log-entry log-info">[SYSTEM] 디버깅 샌드박스가 가동되었습니다.</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="test-footer">
+      <span>SORO Students Portal • Administration Suite</span>
+      <span>v1.2.0 (Stable Cloud Mode)</span>
+    </footer>
+  </div>
+
+  <script>
+    // System Logger
+    function log(message, type = 'info') {
+      const logBox = document.getElementById("debug-log");
+      const entry = document.createElement("div");
+      entry.className = `log-entry log-${type}`;
+      
+      const now = new Date();
+      const timeStr = `[${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}]`;
+      
+      entry.textContent = `${timeStr} ${message}`;
+      logBox.appendChild(entry);
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    // Dynamic Google Sheet API URL Parser from app.js
+    let googleApiUrl = "";
+
+    async function detectGoogleSheetApiUrl() {
+      try {
+        const response = await fetch("app.js");
+        if (!response.ok) throw new Error("app.js 파일 로드 실패");
+        
+        const codeText = await response.text();
+        // Extract GOOGLE_SHEET_API_URL value via regex
+        const match = codeText.match(/const\s+GOOGLE_SHEET_API_URL\s*=\s*"([^"]*)";/);
+        
+        const apiStatusEl = document.getElementById("stat-api-status");
+        const apiUrlEl = document.getElementById("stat-api-url");
+
+        if (match && match[1]) {
+          googleApiUrl = match[1].trim();
+          apiStatusEl.textContent = "연동 활성화 (Cloud Mode)";
+          apiStatusEl.className = "status-val success";
+          apiUrlEl.textContent = googleApiUrl;
+          log(`[DB] app.js로부터 구글 시트 웹앱 URL 자동 연동 성공: ${googleApiUrl.substring(0, 45)}...`, 'success');
+        } else {
+          googleApiUrl = "";
+          apiStatusEl.textContent = "미연동 (Local Storage Only)";
+          apiStatusEl.className = "status-val warning";
+          apiUrlEl.textContent = "비어 있음 (로컬 저장소 전용)";
+          log("[DB] 구글 시트 웹앱 URL이 세팅되어 있지 않아 로컬 브라우저 DB 모드로 시뮬레이션 작동합니다.", 'warn');
+        }
+      } catch (err) {
+        log(`[CORS/ERROR] app.js의 구글 시트 API 정보를 읽는 도중 오류가 발생했습니다: ${err.message}`, 'err');
+        document.getElementById("stat-api-status").textContent = "분석 실패 (로컬 디폴트)";
+        document.getElementById("stat-api-status").className = "status-val danger";
+      }
+    }
+
+    // Refresh Local Storage statistics
+    function refreshStats() {
+      try {
+        const localUsers = JSON.parse(localStorage.getItem("soro_users") || "[]");
+        const localSubs = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
+        
+        document.getElementById("stat-local-users").textContent = `${localUsers.length}명`;
+        document.getElementById("stat-local-subs").textContent = `${localSubs.length}개`;
+      } catch (e) {
+        log(`[STATS] 로컬 저장 데이터를 집계하는 도중 오류가 발생했습니다: ${e.message}`, 'err');
+      }
+    }
+
+    // Initialize
+    window.addEventListener("DOMContentLoaded", () => {
+      detectGoogleSheetApiUrl();
+      refreshStats();
+
+      // Setup Event Listeners
+      document.getElementById("btn-sim-user").addEventListener("click", simulateUserLogin);
+      document.getElementById("btn-sim-logout").addEventListener("click", simulateLogout);
+      document.getElementById("btn-send-test-sub").addEventListener("click", sendTestSubmission);
+      document.getElementById("btn-clear-local").addEventListener("click", clearStorage);
+    });
+
+    // 1. Quick User Session Simulator
+    const FIRST_NAMES = ["민준", "서준", "도윤", "예준", "시우", "하준", "주원", "지호", "지후", "준우", "서윤", "서연", "지우", "하윤", "민서", "하은", "지아", "수아", "윤서", "채원"];
+    const LAST_NAMES = ["김", "이", "박", "최", "정", "강", "조", "윤", "장", "임", "한", "오", "서", "신", "권", "황", "안", "송", "류", "전"];
+
+    function simulateUserLogin() {
+      const grade = Math.floor(Math.random() * 4) + 3; // 3 to 6 Grade
+      const classNum = Math.floor(Math.random() * 8) + 1; // 1 to 8 Class
+      const number = Math.floor(Math.random() * 25) + 1; // 1 to 25 Number
+      const name = LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)] + FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)];
+      const password = "test1234";
+
+      const userKey = `${grade}_${classNum}_${number}_${name}`;
+
+      const mockUser = { userKey, grade, classNum, number, name };
+      
+      try {
+        // Add to local DB if not exists
+        const users = JSON.parse(localStorage.getItem("soro_users") || "[]");
+        const exists = users.find(u => u.userKey === userKey);
+        if (!exists) {
+          users.push({ ...mockUser, password });
+          localStorage.setItem("soro_users", JSON.stringify(users));
+        }
+
+        // Set current active session
+        localStorage.setItem("soro_current_user", JSON.stringify(mockUser));
+        
+        log(`[SESSION] 가상 로그인 성공: ${grade}학년 ${classNum}반 ${number}번 ${name} 학생 (세션 바인딩 완료)`, 'success');
+        refreshStats();
+        
+        alert(`가상 학생 로그인 완료!\n\n학생 정보: ${grade}학년 ${classNum}반 ${number}번 ${name}\n\n메인 포털 페이지 새로고침 시 이 학생으로 즉시 로그인됩니다.`);
+      } catch (err) {
+        log(`[SESSION/ERR] 로그인 세션 설정 실패: ${err.message}`, 'err');
+      }
+    }
+
+    // 2. Simulate Logout
+    function simulateLogout() {
+      try {
+        localStorage.removeItem("soro_current_user");
+        log("[SESSION] 로그인 세션을 정상 해제하였습니다.", 'info');
+        alert("로그아웃 되었습니다. 메인 포털 세션이 초기화됩니다.");
+      } catch (err) {
+        log(`[SESSION/ERR] 로그아웃 실패: ${err.message}`, 'err');
+      }
+    }
+
+    // 3. API Direct Sender (Google sheet CORS and request tester)
+    async function sendTestSubmission() {
+      if (!googleApiUrl) {
+        log("[API/BLOCK] 구글 시트 URL이 구성되어 있지 않아 테스트 데이터를 쏠 수 없습니다. app.js에 URL을 기입해 주세요.", 'warn');
+        alert("구글 시트 연동 URL이 기입되어 있지 않습니다. 로컬 스토리지 모드만 확인 가능합니다.");
+        return;
+      }
+
+      log("[API/SEND] 테스트용 공모전 접수 템플릿 데이터를 구성하고 구글 서버로 송출합니다...", 'info');
+
+      const tempId = 'test_' + Date.now();
+      const mockEntry = {
+        id: tempId,
+        contestId: "cuttoon",
+        contestTitle: "안전 사고 예방 컷툰 (테스트)",
+        studentUsername: "4_2_10_김테스트",
+        studentName: "김테스트",
+        studentGrade: 4,
+        studentClass: 2,
+        studentNumber: 10,
+        submissionType: "image",
+        data: {
+          type: "image",
+          image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" // 1px transparent pixel mock
+        },
+        timestamp: new Date().toISOString()
+      };
+
+      const payload = {
+        action: "submitContest",
+        entry: mockEntry
+      };
+
+      try {
+        const startTime = Date.now();
+        const response = await fetch(googleApiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: JSON.stringify(payload)
+        });
+
+        const rtt = Date.now() - startTime;
+        if (!response.ok) throw new Error(`HTTP 상태코드 ${response.status} 수신`);
+        
+        const result = await response.json();
+        
+        if (result.status === "success") {
+          log(`[API/SUCCESS] 구글 서버 응답 완료 (왕복 시간: ${rtt}ms) - 상태: SUCCESS`, 'success');
+          log(`[API/SUCCESS] 서버 리턴 메시지: ${result.message || '데이터베이스 기록 성공'}`, 'success');
+          alert("구글 시트 다이렉트 전송 성공!\n구글 스프레드시트에 '김테스트' 학생의 행이 기록되었는지 바로 확인해보세요.");
+        } else {
+          log(`[API/FAILURE] 구글 서버 에러 응답 수신: ${result.message}`, 'err');
+          alert(`서버 에러 응답: ${result.message}`);
+        }
+      } catch (err) {
+        log(`[API/CORS-ERR] 통신 전송 중 에러가 발생하였습니다: ${err.message}`, 'err');
+        log("[API/TIP] 구글 Apps Script 배포 시 '액세스할 수 있는 사용자'를 '모든 사람(Anyone)'으로 설정했는지 꼭 점검해 주세요.", 'warn');
+        alert(`API 통신 실패!\n\n에러 내용: ${err.message}\n\n상세 정보는 하단 실시간 로그를 참조하십시오.`);
+      }
+    }
+
+    // 4. Storage Cleaner (Factory reset)
+    function clearStorage() {
+      if (confirm("⚠️ 경고: 로컬 저장소의 모든 데이터(가입 학생 리스트, 접수 결과물 등)가 영구히 소멸합니다. 정말 공장 초기화를 진행하시겠습니까?")) {
+        try {
+          localStorage.clear();
+          log("[SYSTEM] 로컬 스토리지를 완전히 공장 초기화 처리하였습니다.", 'warn');
+          refreshStats();
+          alert("초기화가 완비되었습니다. 모든 로컬 데이터가 깨끗하게 지워졌습니다.");
+        } catch (e) {
+          log(`[SYSTEM/ERR] 스토리지 청소 실패: ${e.message}`, 'err');
+        }
+      }
+    }
+  </script>
+</body>
+</html>

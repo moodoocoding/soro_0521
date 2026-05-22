@@ -201,6 +201,27 @@ h1, h2, h3, h4, .logo-text, .logo-sub, .badge, .stat-value, .month-btn, .auth-ta
   background: var(--accent-light);
 }
 
+.btn-test-dashboard {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  border-radius: 0;
+  transition: all var(--transition-fast);
+}
+.btn-test-dashboard:hover {
+  background: #ffe600;
+  color: #000000;
+  border-color: #ffe600;
+}
+
 .btn-block {
   width: 100%;
   padding: 12px;
