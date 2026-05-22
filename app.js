@@ -4,7 +4,7 @@
 // [가이드] 구글 스프레드시트 연동 완료 후, 아래 공란에 구글 Apps Script 웹앱 배포 URL을 입력해 주세요.
 // 예시: "https://script.google.com/macros/s/AKfycbz.../exec"
 // 이 주소가 비어있는 동안에는 브라우저의 localStorage 로컬 DB 모드로 즉시 원활히 시뮬레이션 작동합니다.
-const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxE1kAeZ9inLbkhQiQ-SA3DLWf8uW59GLL02421-I-_gJLgCnDrWxXihkOfSlmpitb2Vg/exec";
+const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyGKQlom8k8okl8Gbd-WeADknfztVlZZ1md6RE1A37VoAIuPg4G0YC4FQLrJAvHyRo1Mg/exec";
 
 // ====================================================
 // CONTEST DATA AND INLINE ILLUSTRATIONS (SVG)
