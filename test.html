@@ -423,6 +423,36 @@
         log(`[SESSION] 가상 로그인 성공: ${grade}학년 ${classNum}반 ${number}번 ${name} 학생 (세션 바인딩 완료)`, 'success');
         refreshStats();
         
+        // 구글 시트 원격 연동이 활성화된 경우 가상 학생 가입 정보 동기화 요청
+        if (googleApiUrl) {
+          log(`[API/CLOUD] 클라우드 연동 상태: 가상 학생 '${name}'을 구글 Users 시트에 원격 가입 시도 중...`, 'info');
+          const signUpPayload = {
+            action: "signUp",
+            userKey,
+            grade,
+            classNum,
+            number,
+            name,
+            password
+          };
+          fetch(googleApiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: JSON.stringify(signUpPayload)
+          })
+          .then(res => res.json())
+          .then(resData => {
+            if (resData.status === "success") {
+              log(`[API/CLOUD_SUCCESS] 가상 학생 '${name}' 구글 시트 원격 가입 및 연동 성공!`, 'success');
+            } else {
+              log(`[API/CLOUD_WARN] 가상 학생 원격 등록 응답: ${resData.message}`, 'warn');
+            }
+          })
+          .catch(err => {
+            log(`[API/CLOUD_ERR] 가상 학생 원격 가입 통신 오류 (로컬 모드로 진행됩니다): ${err.message}`, 'err');
+          });
+        }
+        
         alert(`가상 학생 로그인 완료!\n\n학생 정보: ${grade}학년 ${classNum}반 ${number}번 ${name}\n\n메인 포털 페이지 새로고침 시 이 학생으로 즉시 로그인됩니다.`);
       } catch (err) {
         log(`[SESSION/ERR] 로그인 세션 설정 실패: ${err.message}`, 'err');
@@ -489,6 +519,18 @@
         if (result.status === "success") {
           log(`[API/SUCCESS] 구글 서버 응답 완료 (왕복 시간: ${rtt}ms) - 상태: SUCCESS`, 'success');
           log(`[API/SUCCESS] 서버 리턴 메시지: ${result.message || '데이터베이스 기록 성공'}`, 'success');
+          
+          // 로컬 스토리지 브라우저 DB에도 동일하게 백업 기록하여 카운터 및 마이페이지 내역 즉시 동기화
+          try {
+            const allSubmissions = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
+            allSubmissions.push(mockEntry);
+            localStorage.setItem("soro_submissions", JSON.stringify(allSubmissions));
+            refreshStats();
+            log(`[DB] 테스트 작품 접수 정보를 로컬 브라우저 DB에도 연동 동기화하였습니다.`, 'info');
+          } catch(e) {
+            log(`[DB/ERR] 로컬 저장 실패: ${e.message}`, 'err');
+          }
+
           alert("구글 시트 다이렉트 전송 성공!\n구글 스프레드시트에 '김테스트' 학생의 행이 기록되었는지 바로 확인해보세요.");
         } else {
           log(`[API/FAILURE] 구글 서버 에러 응답 수신: ${result.message}`, 'err');
