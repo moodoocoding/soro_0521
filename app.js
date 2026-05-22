@@ -237,36 +237,17 @@ function updateThemeIcon(theme) {
 }
 
 // ====================================================
-// VIRTUAL TIME CONTROLLER
+// PRODUCTION TIME CONFIGURATION (JUNE ONLY)
 // ====================================================
 function initVirtualTime() {
-  const savedMonth = sessionStorage.getItem("soro_virtual_month");
-  if (savedMonth) {
-    currentVirtualMonth = parseInt(savedMonth, 10);
-  }
+  // 실제 프로덕션 환경의 진행 월을 6월로 고정합니다.
+  currentVirtualMonth = 6;
+  sessionStorage.removeItem("soro_virtual_month"); // 가상 오버라이드 제거
 
   const statMonthEl = document.getElementById("stat-current-month");
   if (statMonthEl) {
     statMonthEl.textContent = `${currentVirtualMonth}월`;
   }
-}
-
-function setVirtualMonth(month) {
-  currentVirtualMonth = month;
-  sessionStorage.setItem("soro_virtual_month", month);
-
-  const statMonthEl = document.getElementById("stat-current-month");
-  if (statMonthEl) {
-    statMonthEl.textContent = `${currentVirtualMonth}월`;
-  }
-  renderContestGrid();
-  updateLiveCounters();
-
-  if (activeContest) {
-    openContestDetails(activeContest.id);
-  }
-
-  showToast(`가상의 현재 날짜가 [${month}월]로 변경되었습니다.`, "info");
 }
 
 // ====================================================
