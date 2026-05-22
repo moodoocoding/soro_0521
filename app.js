@@ -257,6 +257,13 @@ function initUserSession() {
   const savedUser = localStorage.getItem("soro_current_user");
   if (savedUser) {
     currentUser = JSON.parse(savedUser);
+    
+    // [보안/오류 방어] 만약 구버전 세션 정보로 인해 userKey가 누락되어 있다면 자동 복구하여 기입합니다.
+    if (currentUser && !currentUser.userKey && currentUser.grade && currentUser.classNum && currentUser.number && currentUser.name) {
+      currentUser.userKey = `${currentUser.grade}_${currentUser.classNum}_${currentUser.number}_${currentUser.name}`;
+      localStorage.setItem("soro_current_user", JSON.stringify(currentUser));
+    }
+    
     updateUIForLoggedInState();
   } else {
     currentUser = null;
@@ -585,20 +592,8 @@ function openContestDetails(contestId) {
     formContainer.style.display = "block";
     noticeContainer.style.display = "none";
 
-    if (currentUser) {
-      authNotice.style.display = "none";
-      subForm.style.display = "block";
-
-      document.getElementById("student-name").value = currentUser.name;
-      document.getElementById("student-grade").value = `${currentUser.grade}학년`;
-      document.getElementById("student-class").value = `${currentUser.classNum}반`;
-      document.getElementById("student-number").value = `${currentUser.number}번`;
-
-      setupDynamicFormFields(contest);
-    } else {
-      authNotice.style.display = "flex";
-      subForm.style.display = "none";
-    }
+    // Asynchronously check and render the submission area (existing submission vs empty form)
+    checkAndRenderSubmissionArea(contest);
   } else if (status === "pending") {
     drawerStatus.textContent = "접수 대기 중 (Upcoming)";
     drawerStatus.className = "status-indicator status-pending";
@@ -624,7 +619,188 @@ function closeContestDrawer() {
 
   document.getElementById("submission-form").reset();
   document.querySelectorAll("#submission-form .form-group.has-error").forEach(e => e.classList.remove("has-error"));
+
+  // [오류 방어] 서랍이 닫힐 때 기존 미리보기 및 로딩 요소를 말끔히 제거합니다.
+  const existingView = document.getElementById("existing-submission-view");
+  if (existingView) existingView.remove();
+  const loader = document.getElementById("submission-loading-indicator");
+  if (loader) loader.remove();
 }
+
+// ====================================================
+// ASYNCHRONOUS CHECK AND RENDER SUBMISSION PROCESS
+// ====================================================
+async function checkAndRenderSubmissionArea(contest) {
+  const formContainer = document.getElementById("submission-form-container");
+  const subForm = document.getElementById("submission-form");
+  const authNotice = document.getElementById("auth-required-notice");
+
+  // 기존 뷰/로더 잔여물 소거
+  const existingView = document.getElementById("existing-submission-view");
+  if (existingView) existingView.remove();
+  const loader = document.getElementById("submission-loading-indicator");
+  if (loader) loader.remove();
+
+  if (!currentUser) {
+    authNotice.style.display = "flex";
+    subForm.style.display = "none";
+    return;
+  }
+
+  authNotice.style.display = "none";
+  subForm.style.display = "none";
+
+  // 로딩 인디케이터 표시
+  const loadingIndicator = document.createElement("div");
+  loadingIndicator.id = "submission-loading-indicator";
+  loadingIndicator.className = "submission-loading";
+  loadingIndicator.innerHTML = `
+    <div class="spinner"></div>
+    <p style="margin-top: 8px;">제출 내역을 확인하고 있습니다...</p>
+  `;
+  formContainer.appendChild(loadingIndicator);
+
+  // 1. 원격 또는 로컬 제출 목록 조회
+  let mySubmissions = [];
+  if (GOOGLE_SHEET_API_URL) {
+    const payload = {
+      action: "getSubmissions",
+      studentUsername: currentUser.userKey
+    };
+    try {
+      const response = await fetch(GOOGLE_SHEET_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json();
+      if (result.status === "success") {
+        mySubmissions = result.data;
+      }
+    } catch (e) {
+      console.error("제출 내역 원격 조회 에러:", e);
+    }
+  }
+
+  if (!GOOGLE_SHEET_API_URL || mySubmissions.length === 0) {
+    const allSubmissions = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
+    mySubmissions = allSubmissions.filter(entry =>
+      entry.studentUsername.toLowerCase() === currentUser.userKey.toLowerCase()
+    );
+  }
+
+  // 로더 제거
+  const activeLoader = document.getElementById("submission-loading-indicator");
+  if (activeLoader) activeLoader.remove();
+
+  const existingSubmission = mySubmissions.find(s => s.contestId === contest.id);
+
+  if (existingSubmission) {
+    // 2. 이미 제출한 작품이 있을 때: 상세 정보 노출 및 삭제 유도
+    const viewDiv = document.createElement("div");
+    viewDiv.id = "existing-submission-view";
+    viewDiv.className = "existing-submission-view";
+
+    let contentHtml = "";
+    let entryData = {};
+    try {
+      entryData = typeof existingSubmission.data === "string" ? JSON.parse(existingSubmission.data) : (existingSubmission.data || {});
+    } catch (err) {
+      if (existingSubmission.data) entryData = { image: existingSubmission.data };
+    }
+
+    if (entryData.image) {
+      contentHtml += `
+        <div class="submitted-media-preview">
+          <img src="${entryData.image}" alt="제출 작품 이미지">
+        </div>
+      `;
+    } else if (entryData["book-title"]) {
+      contentHtml += `
+        <div class="submitted-text-preview">
+          <p><strong>📖 추천 도서:</strong> ${entryData["book-title"]} (${entryData["book-author"] || "저자 미상"})</p>
+          <p style="margin-top: 6px;"><strong>✍️ 추천 사유:</strong> "${entryData["book-review"]}"</p>
+        </div>
+      `;
+    } else if (entryData.type === "text") {
+      contentHtml += `
+        <div class="submitted-text-preview">
+          <p><strong>✍️ 필사 구절:</strong></p>
+          <blockquote style="font-family: serif; white-space: pre-line; background: var(--bg-tertiary); padding: 12px; border-radius: 6px; margin: 8px 0; border: 1px solid var(--border-color); color: var(--text-primary);">
+            ${entryData.text}
+          </blockquote>
+        </div>
+      `;
+    }
+
+    viewDiv.innerHTML = `
+      <div class="submitted-badge-success">🎨 접수 완료됨</div>
+      <p class="submitted-notice-title">이 대회에 이미 작품을 제출하셨습니다.</p>
+      <p class="submitted-notice-time">제출 시각: ${existingSubmission.timestamp}</p>
+      
+      ${contentHtml}
+
+      <div class="submitted-actions">
+        <p class="submitted-actions-info">⚠️ 다른 작품을 새로 제출하시려면, 기존 접수를 취소하셔야 합니다.</p>
+        <button type="button" class="btn btn-danger btn-block" onclick="cancelSubmissionInDrawer('${existingSubmission.id}')">
+          접수 취소하기 (영구 삭제)
+        </button>
+      </div>
+    `;
+    formContainer.appendChild(viewDiv);
+  } else {
+    // 3. 제출한 작품이 없을 때: 정상 제출 폼 렌더링
+    subForm.style.display = "block";
+    document.getElementById("student-name").value = currentUser.name;
+    document.getElementById("student-grade").value = `${currentUser.grade}학년`;
+    document.getElementById("student-class").value = `${currentUser.classNum}반`;
+    document.getElementById("student-number").value = `${currentUser.number}번`;
+    setupDynamicFormFields(contest);
+  }
+}
+
+// 서랍(Drawer) 내에서 직접 취소를 처리하는 전역 핸들러
+window.cancelSubmissionInDrawer = async function (entryId) {
+  if (confirm("정말 이 작품의 접수를 취소하고 삭제하시겠습니까? 한 번 지워진 접수 데이터는 복구할 수 없습니다.")) {
+    // 1. Remote DB Cloud Mode
+    if (GOOGLE_SHEET_API_URL) {
+      showToast("원격 구글 스프레드시트에서 접수를 파기하고 있습니다...", "info");
+      const payload = {
+        action: "deleteSubmission",
+        id: entryId
+      };
+      try {
+        const response = await fetch(GOOGLE_SHEET_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+
+        if (result.status === "error") {
+          showToast(result.message, "error");
+          return;
+        }
+      } catch (e) {
+        console.error("원격 삭제 에러:", e);
+        showToast("원격 서버 통신 지연. 로컬 삭제를 실행합니다.", "error");
+      }
+    }
+
+    // 2. Fallback Local Mode
+    const allSubmissions = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
+    const updatedSubmissions = allSubmissions.filter(entry => entry.id !== entryId);
+    localStorage.setItem("soro_submissions", JSON.stringify(updatedSubmissions));
+
+    showToast("작품 접수 정보가 성공적으로 취소 및 삭제 처리되었습니다. ✨", "success");
+    updateLiveCounters();
+    
+    // 서랍 내용 리프레시
+    if (activeContest) {
+      checkAndRenderSubmissionArea(activeContest);
+    }
+  }
+};
 
 function getGradientForContest(id) {
   const gradients = {
@@ -1162,23 +1338,31 @@ async function executeLoggedInLookup() {
     let contentHtml = "";
 
     // Parse data structure depending on how it was stored
-    const entryData = typeof entry.data === "string" ? JSON.parse(entry.data) : entry.data;
+    let entryData = {};
+    try {
+      entryData = typeof entry.data === "string" ? JSON.parse(entry.data) : (entry.data || {});
+    } catch (err) {
+      console.error("Error parsing entry data:", err, entry.data);
+      if (entry.data) {
+        entryData = { image: entry.data };
+      }
+    }
 
-    if (entryData.image) {
+    if (entryData && entryData.image) {
       contentHtml += `
         <div><strong>제출한 이미지 시안:</strong></div>
         <img class="submission-thumbnail" src="${entryData.image}" alt="제출 이미지">
       `;
     }
 
-    else if (entryData["book-title"]) {
+    else if (entryData && entryData["book-title"]) {
       contentHtml += `
         <div><strong>추천 도서:</strong> ${entryData["book-title"]} (${entryData["book-author"] || "저자 미상"})</div>
         <div><strong>추천 사유 & 평점:</strong> "${entryData["book-review"]}"</div>
       `;
     }
 
-    else if (entryData.type === "text") {
+    else if (entryData && entryData.type === "text") {
       contentHtml += `
         <div><strong>필사 텍스트 구절:</strong></div>
         <div style="font-family: serif; white-space: pre-line; background: var(--bg-tertiary); padding: 12px; border-radius: 6px; margin-top: 4px; border: 1px solid var(--border-color); color: var(--text-primary);">
@@ -1468,7 +1652,10 @@ function doPost(e) {
               studentClass: data[i][6],
               studentNumber: data[i][7],
               timestamp: data[i][8],
-              data: JSON.parse(data[i][9])
+              data: (function() {
+                try { return JSON.parse(data[i][9]); }
+                catch(e) { return { image: data[i][9] }; }
+              })()
             });
           }
         }

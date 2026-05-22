@@ -199,7 +199,10 @@ function doPost(e) {
               studentClass: data[i][6],
               studentNumber: data[i][7],
               timestamp: data[i][8],
-              data: JSON.parse(data[i][9])
+              data: (function() {
+                try { return JSON.parse(data[i][9]); }
+                catch(e) { return { image: data[i][9] }; }
+              })()
             });
           }
         }
