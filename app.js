@@ -1239,66 +1239,141 @@ function setupDynamicFormFields(contest) {
       <div id="toggle-pixel-upload" style="display: none;"></div>
 
       <div id="pixel-draw-container" class="pixel-editor-shell" style="display: none;">
+        <!-- Left Toolbar -->
         <div class="pixel-toolbar">
-          <button type="button" class="pixel-tool-btn action" id="pixel-close-editor" title="업로드 화면으로 돌아가기">×</button>
-          <button type="button" class="pixel-tool-btn active" data-tool="pencil" title="연필">✏️</button>
-          <button type="button" class="pixel-tool-btn" data-tool="brush" title="브러시">🖌️</button>
-          <button type="button" class="pixel-tool-btn" data-tool="eraser" title="지우개">🧹</button>
-          <button type="button" class="pixel-tool-btn" data-tool="bucket" title="채우기">🪣</button>
-          <button type="button" class="pixel-tool-btn" data-tool="eyedropper" title="스포이트">💧</button>
-          <button type="button" class="pixel-tool-btn" data-tool="line" title="직선">╱</button>
-          <button type="button" class="pixel-tool-btn" data-tool="rect-outline" title="사각형 테두리">▢</button>
-          <button type="button" class="pixel-tool-btn" data-tool="rect-fill" title="채운 사각형">▣</button>
-          <button type="button" class="pixel-tool-btn" data-tool="circle-outline" title="원 테두리">○</button>
-          <button type="button" class="pixel-tool-btn" data-tool="circle-fill" title="채운 원">●</button>
-          <button type="button" class="pixel-tool-btn" data-tool="mirror-x" title="좌우 대칭">↔</button>
-          <button type="button" class="pixel-tool-btn" data-tool="mirror-y" title="상하 대칭">↕</button>
-          <button type="button" class="pixel-tool-btn" data-tool="dithering" title="디더링">░</button>
-          <button type="button" class="pixel-tool-btn" data-tool="replace-color" title="색 교체">⇄</button>
-          <button type="button" class="pixel-tool-btn action" id="pixel-undo" title="되돌리기">↶</button>
-          <button type="button" class="pixel-tool-btn action" id="pixel-redo" title="다시 실행">↷</button>
-          <button type="button" class="pixel-tool-btn action" id="pixel-grid-toggle" title="격자 토글">#</button>
-          <button type="button" class="pixel-tool-btn action" id="pixel-clear" title="전체 지우기">🗑️</button>
-          <button type="button" class="pixel-tool-btn action" id="pixel-save-draft" title="임시 저장">💾</button>
+          <div class="pixel-tool-group">
+            <button type="button" class="pixel-tool-btn active" data-tool="pencil" title="연필">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
+            </button>
+            <button type="button" class="pixel-tool-btn" data-tool="brush" title="브러시">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path><path d="m15 5 4 4"></path></svg>
+            </button>
+            <button type="button" class="pixel-tool-btn" data-tool="eraser" title="지우개">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"></path><path d="M22 21H7"></path><path d="m5 11 9 9"></path></svg>
+            </button>
+            <button type="button" class="pixel-tool-btn" data-tool="bucket" title="채우기">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2c.8.8 2 .8 2.8 0L19 11Z"></path><path d="m5 2 5 5"></path><path d="M2 13h15"></path><path d="M22 20a2 2 0 1 1-4 0c0-1.6 1.7-2.4 2-4 .3 1.6 2 2.4 2 4Z"></path></svg>
+            </button>
+            <button type="button" class="pixel-tool-btn" data-tool="eyedropper" title="스포이트">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="m2 22 1-1h3l9-9"></path><path d="M3 21v-3l9-9"></path><path d="m15 6 3.4-3.4a2.1 2.1 0 1 1 3 3L18 9l.4.4a2.1 2.1 0 1 1-3 3l-3.8-3.8a2.1 2.1 0 1 1 3-3l.4.4Z"></path></svg>
+            </button>
+          </div>
+          <div class="pixel-tool-separator"></div>
+          <div class="pixel-tool-group">
+            <button type="button" class="pixel-tool-btn" data-tool="line" title="직선">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="19" x2="19" y2="5"></line></svg>
+            </button>
+            <button type="button" class="pixel-tool-btn" data-tool="rect-outline" title="사각형 테두리">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
+            </button>
+            <button type="button" class="pixel-tool-btn" data-tool="rect-fill" title="채운 사각형">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
+            </button>
+            <button type="button" class="pixel-tool-btn" data-tool="circle-outline" title="원 테두리">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle></svg>
+            </button>
+            <button type="button" class="pixel-tool-btn" data-tool="circle-fill" title="채운 원">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="currentColor"><circle cx="12" cy="12" r="10"></circle></svg>
+            </button>
+          </div>
+          <div class="pixel-tool-separator"></div>
+          <div class="pixel-tool-group">
+            <button type="button" class="pixel-tool-btn" data-tool="mirror-x" title="좌우 대칭">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="17 18 22 12 17 6"></polyline><polyline points="7 6 2 12 7 18"></polyline><line x1="12" y1="2" x2="12" y2="22"></line></svg>
+            </button>
+            <button type="button" class="pixel-tool-btn" data-tool="mirror-y" title="상하 대칭">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 17 12 22 18 17"></polyline><polyline points="6 7 12 2 18 7"></polyline><line x1="22" y1="12" x2="2" y2="12"></line></svg>
+            </button>
+            <button type="button" class="pixel-tool-btn" data-tool="dithering" title="디더링">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h1v1H4zM8 4h1v1H8zM12 4h1v1h-1zM16 4h1v1h-1zM20 4h1v1h-1zM6 8h1v1H6zM10 8h1v1h-1zM14 8h1v1h-1zM18 8h1v1h-1zM4 12h1v1H4zM8 12h1v1H8zM12 12h1v1h-1zM16 12h1v1h-1zM20 12h1v1h-1zM6 16h1v1H6zM10 16h1v1h-1zM14 16h1v1h-1zM18 16h1v1h-1zM4 20h1v1H4zM8 20h1v1H8zM12 20h1v1h-1zM16 20h1v1h-1zM20 20h1v1h-1z"></path></svg>
+            </button>
+            <button type="button" class="pixel-tool-btn" data-tool="replace-color" title="색 교체">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="m3 16 4 4 4-4"></path><path d="M7 20V4"></path><path d="m21 8-4-4-4 4"></path><path d="M17 4v16"></path></svg>
+            </button>
+          </div>
+          <div class="pixel-tool-separator"></div>
+          <div class="pixel-tool-group">
+            <button type="button" class="pixel-tool-btn action" id="pixel-undo" title="되돌리기">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
+            </button>
+            <button type="button" class="pixel-tool-btn action" id="pixel-redo" title="다시 실행">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path></svg>
+            </button>
+            <button type="button" class="pixel-tool-btn action" id="pixel-grid-toggle" title="격자 토글">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg>
+            </button>
+            <button type="button" class="pixel-tool-btn action pixel-btn-danger" id="pixel-clear" title="전체 지우기">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+            <button type="button" class="pixel-tool-btn action pixel-btn-primary" id="pixel-save-draft" title="임시 저장">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+            </button>
+          </div>
         </div>
 
+        <!-- Center Stage -->
         <div class="pixel-stage">
           <div class="pixel-grid-wrapper">
             <div class="pixel-grid-board" id="pixel-grid-board"></div>
           </div>
-          <div class="pixel-editor-status">
-            <span id="pixel-coords">X: -, Y: -</span>
-            <span id="pixel-tool-label">PENCIL</span>
-          </div>
         </div>
 
+        <!-- Right Panel -->
         <div class="pixel-side-panel">
-          <div class="pixel-panel-label">현재 색상</div>
-          <div class="pixel-current-row">
-            <div class="pixel-current-swatch" id="pixel-current-swatch" style="background:#111111;"></div>
-            <span id="pixel-current-hex">#111111</span>
+          <button type="button" class="pixel-close-main-btn" id="pixel-close-editor" title="업로드 화면으로 돌아가기">
+            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+          
+          <div class="pixel-panel-section">
+            <div class="pixel-panel-label">현재 색상</div>
+            <div class="pixel-current-row">
+              <div class="pixel-current-swatch" id="pixel-current-swatch" style="background:#111111;"></div>
+              <span id="pixel-current-hex">#111111</span>
+            </div>
+            <div class="pixel-color-picker-wrapper">
+              <input type="color" class="pixel-custom-color" id="pixel-custom-color" value="#111111" title="자유 색상 선택">
+              <span>사용자 지정 색상</span>
+            </div>
           </div>
-          <input type="color" class="pixel-custom-color" id="pixel-custom-color" value="#111111" title="자유 색상 선택">
-          <div class="pixel-panel-label">팔레트</div>
-          <div class="pixel-palette-row" id="pixel-palette-row">
-            <div class="color-chip active" data-color="#111111" style="background:#111111;" title="검정"></div>
-            <div class="color-chip" data-color="#ffffff" style="background:#ffffff;" title="흰색"></div>
-            <div class="color-chip" data-color="#ef4444" style="background:#ef4444;" title="빨강"></div>
-            <div class="color-chip" data-color="#f97316" style="background:#f97316;" title="주황"></div>
-            <div class="color-chip" data-color="#eab308" style="background:#eab308;" title="노랑"></div>
-            <div class="color-chip" data-color="#22c55e" style="background:#22c55e;" title="연두"></div>
-            <div class="color-chip" data-color="#3b82f6" style="background:#3b82f6;" title="파랑"></div>
-            <div class="color-chip" data-color="#8b5cf6" style="background:#8b5cf6;" title="보라"></div>
-            <div class="color-chip" data-color="#ec4899" style="background:#ec4899;" title="핑크"></div>
-            <div class="color-chip" data-color="#92400e" style="background:#92400e;" title="갈색"></div>
-            <div class="color-chip" data-color="#6b7280" style="background:#6b7280;" title="회색"></div>
-            <div class="color-chip" data-color="#67e8f9" style="background:#67e8f9;" title="하늘"></div>
+          
+          <div class="pixel-panel-section">
+            <div class="pixel-panel-label">팔레트</div>
+            <div class="pixel-palette-row" id="pixel-palette-row">
+              <div class="color-chip active" data-color="#111111" style="background:#111111;" title="검정"></div>
+              <div class="color-chip" data-color="#ffffff" style="background:#ffffff;" title="흰색"></div>
+              <div class="color-chip" data-color="#ef4444" style="background:#ef4444;" title="빨강"></div>
+              <div class="color-chip" data-color="#f97316" style="background:#f97316;" title="주황"></div>
+              <div class="color-chip" data-color="#eab308" style="background:#eab308;" title="노랑"></div>
+              <div class="color-chip" data-color="#22c55e" style="background:#22c55e;" title="연두"></div>
+              <div class="color-chip" data-color="#3b82f6" style="background:#3b82f6;" title="파랑"></div>
+              <div class="color-chip" data-color="#8b5cf6" style="background:#8b5cf6;" title="보라"></div>
+              <div class="color-chip" data-color="#ec4899" style="background:#ec4899;" title="핑크"></div>
+              <div class="color-chip" data-color="#92400e" style="background:#92400e;" title="갈색"></div>
+              <div class="color-chip" data-color="#6b7280" style="background:#6b7280;" title="회색"></div>
+              <div class="color-chip" data-color="#67e8f9" style="background:#67e8f9;" title="하늘"></div>
+            </div>
           </div>
         </div>
 
-        <div class="pixel-action-bar">
-          <button type="button" class="btn btn-secondary" id="pixel-switch-upload">이미지 파일 업로드로 전환</button>
-          <button type="button" class="btn btn-primary" id="pixel-submit-draw">최종 제출</button>
+        <!-- Bottom Action Bar & Status Bar -->
+        <div class="pixel-bottom-bar">
+          <div class="pixel-status-info">
+            <span class="pixel-status-tool" id="pixel-tool-label">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path></svg>
+              <span>PENCIL</span>
+            </span>
+            <span class="pixel-status-coords" id="pixel-coords">X: -, Y: -</span>
+          </div>
+          <div class="pixel-action-buttons">
+            <button type="button" class="btn btn-secondary" id="pixel-switch-upload">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              이미지 업로드로 전환
+            </button>
+            <button type="button" class="btn btn-primary" id="pixel-submit-draw">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              작품 최종 제출
+            </button>
+          </div>
         </div>
       </div>
 
