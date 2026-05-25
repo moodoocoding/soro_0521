@@ -526,6 +526,10 @@ function updateUIForLoggedOutState() {
   document.getElementById("logout-btn").style.display = "none";
   document.getElementById("lookup-toggle-btn").style.display = "none";
   document.getElementById("user-profile-badge").style.display = "none";
+  const levelContainer = document.getElementById("lookup-level-container");
+  if (levelContainer) {
+    levelContainer.innerHTML = "";
+  }
 }
 
 function executeLogout() {
@@ -3172,6 +3176,84 @@ async function executeLoggedInLookup() {
 
   // 임시저장 본은 제출 목록 리스트에서 제외
   mySubmissions = mySubmissions.filter(entry => entry.contestId !== "pixelart_draft");
+
+  // === [신설] 게이미피케이션 레벨링 시스템 렌더링 ===
+  const levelContainer = document.getElementById("lookup-level-container");
+  if (levelContainer) {
+    const completedContests = new Set();
+    mySubmissions.forEach(entry => {
+      completedContests.add(entry.contestId);
+    });
+    
+    const completedCount = completedContests.size;
+    const totalCount = CONTESTS_DATA.length;
+    const progressPercent = Math.round((completedCount / totalCount) * 100);
+
+    const levels = [
+      { title: "소로 새싹 🌱", desc: "도전을 준비하는 파릇파릇한 새싹 단계입니다. 공모전에 참여해 첫 작품을 등록해 보세요!", icon: "🌱" },
+      { title: "도전 시작 🚀", desc: "첫 걸음을 떼었습니다! 계속해서 상상의 나래를 펼쳐 다른 미션도 완료해 보세요.", icon: "🚀" },
+      { title: "꿈꾸는 크리에이터 ✨", desc: "멋진 창의성으로 벌써 두 개의 미션을 완료하셨네요! 자신만의 작품 세계를 구축 중입니다.", icon: "✨" },
+      { title: "창작 탐험가 🗺️", desc: "세 개의 미션 클리어! 새로운 한계를 뛰어넘어 창작의 진정한 묘미를 알아가는 중입니다.", icon: "🗺️" },
+      { title: "아이디어 발전기 ⚡", desc: "네 개의 미션 클리어! 반짝이는 아이디어가 쉴 새 없이 샘솟는 학급 대표 창의력 대장!", icon: "⚡" },
+      { title: "디지털 마스터 🎓", desc: "다섯 개의 미션 완료! 다양한 디지털 창작 도구를 완벽에 가깝게 다루는 디지털 마스터 수준입니다.", icon: "🎓" },
+      { title: "전설의 크리에이터 🏆", desc: "경배하라! 6개의 모든 공모전 미션을 완벽 정복한 청주소로초 최고의 크리에이티브 히어로!", icon: "🏆" }
+    ];
+
+    const currentLevelInfo = levels[completedCount] || levels[0];
+    const nextLevelInfo = levels[completedCount + 1] || null;
+
+    let stageBadgesHtml = CONTESTS_DATA.map(contest => {
+      const isCompleted = completedContests.has(contest.id);
+      return `
+        <div class="stage-badge ${isCompleted ? 'completed' : 'locked'}">
+          <div class="badge-icon">${isCompleted ? '🟢' : '🔒'}</div>
+          <div class="badge-title" title="${contest.title}">${contest.title}</div>
+          <div class="badge-status">${isCompleted ? '완료' : '대기 중'}</div>
+        </div>
+      `;
+    }).join("");
+
+    let nextLevelMessage = nextLevelInfo 
+      ? `다음 레벨 <strong>[${nextLevelInfo.title}]</strong>까지 미션 <strong>1개</strong> 더 완료하기!`
+      : `🎉 모든 공모전 미션을 정복하여 최고 레벨에 도달했습니다!`;
+
+    levelContainer.innerHTML = `
+      <div class="level-card">
+        <div class="level-card-header">
+          <div class="level-info">
+            <span class="level-badge">LV.${completedCount}</span>
+            <h3 class="level-title">${currentLevelInfo.title}</h3>
+            <span class="student-grade-name">(${currentUser.grade}학년 ${currentUser.classNum}반 ${currentUser.name})</span>
+          </div>
+          <div class="level-desc">${currentLevelInfo.desc}</div>
+        </div>
+        
+        <div class="level-xp-section">
+          <div class="level-xp-label">
+            <span>미션 진행도 (XP)</span>
+            <span>${completedCount} / ${totalCount} (${progressPercent}%)</span>
+          </div>
+          <div class="xp-bar-container">
+            <div class="xp-bar-fill" id="xp-bar-fill-dynamic" style="width: 0%;"></div>
+          </div>
+          <div class="level-next-tip">${nextLevelMessage}</div>
+        </div>
+        
+        <div class="level-stages-grid">
+          <div class="stages-grid-title">미션 달성 보드 (Mission Board)</div>
+          <div class="stages-grid-container">
+            ${stageBadgesHtml}
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Trigger width animation after rendering
+    setTimeout(() => {
+      const bar = document.getElementById("xp-bar-fill-dynamic");
+      if (bar) bar.style.width = `${progressPercent}%`;
+    }, 100);
+  }
 
   container.innerHTML = "";
 

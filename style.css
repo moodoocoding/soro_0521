@@ -2195,6 +2195,194 @@ textarea {
   opacity: 0.8;
 }
 
+/* My Submissions Drawer Expansion */
+#lookup-drawer .drawer-content {
+  max-width: 800px;
+}
+@media (max-width: 800px) {
+  #lookup-drawer .drawer-content {
+    max-width: 100%;
+  }
+}
+
+/* Gamified Level Card */
+.level-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 24px;
+  border-radius: 0; /* matches crisp monochrome square aesthetic */
+  margin-bottom: 28px;
+}
+
+.level-card-header {
+  margin-bottom: 20px;
+}
+
+.level-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.level-badge {
+  background-color: var(--text-primary);
+  color: var(--bg-primary);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 4px 10px;
+  letter-spacing: 0.5px;
+}
+
+.level-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.student-grade-name {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.level-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* XP Progress Bar */
+.level-xp-section {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.level-xp-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  font-family: var(--font-display), monospace;
+}
+
+.xp-bar-container {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  height: 10px;
+  width: 100%;
+  overflow: hidden;
+}
+
+body.light-theme .xp-bar-container {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.xp-bar-fill {
+  background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+  height: 100%;
+  width: 0; /* Set dynamically */
+  transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.level-next-tip {
+  font-size: 12px;
+  color: var(--status-pending);
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+/* Mission Board Grid */
+.level-stages-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stages-grid-title {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+}
+
+.stages-grid-container {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 650px) {
+  .stages-grid-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 400px) {
+  .stages-grid-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.stage-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 8px;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+
+.stage-badge.completed {
+  border-color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.04);
+}
+
+.stage-badge.locked {
+  opacity: 0.5;
+}
+
+.stage-badge .badge-icon {
+  font-size: 20px;
+  margin-bottom: 6px;
+}
+
+.stage-badge .badge-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.stage-badge .badge-status {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.stage-badge.completed .badge-status {
+  color: #3b82f6;
+  font-weight: 700;
+}
+
 
 
 
