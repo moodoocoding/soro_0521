@@ -800,6 +800,7 @@ h1, h2, h3, h4, .logo-text, .logo-sub, .badge, .stat-value, .month-btn, .auth-ta
 }
 
 #submission-form > .form-group-row,
+.submission-area.is-loading .form-title,
 .submission-area.has-existing-submission .form-title {
   display: none;
 }

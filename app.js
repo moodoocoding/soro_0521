@@ -1029,6 +1029,7 @@ async function checkAndRenderSubmissionArea(contest) {
   const subForm = document.getElementById("submission-form");
   const authNotice = document.getElementById("auth-required-notice");
   formContainer.classList.remove("has-existing-submission");
+  formContainer.classList.add("is-loading");
 
   // 기존 뷰/로더 잔여물 소거
   const existingView = document.getElementById("existing-submission-view");
@@ -1037,6 +1038,7 @@ async function checkAndRenderSubmissionArea(contest) {
   if (loader) loader.remove();
 
   if (!currentUser) {
+    formContainer.classList.remove("is-loading");
     authNotice.style.display = "flex";
     subForm.style.display = "none";
     return;
@@ -1087,6 +1089,7 @@ async function checkAndRenderSubmissionArea(contest) {
   // 로더 제거
   const activeLoader = document.getElementById("submission-loading-indicator");
   if (activeLoader) activeLoader.remove();
+  formContainer.classList.remove("is-loading");
 
   const existingSubmission = mySubmissions.find(s => s.contestId === contest.id);
 
