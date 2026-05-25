@@ -2132,4 +2132,52 @@ textarea {
   box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
 }
 
+/* === 6. Special Shapes Grid inside Right Panel === */
+.pixel-special-shapes-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  background-color: #0c0c0e;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #2c2c32;
+}
+
+.pixel-shape-item {
+  aspect-ratio: 1/1;
+  background-color: #161619;
+  border: 1px solid #2c2c32;
+  border-radius: 6px;
+  color: #909099;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.pixel-shape-item svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.15s;
+}
+
+.pixel-shape-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  border-color: #888;
+}
+
+.pixel-shape-item:hover svg {
+  transform: scale(1.15);
+}
+
+.pixel-shape-item.active {
+  background-color: rgba(236, 72, 153, 0.1);
+  border-color: #ec4899; /* Glowing pink border */
+  color: #ec4899;
+  box-shadow: 0 0 8px rgba(236, 72, 153, 0.4), inset 0 0 4px rgba(236, 72, 153, 0.2);
+}
+
+
 

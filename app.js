@@ -1263,38 +1263,8 @@ function setupDynamicFormFields(contest) {
             <button type="button" class="pixel-tool-btn" data-tool="eyedropper" title="스포이트">
               <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="m2 22 1-1h3l9-9"></path><path d="M3 21v-3l9-9"></path><path d="m15 6 3.4-3.4a2.1 2.1 0 1 1 3 3L18 9l.4.4a2.1 2.1 0 1 1-3 3l-3.8-3.8a2.1 2.1 0 1 1 3-3l.4.4Z"></path></svg>
             </button>
-          </div>
-          <div class="pixel-tool-separator"></div>
-          <div class="pixel-tool-group">
-            <button type="button" class="pixel-tool-btn" data-tool="line" title="직선">
-              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="19" x2="19" y2="5"></line></svg>
-            </button>
-            <button type="button" class="pixel-tool-btn" data-tool="rect-outline" title="사각형 테두리">
-              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
-            </button>
-            <button type="button" class="pixel-tool-btn" data-tool="rect-fill" title="채운 사각형">
-              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
-            </button>
-            <button type="button" class="pixel-tool-btn" data-tool="circle-outline" title="원 테두리">
-              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle></svg>
-            </button>
-            <button type="button" class="pixel-tool-btn" data-tool="circle-fill" title="채운 원">
-              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="currentColor"><circle cx="12" cy="12" r="10"></circle></svg>
-            </button>
-          </div>
-          <div class="pixel-tool-separator"></div>
-          <div class="pixel-tool-group">
-            <button type="button" class="pixel-tool-btn" data-tool="mirror-x" title="좌우 대칭">
-              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="17 18 22 12 17 6"></polyline><polyline points="7 6 2 12 7 18"></polyline><line x1="12" y1="2" x2="12" y2="22"></line></svg>
-            </button>
-            <button type="button" class="pixel-tool-btn" data-tool="mirror-y" title="상하 대칭">
-              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 17 12 22 18 17"></polyline><polyline points="6 7 12 2 18 7"></polyline><line x1="22" y1="12" x2="2" y2="12"></line></svg>
-            </button>
-            <button type="button" class="pixel-tool-btn" data-tool="dithering" title="디더링">
-              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 4h1v1H4zM8 4h1v1H8zM12 4h1v1h-1zM16 4h1v1h-1zM20 4h1v1h-1zM6 8h1v1H6zM10 8h1v1h-1zM14 8h1v1h-1zM18 8h1v1h-1zM4 12h1v1H4zM8 12h1v1H8zM12 12h1v1h-1zM16 12h1v1h-1zM20 12h1v1h-1zM6 16h1v1H6zM10 16h1v1h-1zM14 16h1v1h-1zM18 16h1v1h-1zM4 20h1v1H4zM8 20h1v1H8zM12 20h1v1h-1zM16 20h1v1h-1zM20 20h1v1h-1z"></path></svg>
-            </button>
-            <button type="button" class="pixel-tool-btn" data-tool="replace-color" title="색 교체">
-              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="m3 16 4 4 4-4"></path><path d="M7 20V4"></path><path d="m21 8-4-4-4 4"></path><path d="M17 4v16"></path></svg>
+            <button type="button" class="pixel-tool-btn" data-tool="special-shape" title="특별 도형 도구 (우측에서 선택)">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"></polygon></svg>
             </button>
           </div>
           <div class="pixel-tool-separator"></div>
@@ -1383,6 +1353,17 @@ function setupDynamicFormFields(contest) {
                 <button type="button" class="pixel-size-btn" data-size="3" title="3 픽셀 (3x3)">3px</button>
                 <button type="button" class="pixel-size-btn" data-size="4" title="4 픽셀 (4x4)">4px</button>
               </div>
+            </div>
+          </div>
+
+          <!-- 세로 구분선 (Divider Line) -->
+          <div class="pixel-tool-separator horizontal"></div>
+
+          <!-- 4단: 특별 도형 (28종) -->
+          <div class="pixel-panel-section">
+            <div class="pixel-panel-label">특별 도형 선택 (28종)</div>
+            <div class="pixel-special-shapes-grid" id="pixel-special-shapes-grid">
+              <!-- Dynamically populated from JS -->
             </div>
           </div>
         </div>
@@ -1664,6 +1645,47 @@ function initPixelArtEditor() {
   let currentColor = primaryColor; // default fallback
   let activeColorSlot = "primary"; // "primary" or "secondary"
   
+  let activeSpecialShape = "rect-outline"; // Default special shape
+  const SPECIAL_SHAPES = [
+    { id: "line", name: "직선", icon: `<line x1="3" y1="21" x2="21" y2="3" stroke="currentColor" stroke-width="2"/>` },
+    { id: "rect-outline", name: "사각형 테두리", icon: `<rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>` },
+    { id: "rect-fill", name: "채운 사각형", icon: `<rect x="3" y="3" width="18" height="18" rx="2" fill="currentColor"/>` },
+    { id: "circle-outline", name: "원 테두리", icon: `<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/>` },
+    { id: "circle-fill", name: "채운 원", icon: `<circle cx="12" cy="12" r="9" fill="currentColor"/>` },
+    
+    { id: "triangle-up-outline", name: "삼각형 테두리(▲)", icon: `<polygon points="12 3 2 21 22 21" stroke="currentColor" stroke-width="2" fill="none"/>` },
+    { id: "triangle-up-fill", name: "채운 삼각형(▲)", icon: `<polygon points="12 3 2 21 22 21" fill="currentColor"/>` },
+    { id: "triangle-down-outline", name: "삼각형 테두리(▼)", icon: `<polygon points="12 21 2 3 22 3" stroke="currentColor" stroke-width="2" fill="none"/>` },
+    { id: "triangle-down-fill", name: "채운 삼각형(▼)", icon: `<polygon points="12 21 2 3 22 3" fill="currentColor"/>` },
+    
+    { id: "right-triangle-tl-outline", name: "직각삼각형(↖)", icon: `<polygon points="3 3 21 3 3 21" stroke="currentColor" stroke-width="2" fill="none"/>` },
+    { id: "right-triangle-tl-fill", name: "채운 직각삼각형(↖)", icon: `<polygon points="3 3 21 3 3 21" fill="currentColor"/>` },
+    { id: "right-triangle-br-outline", name: "직각삼각형(↘)", icon: `<polygon points="21 21 3 21 21 3" stroke="currentColor" stroke-width="2" fill="none"/>` },
+    { id: "right-triangle-br-fill", name: "채운 직각삼각형(↘)", icon: `<polygon points="21 21 3 21 21 3" fill="currentColor"/>` },
+    
+    { id: "diamond-outline", name: "마름모 테두리", icon: `<polygon points="12 2 22 12 12 22 2 12" stroke="currentColor" stroke-width="2" fill="none"/>` },
+    { id: "diamond-fill", name: "채운 마름모", icon: `<polygon points="12 2 22 12 12 22 2 12" fill="currentColor"/>` },
+    
+    { id: "heart-outline", name: "하트 테두리", icon: `<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="currentColor" stroke-width="2" fill="none"/>` },
+    { id: "heart-fill", name: "채운 하트", icon: `<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="currentColor"/>` },
+    
+    { id: "star-outline", name: "별 테두리", icon: `<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26" stroke="currentColor" stroke-width="2" fill="none"/>` },
+    { id: "star-fill", name: "채운 별", icon: `<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26" fill="currentColor"/>` },
+    
+    { id: "cross-outline", name: "십자가 테두리", icon: `<polygon points="9 3 15 3 15 9 21 9 21 15 15 15 15 21 9 21 9 15 3 15 3 9 9 9" stroke="currentColor" stroke-width="2" fill="none"/>` },
+    { id: "cross-fill", name: "채운 십자가", icon: `<polygon points="9 3 15 3 15 9 21 9 21 15 15 15 15 21 9 21 9 15 3 15 3 9 9 9" fill="currentColor"/>` },
+    
+    { id: "arrow-up-outline", name: "화살표(↑) 테두리", icon: `<polygon points="12 3 4 11 9 11 9 21 15 21 15 11 20 11" stroke="currentColor" stroke-width="2" fill="none"/>` },
+    { id: "arrow-up-fill", name: "채운 화살표(↑)", icon: `<polygon points="12 3 4 11 9 11 9 21 15 21 15 11 20 11" fill="currentColor"/>` },
+    { id: "arrow-down-outline", name: "화살표(↓) 테두리", icon: `<polygon points="12 21 4 13 9 13 9 3 15 3 15 13 20 13" stroke="currentColor" stroke-width="2" fill="none"/>` },
+    { id: "arrow-down-fill", name: "채운 화살표(↓)", icon: `<polygon points="12 21 4 13 9 13 9 3 15 3 15 13 20 13" fill="currentColor"/>` },
+    
+    { id: "hexagon-outline", name: "육각형 테두리", icon: `<polygon points="12 2 22 7.5 22 18.5 12 24 2 18.5 2 7.5" stroke="currentColor" stroke-width="2" fill="none"/>` },
+    { id: "hexagon-fill", name: "채운 육각형", icon: `<polygon points="12 2 22 7.5 22 18.5 12 24 2 18.5 2 7.5" fill="currentColor"/>` },
+    { id: "pentagon-outline", name: "오각형 테두리", icon: `<polygon points="12 2 22 9.5 18 22 6 22 2 9.5" stroke="currentColor" stroke-width="2" fill="none"/>` },
+    { id: "pentagon-fill", name: "채운 오각형", icon: `<polygon points="12 2 22 9.5 18 22 6 22 2 9.5" fill="currentColor"/>` }
+  ];
+  
   let currentBrushSize = 1;
   let currentTool = "pencil";
   let isDrawing = false;
@@ -1936,37 +1958,416 @@ function initPixelArtEditor() {
     }
   }
 
-  function mirrorX(index, color) {
-    const { x, y } = xy(index);
-    setPixelWithSize(x, y, color);
-    const offsets = getBrushOffsets(currentBrushSize);
-    offsets.forEach(([dx, dy]) => {
-      const nx = x + dx;
-      const ny = y + dy;
-      if (inBounds(nx, ny)) {
-        setPixel(GRID_SIZE - 1 - nx, ny, color);
-      }
-    });
+  function isShapeTool(tool) {
+    return ["line", "rect-outline", "rect-fill", "circle-outline", "circle-fill", "triangle-outline", "triangle-fill", "right-triangle-outline", "right-triangle-fill", "diamond-outline", "diamond-fill", "special-shape"].includes(tool);
   }
 
-  function mirrorY(index, color) {
-    const { x, y } = xy(index);
-    setPixelWithSize(x, y, color);
-    const offsets = getBrushOffsets(currentBrushSize);
-    offsets.forEach(([dx, dy]) => {
-      const nx = x + dx;
-      const ny = y + dy;
-      if (inBounds(nx, ny)) {
-        setPixel(nx, GRID_SIZE - 1 - ny, color);
+  function drawTriangle(x0, y0, x1, y1, direction, fill, color) {
+    const minX = Math.min(x0, x1);
+    const maxX = Math.max(x0, x1);
+    const minY = Math.min(y0, y1);
+    const maxY = Math.max(y0, y1);
+    const midX = Math.round((x0 + x1) / 2);
+    
+    if (fill) {
+      const height = maxY - minY + 1;
+      for (let y = minY; y <= maxY; y++) {
+        let progress;
+        if (direction === "up") {
+          progress = height > 1 ? (y - minY) / (height - 1) : 1;
+        } else {
+          progress = height > 1 ? (maxY - y) / (height - 1) : 1;
+        }
+        const width = Math.round((maxX - minX) * progress);
+        const startX = midX - Math.floor(width / 2);
+        const endX = startX + width - 1;
+        for (let x = startX; x <= endX; x++) {
+          setPixel(x, y, color);
+        }
       }
-    });
+    } else {
+      const peakY = direction === "up" ? minY : maxY;
+      const baseY = direction === "up" ? maxY : minY;
+      drawLine(midX, peakY, minX, baseY, color);
+      drawLine(midX, peakY, maxX, baseY, color);
+      drawLine(minX, baseY, maxX, baseY, color);
+    }
   }
 
-  function replaceColorAt(index, color) {
-    const target = activeBuffer[index] || "";
-    for (let i = 0; i < activeBuffer.length; i++) {
-      if ((activeBuffer[i] || "") === target) {
-        activeBuffer[i] = color;
+  function drawRightTriangle(x0, y0, x1, y1, corner, fill, color) {
+    const minX = Math.min(x0, x1);
+    const maxX = Math.max(x0, x1);
+    const minY = Math.min(y0, y1);
+    const maxY = Math.max(y0, y1);
+    const w = maxX - minX;
+    const h = maxY - minY;
+    
+    if (fill) {
+      for (let y = minY; y <= maxY; y++) {
+        const dy = y - minY;
+        const progress = h > 0 ? dy / h : 1;
+        if (corner === "tl") {
+          const endX = minX + Math.round(w * (1 - progress));
+          for (let x = minX; x <= endX; x++) {
+            setPixel(x, y, color);
+          }
+        } else {
+          const startX = minX + Math.round(w * (1 - progress));
+          for (let x = startX; x <= maxX; x++) {
+            setPixel(x, y, color);
+          }
+        }
+      }
+    } else {
+      if (corner === "tl") {
+        drawLine(minX, minY, maxX, minY, color);
+        drawLine(minX, minY, minX, maxY, color);
+        drawLine(maxX, minY, minX, maxY, color);
+      } else {
+        drawLine(minX, maxY, maxX, maxY, color);
+        drawLine(maxX, minY, maxX, maxY, color);
+        drawLine(minX, maxY, maxX, minY, color);
+      }
+    }
+  }
+
+  function drawDiamond(x0, y0, x1, y1, fill, color) {
+    const minX = Math.min(x0, x1);
+    const maxX = Math.max(x0, x1);
+    const minY = Math.min(y0, y1);
+    const maxY = Math.max(y0, y1);
+    const midX = Math.round((x0 + x1) / 2);
+    const midY = Math.round((y0 + y1) / 2);
+    
+    if (fill) {
+      const halfH = midY - minY;
+      for (let y = minY; y <= maxY; y++) {
+        const dy = Math.abs(y - midY);
+        const progress = halfH > 0 ? (1 - dy / halfH) : 1;
+        const width = Math.round((maxX - minX) * progress);
+        const startX = midX - Math.floor(width / 2);
+        const endX = startX + width - 1;
+        for (let x = startX; x <= endX; x++) {
+          setPixel(x, y, color);
+        }
+      }
+    } else {
+      drawLine(midX, minY, minX, midY, color);
+      drawLine(midX, minY, maxX, midY, color);
+      drawLine(midX, maxY, minX, midY, color);
+      drawLine(midX, maxY, maxX, midY, color);
+    }
+  }
+
+  function drawHeart(x0, y0, x1, y1, fill, color) {
+    const minX = Math.min(x0, x1);
+    const maxX = Math.max(x0, x1);
+    const minY = Math.min(y0, y1);
+    const maxY = Math.max(y0, y1);
+    const w = maxX - minX;
+    const h = maxY - minY;
+    
+    if (w === 0 || h === 0) {
+      setPixel(x0, y0, color);
+      return;
+    }
+    
+    const cx = (minX + maxX) / 2;
+    const cy = minY + h * 0.38;
+    
+    for (let y = minY; y <= maxY; y++) {
+      for (let x = minX; x <= maxX; x++) {
+        const nx = ((x - cx) / (w / 2)) * 1.25;
+        const ny = (((cy - y) / (h / 2)) * 1.2) + 0.15;
+        const equation = (nx*nx + ny*ny - 1)**3 - nx*nx * ny*ny*ny;
+        
+        if (fill) {
+          if (equation <= 0) {
+            setPixel(x, y, color);
+          }
+        } else {
+          if (equation <= 0) {
+            let isBorder = false;
+            const neighbors = [[x+1, y], [x-1, y], [x, y+1], [x, y-1]];
+            for (const [nx_n, ny_n] of neighbors) {
+              if (nx_n < minX || nx_n > maxX || ny_n < minY || ny_n > maxY) {
+                isBorder = true;
+                break;
+              }
+              const nnx = ((nx_n - cx) / (w / 2)) * 1.25;
+              const nny = (((cy - ny_n) / (h / 2)) * 1.2) + 0.15;
+              const n_eq = (nnx*nnx + nny*nny - 1)**3 - nnx*nnx * nny*nny*nny;
+              if (n_eq > 0) {
+                isBorder = true;
+                break;
+              }
+            }
+            if (isBorder) {
+              setPixelWithSize(x, y, color);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  function drawStar(x0, y0, x1, y1, fill, color) {
+    const minX = Math.min(x0, x1);
+    const maxX = Math.max(x0, x1);
+    const minY = Math.min(y0, y1);
+    const maxY = Math.max(y0, y1);
+    const w = maxX - minX;
+    const h = maxY - minY;
+    
+    if (w === 0 || h === 0) {
+      setPixel(x0, y0, color);
+      return;
+    }
+    
+    const cx = (minX + maxX) / 2;
+    const cy = (minY + maxY) / 2;
+    
+    for (let y = minY; y <= maxY; y++) {
+      for (let x = minX; x <= maxX; x++) {
+        const nx = Math.abs(x - cx) / (w / 2);
+        const ny = Math.abs(y - cy) / (h / 2);
+        const value = Math.sqrt(nx) + Math.sqrt(ny);
+        
+        if (fill) {
+          if (value <= 1.0) {
+            setPixel(x, y, color);
+          }
+        } else {
+          if (value <= 1.0) {
+            let isBorder = false;
+            const neighbors = [[x+1, y], [x-1, y], [x, y+1], [x, y-1]];
+            for (const [nx_n, ny_n] of neighbors) {
+              if (nx_n < minX || nx_n > maxX || ny_n < minY || ny_n > maxY) {
+                isBorder = true;
+                break;
+              }
+              const nnx = Math.abs(nx_n - cx) / (w / 2);
+              const nny = Math.abs(ny_n - cy) / (h / 2);
+              const n_val = Math.sqrt(nnx) + Math.sqrt(nny);
+              if (n_val > 1.0) {
+                isBorder = true;
+                break;
+              }
+            }
+            if (isBorder) {
+              setPixelWithSize(x, y, color);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  function drawCross(x0, y0, x1, y1, fill, color) {
+    const minX = Math.min(x0, x1);
+    const maxX = Math.max(x0, x1);
+    const minY = Math.min(y0, y1);
+    const maxY = Math.max(y0, y1);
+    const w = maxX - minX;
+    const h = maxY - minY;
+    
+    const cx = Math.round((minX + maxX) / 2);
+    const cy = Math.round((minY + maxY) / 2);
+    
+    const thickX = Math.max(1, Math.round(w / 3));
+    const thickY = Math.max(1, Math.round(h / 3));
+    
+    const xStart = cx - Math.floor(thickX / 2);
+    const xEnd = xStart + thickX - 1;
+    const yStart = cy - Math.floor(thickY / 2);
+    const yEnd = yStart + thickY - 1;
+    
+    for (let y = minY; y <= maxY; y++) {
+      for (let x = minX; x <= maxX; x++) {
+        const inVertBar = (x >= xStart && x <= xEnd);
+        const inHorizBar = (y >= yStart && y <= yEnd);
+        const inside = inVertBar || inHorizBar;
+        
+        if (fill) {
+          if (inside) setPixel(x, y, color);
+        } else {
+          if (inside) {
+            let isBorder = false;
+            const neighbors = [[x+1, y], [x-1, y], [x, y+1], [x, y-1]];
+            for (const [nx_n, ny_n] of neighbors) {
+              if (nx_n < minX || nx_n > maxX || ny_n < minY || ny_n > maxY) {
+                isBorder = true;
+                break;
+              }
+              const n_inVert = (nx_n >= xStart && nx_n <= xEnd);
+              const n_inHoriz = (ny_n >= yStart && ny_n <= yEnd);
+              if (!(n_inVert || n_inHoriz)) {
+                isBorder = true;
+                break;
+              }
+            }
+            if (isBorder) {
+              setPixelWithSize(x, y, color);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  function drawArrow(x0, y0, x1, y1, direction, fill, color) {
+    const minX = Math.min(x0, x1);
+    const maxX = Math.max(x0, x1);
+    const minY = Math.min(y0, y1);
+    const maxY = Math.max(y0, y1);
+    const w = maxX - minX;
+    const h = maxY - minY;
+    
+    const cx = Math.round((minX + maxX) / 2);
+    const headHeight = Math.max(2, Math.round(h * 0.5));
+    const shaftWidth = Math.max(1, Math.round(w / 3));
+    const shaftStart = cx - Math.floor(shaftWidth / 2);
+    const shaftEnd = shaftStart + shaftWidth - 1;
+    
+    function isInside(x, y) {
+      if (x < minX || x > maxX || y < minY || y > maxY) return false;
+      
+      if (direction === "up") {
+        if (y < minY + headHeight) {
+          const dy = y - minY;
+          const progress = headHeight > 1 ? dy / (headHeight - 1) : 1;
+          const halfW = Math.round((w / 2) * progress);
+          return (x >= cx - halfW && x <= cx + halfW);
+        }
+        return (x >= shaftStart && x <= shaftEnd);
+      } else {
+        if (y > maxY - headHeight) {
+          const dy = maxY - y;
+          const progress = headHeight > 1 ? dy / (headHeight - 1) : 1;
+          const halfW = Math.round((w / 2) * progress);
+          return (x >= cx - halfW && x <= cx + halfW);
+        }
+        return (x >= shaftStart && x <= shaftEnd);
+      }
+    }
+    
+    for (let y = minY; y <= maxY; y++) {
+      for (let x = minX; x <= maxX; x++) {
+        const inside = isInside(x, y);
+        if (fill) {
+          if (inside) setPixel(x, y, color);
+        } else {
+          if (inside) {
+            let isBorder = false;
+            const neighbors = [[x+1, y], [x-1, y], [x, y+1], [x, y-1]];
+            for (const [nx_n, ny_n] of neighbors) {
+              if (!isInside(nx_n, ny_n)) {
+                isBorder = true;
+                break;
+              }
+            }
+            if (isBorder) {
+              setPixelWithSize(x, y, color);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  function drawHexagon(x0, y0, x1, y1, fill, color) {
+    const minX = Math.min(x0, x1);
+    const maxX = Math.max(x0, x1);
+    const minY = Math.min(y0, y1);
+    const maxY = Math.max(y0, y1);
+    const w = maxX - minX;
+    const h = maxY - minY;
+    
+    if (w === 0 || h === 0) {
+      setPixel(x0, y0, color);
+      return;
+    }
+    
+    const cx = (minX + maxX) / 2;
+    const cy = (minY + maxY) / 2;
+    
+    function isInside(x, y) {
+      if (x < minX || x > maxX || y < minY || y > maxY) return false;
+      const dy = Math.abs(y - cy) / (h / 2);
+      const limitW = w * (1 - dy * 0.5);
+      return Math.abs(x - cx) <= limitW / 2;
+    }
+    
+    for (let y = minY; y <= maxY; y++) {
+      for (let x = minX; x <= maxX; x++) {
+        const inside = isInside(x, y);
+        if (fill) {
+          if (inside) setPixel(x, y, color);
+        } else {
+          if (inside) {
+            let isBorder = false;
+            const neighbors = [[x+1, y], [x-1, y], [x, y+1], [x, y-1]];
+            for (const [nx_n, ny_n] of neighbors) {
+              if (!isInside(nx_n, ny_n)) {
+                isBorder = true;
+                break;
+              }
+            }
+            if (isBorder) {
+              setPixelWithSize(x, y, color);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  function drawPentagon(x0, y0, x1, y1, fill, color) {
+    const minX = Math.min(x0, x1);
+    const maxX = Math.max(x0, x1);
+    const minY = Math.min(y0, y1);
+    const maxY = Math.max(y0, y1);
+    const w = maxX - minX;
+    const h = maxY - minY;
+    
+    if (w === 0 || h === 0) {
+      setPixel(x0, y0, color);
+      return;
+    }
+    
+    const cx = (minX + maxX) / 2;
+    const splitY = minY + h * 0.4;
+    
+    function isInside(x, y) {
+      if (x < minX || x > maxX || y < minY || y > maxY) return false;
+      if (y < splitY) {
+        const progress = (y - minY) / (splitY - minY || 1);
+        const limitW = w * progress;
+        return Math.abs(x - cx) <= limitW / 2;
+      }
+      return true;
+    }
+    
+    for (let y = minY; y <= maxY; y++) {
+      for (let x = minX; x <= maxX; x++) {
+        const inside = isInside(x, y);
+        if (fill) {
+          if (inside) setPixel(x, y, color);
+        } else {
+          if (inside) {
+            let isBorder = false;
+            const neighbors = [[x+1, y], [x-1, y], [x, y+1], [x, y-1]];
+            for (const [nx_n, ny_n] of neighbors) {
+              if (!isInside(nx_n, ny_n)) {
+                isBorder = true;
+                break;
+              }
+            }
+            if (isBorder) {
+              setPixelWithSize(x, y, color);
+            }
+          }
+        }
       }
     }
   }
@@ -1988,21 +2389,6 @@ function initPixelArtEditor() {
       }
       updateSwatchUI();
       updatePaletteHighlight();
-    } else if (currentTool === "mirror-x") {
-      mirrorX(index, color);
-    } else if (currentTool === "mirror-y") {
-      mirrorY(index, color);
-    } else if (currentTool === "dithering") {
-      const offsets = getBrushOffsets(currentBrushSize);
-      offsets.forEach(([dx, dy]) => {
-        const nx = x + dx;
-        const ny = y + dy;
-        if (inBounds(nx, ny)) {
-          setPixel(nx, ny, (nx + ny) % 2 === 0 ? color : "");
-        }
-      });
-    } else if (currentTool === "replace-color") {
-      replaceColorAt(index, color);
     }
   }
 
@@ -2010,11 +2396,47 @@ function initPixelArtEditor() {
     if (startIndex === null) return;
     const a = xy(startIndex);
     const b = xy(endIndex);
-    if (currentTool === "line") drawLine(a.x, a.y, b.x, b.y, color);
-    else if (currentTool === "rect-outline") drawRect(a.x, a.y, b.x, b.y, false, color);
-    else if (currentTool === "rect-fill") drawRect(a.x, a.y, b.x, b.y, true, color);
-    else if (currentTool === "circle-outline") drawCircle(a.x, a.y, b.x, b.y, false, color);
-    else if (currentTool === "circle-fill") drawCircle(a.x, a.y, b.x, b.y, true, color);
+    
+    const shape = activeSpecialShape;
+    
+    if (shape === "line") drawLine(a.x, a.y, b.x, b.y, color);
+    else if (shape === "rect-outline") drawRect(a.x, a.y, b.x, b.y, false, color);
+    else if (shape === "rect-fill") drawRect(a.x, a.y, b.x, b.y, true, color);
+    else if (shape === "circle-outline") drawCircle(a.x, a.y, b.x, b.y, false, color);
+    else if (shape === "circle-fill") drawCircle(a.x, a.y, b.x, b.y, true, color);
+    
+    else if (shape === "triangle-up-outline") drawTriangle(a.x, a.y, b.x, b.y, "up", false, color);
+    else if (shape === "triangle-up-fill") drawTriangle(a.x, a.y, b.x, b.y, "up", true, color);
+    else if (shape === "triangle-down-outline") drawTriangle(a.x, a.y, b.x, b.y, "down", false, color);
+    else if (shape === "triangle-down-fill") drawTriangle(a.x, a.y, b.x, b.y, "down", true, color);
+    
+    else if (shape === "right-triangle-tl-outline") drawRightTriangle(a.x, a.y, b.x, b.y, "tl", false, color);
+    else if (shape === "right-triangle-tl-fill") drawRightTriangle(a.x, a.y, b.x, b.y, "tl", true, color);
+    else if (shape === "right-triangle-br-outline") drawRightTriangle(a.x, a.y, b.x, b.y, "br", false, color);
+    else if (shape === "right-triangle-br-fill") drawRightTriangle(a.x, a.y, b.x, b.y, "br", true, color);
+    
+    else if (shape === "diamond-outline") drawDiamond(a.x, a.y, b.x, b.y, false, color);
+    else if (shape === "diamond-fill") drawDiamond(a.x, a.y, b.x, b.y, true, color);
+    
+    else if (shape === "heart-outline") drawHeart(a.x, a.y, b.x, b.y, false, color);
+    else if (shape === "heart-fill") drawHeart(a.x, a.y, b.x, b.y, true, color);
+    
+    else if (shape === "star-outline") drawStar(a.x, a.y, b.x, b.y, false, color);
+    else if (shape === "star-fill") drawStar(a.x, a.y, b.x, b.y, true, color);
+    
+    else if (shape === "cross-outline") drawCross(a.x, a.y, b.x, b.y, false, color);
+    else if (shape === "cross-fill") drawCross(a.x, a.y, b.x, b.y, true, color);
+    
+    else if (shape === "arrow-up-outline") drawArrow(a.x, a.y, b.x, b.y, "up", false, color);
+    else if (shape === "arrow-up-fill") drawArrow(a.x, a.y, b.x, b.y, "up", true, color);
+    else if (shape === "arrow-down-outline") drawArrow(a.x, a.y, b.x, b.y, "down", false, color);
+    else if (shape === "arrow-down-fill") drawArrow(a.x, a.y, b.x, b.y, "down", true, color);
+    
+    else if (shape === "hexagon-outline") drawHexagon(a.x, a.y, b.x, b.y, false, color);
+    else if (shape === "hexagon-fill") drawHexagon(a.x, a.y, b.x, b.y, true, color);
+    
+    else if (shape === "pentagon-outline") drawPentagon(a.x, a.y, b.x, b.y, false, color);
+    else if (shape === "pentagon-fill") drawPentagon(a.x, a.y, b.x, b.y, true, color);
   }
 
   function setTool(tool) {
@@ -2048,7 +2470,6 @@ function initPixelArtEditor() {
     isDrawing = true;
     startIndex = Number(cell.dataset.index);
 
-    // Left click -> primaryColor, Right click -> secondaryColor
     if (e.button === 2) {
       currentColorForDraw = secondaryColor;
     } else {
@@ -2059,7 +2480,7 @@ function initPixelArtEditor() {
       activeColorSlot = e.button === 2 ? "secondary" : "primary";
     }
 
-    if (["line", "rect-outline", "rect-fill", "circle-outline", "circle-fill"].includes(currentTool)) return;
+    if (isShapeTool(currentTool)) return;
     applyPoint(startIndex, currentColorForDraw);
     renderGrid();
   }
@@ -2074,13 +2495,13 @@ function initPixelArtEditor() {
     if (!isDrawing) return;
     e.preventDefault();
 
-    if (["line", "rect-outline", "rect-fill", "circle-outline", "circle-fill"].includes(currentTool)) {
+    if (isShapeTool(currentTool)) {
       const tempBuffer = [...pixelData];
       activeBuffer = tempBuffer;
       commitShape(index, currentColorForDraw);
       renderGrid(tempBuffer);
-      activeBuffer = pixelData; // Restore
-    } else if (["bucket", "eyedropper", "replace-color"].includes(currentTool)) {
+      activeBuffer = pixelData;
+    } else if (["bucket", "eyedropper"].includes(currentTool)) {
       return;
     } else {
       applyPoint(index, currentColorForDraw);
@@ -2092,8 +2513,8 @@ function initPixelArtEditor() {
     if (!isDrawing) return;
     const cell = cellFromEvent(e) || document.querySelector(`.pixel-cell[data-index="${startIndex}"]`);
     const index = Number(cell.dataset.index);
-    if (["line", "rect-outline", "rect-fill", "circle-outline", "circle-fill"].includes(currentTool)) {
-      activeBuffer = pixelData; // Ensure we draw to main buffer
+    if (isShapeTool(currentTool)) {
+      activeBuffer = pixelData;
       commitShape(index, currentColorForDraw);
       renderGrid();
     }
@@ -2191,6 +2612,9 @@ function initPixelArtEditor() {
           const result = await response.json();
           if (result.status === "success") {
             showToast("픽셀아트 작업 내역이 클라우드에 보관 완료되었습니다! ☁️💾", "success");
+            setTimeout(() => {
+              document.getElementById("pixel-close-editor")?.click();
+            }, 300);
           } else {
             showToast("클라우드 임시저장에 실패했습니다. 브라우저 보관본을 유지합니다.", "error");
           }
@@ -2200,6 +2624,9 @@ function initPixelArtEditor() {
         }
       } else {
         showToast("픽셀아트 작업 내역이 로컬 저장소에 임시 저장되었습니다. 💾", "success");
+        setTimeout(() => {
+          document.getElementById("pixel-close-editor")?.click();
+        }, 300);
       }
     });
   }
@@ -2241,6 +2668,25 @@ function initPixelArtEditor() {
 
   // Load cloud draft quietly after load
   setTimeout(loadCloudDraft, 400);
+
+  // Initialize Special Shapes Grid in Right Panel
+  const shapesGrid = document.getElementById("pixel-special-shapes-grid");
+  if (shapesGrid) {
+    shapesGrid.innerHTML = SPECIAL_SHAPES.map(shape => `
+      <div class="pixel-shape-item${activeSpecialShape === shape.id ? ' active' : ''}" data-shape="${shape.id}" title="${shape.name}">
+        <svg viewBox="0 0 24 24">${shape.icon}</svg>
+      </div>
+    `).join("");
+    
+    shapesGrid.querySelectorAll(".pixel-shape-item").forEach(item => {
+      item.addEventListener("click", () => {
+        activeSpecialShape = item.dataset.shape;
+        shapesGrid.querySelectorAll(".pixel-shape-item").forEach(i => i.classList.remove("active"));
+        item.classList.add("active");
+        setTool("special-shape");
+      });
+    });
+  }
 }
 
 // Exports the pixel art grid to a base64 PNG string
