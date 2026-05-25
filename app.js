@@ -132,11 +132,11 @@ const CONTESTS_DATA = [
     month: 11,
     monthText: "11월",
     summary: "네모난 픽셀 속에 담아내는 나만의 디지털 세상과 미니멀리즘 디자인.",
-    description: "레트로 감성을 자극하는 픽셀 도트 그래픽 대회입니다. 정해진 그리드 칸 안에 마술처럼 찍어내리는 점들로 인물, 동물, 풍경, 미래 과학 등 자신만의 주제를 자유롭게 표현해 보세요.",
+    description: "레트로 감성을 자극하는 픽셀 도트 그래픽 대회입니다. 웹사이트에 내장된 30×30 도트 에디터에서 직접 작품을 그리거나, 외부에서 제작한 이미지를 업로드해 접수할 수 있습니다.",
     rules: [
       "참가 대상: 도트 그래픽과 레트로 감성을 좋아하는 3~6학년 학생",
-      "규격: 16x16, 32x32, 64x64 도트 사이즈의 디지털 픽셀 이미지",
-      "제출물: 픽셀아트 제작 툴이나 웹앱에서 그린 도트 결과물 이미지 파일",
+      "규격: 30×30 도트 캔버스 (내장 에디터 사용 가능) 또는 자유 사이즈 이미지 업로드",
+      "제출물: 내장 도트 에디터로 직접 그린 작품 또는 별도 제작한 이미지 파일",
       "심사 기준: 창의성(40%), 도트 정밀성(30%), 색상 조화(30%)"
     ],
     evaluationCriteria: [
@@ -1213,7 +1213,110 @@ function setupDynamicFormFields(contest) {
   const container = document.getElementById("dynamic-fields-container");
   container.innerHTML = "";
 
-  if (contest.submissionType === "image") {
+  if (contest.submissionType === "image" && contest.id === "pixelart") {
+    // ===== PIXEL ART SPECIAL DUAL-TAB UI =====
+    container.innerHTML = `
+      <label style="margin-bottom: 8px;">제출 방식 선택</label>
+      <div class="form-group-row" style="margin-bottom: 16px;">
+        <button type="button" id="toggle-pixel-draw" class="btn btn-primary btn-block active">🎨 직접 도트 찍기</button>
+        <button type="button" id="toggle-pixel-upload" class="btn btn-secondary btn-block">🖼️ 이미지 파일 업로드</button>
+      </div>
+      
+      <!-- Pixel Art Draw Tab -->
+      <div id="pixel-draw-container">
+        <div class="pixel-editor-container">
+          <!-- Toolbar -->
+          <div class="pixel-editor-toolbar">
+            <button type="button" class="pixel-tool-btn active" data-tool="pen">✏️ 연필</button>
+            <button type="button" class="pixel-tool-btn" data-tool="eraser">🧹 지우개</button>
+            <div class="pixel-tool-separator"></div>
+            <button type="button" class="pixel-tool-btn" data-tool="clear">🗑️ 전체 지우기</button>
+          </div>
+          
+          <!-- Color Palette -->
+          <div class="pixel-palette-section">
+            <div class="pixel-palette-label">컬러 팔레트</div>
+            <div class="pixel-palette-row" id="pixel-palette-row">
+              <div class="color-chip active" data-color="#111111" style="background:#111111;" title="검정"></div>
+              <div class="color-chip" data-color="#ffffff" style="background:#ffffff;" title="흰색"></div>
+              <div class="color-chip" data-color="#ef4444" style="background:#ef4444;" title="빨강"></div>
+              <div class="color-chip" data-color="#f97316" style="background:#f97316;" title="주황"></div>
+              <div class="color-chip" data-color="#eab308" style="background:#eab308;" title="노랑"></div>
+              <div class="color-chip" data-color="#22c55e" style="background:#22c55e;" title="연두"></div>
+              <div class="color-chip" data-color="#3b82f6" style="background:#3b82f6;" title="파랑"></div>
+              <div class="color-chip" data-color="#8b5cf6" style="background:#8b5cf6;" title="보라"></div>
+              <div class="color-chip" data-color="#ec4899" style="background:#ec4899;" title="핑크"></div>
+              <div class="color-chip" data-color="#92400e" style="background:#92400e;" title="갈색"></div>
+              <div class="color-chip" data-color="#6b7280" style="background:#6b7280;" title="회색"></div>
+              <div class="color-chip" data-color="#67e8f9" style="background:#67e8f9;" title="하늘"></div>
+              <input type="color" class="pixel-custom-color" id="pixel-custom-color" value="#ff00ff" title="자유 색상 선택">
+            </div>
+            <div class="pixel-current-color-display">
+              현재 색상: <div class="pixel-current-swatch" id="pixel-current-swatch" style="background:#111111;"></div>
+              <span id="pixel-current-hex">#111111</span>
+            </div>
+          </div>
+          
+          <!-- 30x30 Grid Board -->
+          <div class="pixel-grid-wrapper">
+            <div class="pixel-grid-board" id="pixel-grid-board"></div>
+          </div>
+          
+          <!-- Hidden Canvas for export -->
+          <canvas id="pixel-export-canvas" class="pixel-canvas-hidden" width="300" height="300"></canvas>
+        </div>
+        <span class="error-message">도트 그림판에 작품을 그려주세요.</span>
+      </div>
+      
+      <!-- Standard File Upload Tab -->
+      <div id="pixel-upload-container" style="display: none;">
+        <div id="file-dropzone" class="file-dropzone">
+          <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+          </svg>
+          <div class="dropzone-text">
+            파일을 이곳에 끌어다 놓거나 <span>기기에서 탐색</span>
+          </div>
+          <div class="helper-text">${contest.placeholder}</div>
+          <input type="file" id="submission-file" accept="image/*" style="display: none;" required>
+        </div>
+        <div id="upload-preview-wrapper" style="display: none;"></div>
+        <span class="error-message">응모할 디자인 시안 이미지를 꼭 업로드해 주세요.</span>
+      </div>
+    `;
+
+    // Setup tab toggle
+    const btnDraw = document.getElementById("toggle-pixel-draw");
+    const btnUpload = document.getElementById("toggle-pixel-upload");
+    const cDraw = document.getElementById("pixel-draw-container");
+    const cUpload = document.getElementById("pixel-upload-container");
+
+    btnDraw.addEventListener("click", () => {
+      btnDraw.classList.add("active");
+      btnDraw.classList.replace("btn-secondary", "btn-primary");
+      btnUpload.classList.remove("active");
+      btnUpload.classList.replace("btn-primary", "btn-secondary");
+      cDraw.style.display = "block";
+      cUpload.style.display = "none";
+      uploadBase64Data = null;
+    });
+
+    btnUpload.addEventListener("click", () => {
+      btnUpload.classList.add("active");
+      btnUpload.classList.replace("btn-secondary", "btn-primary");
+      btnDraw.classList.remove("active");
+      btnDraw.classList.replace("btn-primary", "btn-secondary");
+      cDraw.style.display = "none";
+      cUpload.style.display = "block";
+      uploadBase64Data = null;
+    });
+
+    // Init pixel art editor
+    initPixelArtEditor();
+    // Init file uploader for the upload tab
+    setupFileUploader();
+
+  } else if (contest.submissionType === "image") {
     container.innerHTML = `
       <label>${contest.inputLabel}</label>
       <div id="file-dropzone" class="file-dropzone">
@@ -1398,6 +1501,151 @@ function setupFileUploader() {
   }
 }
 
+// ====================================================
+// PIXEL ART INTERACTIVE EDITOR (30x30 Grid)
+// ====================================================
+function initPixelArtEditor() {
+  const GRID_SIZE = 30;
+  const board = document.getElementById("pixel-grid-board");
+  if (!board) return;
+
+  let currentColor = "#111111";
+  let currentTool = "pen"; // "pen" or "eraser"
+  let isDrawing = false;
+  const EMPTY_COLOR = "";
+
+  // Build the 30x30 grid cells
+  board.innerHTML = "";
+  for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+    const cell = document.createElement("div");
+    cell.className = "pixel-cell";
+    cell.dataset.index = i;
+    board.appendChild(cell);
+  }
+
+  // ==== Drawing handlers ====
+  function paintCell(cell) {
+    if (!cell || !cell.classList.contains("pixel-cell")) return;
+    if (currentTool === "pen") {
+      cell.style.backgroundColor = currentColor;
+    } else if (currentTool === "eraser") {
+      cell.style.backgroundColor = "";
+    }
+  }
+
+  // Mouse events
+  board.addEventListener("mousedown", (e) => {
+    if (e.button !== 0) return;
+    isDrawing = true;
+    paintCell(e.target);
+  });
+  board.addEventListener("mouseover", (e) => {
+    if (isDrawing) paintCell(e.target);
+  });
+  document.addEventListener("mouseup", () => { isDrawing = false; });
+
+  // Touch events (mobile support)
+  board.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    isDrawing = true;
+    const touch = e.touches[0];
+    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+    paintCell(target);
+  }, { passive: false });
+
+  board.addEventListener("touchmove", (e) => {
+    e.preventDefault();
+    if (!isDrawing) return;
+    const touch = e.touches[0];
+    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+    paintCell(target);
+  }, { passive: false });
+
+  board.addEventListener("touchend", () => { isDrawing = false; });
+
+  // ==== Tool buttons ====
+  document.querySelectorAll(".pixel-tool-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const tool = btn.dataset.tool;
+      if (tool === "clear") {
+        if (!confirm("도트 그림판을 전체 지우시겠습니까?")) return;
+        board.querySelectorAll(".pixel-cell").forEach(c => {
+          c.style.backgroundColor = "";
+        });
+        return;
+      }
+      currentTool = tool;
+      document.querySelectorAll(".pixel-tool-btn[data-tool='pen'], .pixel-tool-btn[data-tool='eraser']").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+    });
+  });
+
+  // ==== Color palette ====
+  const swatch = document.getElementById("pixel-current-swatch");
+  const hexLabel = document.getElementById("pixel-current-hex");
+  function setColor(color) {
+    currentColor = color;
+    swatch.style.backgroundColor = color;
+    hexLabel.textContent = color;
+  }
+
+  document.querySelectorAll(".color-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      document.querySelectorAll(".color-chip").forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      setColor(chip.dataset.color);
+      currentTool = "pen";
+      document.querySelectorAll(".pixel-tool-btn[data-tool='pen'], .pixel-tool-btn[data-tool='eraser']").forEach(b => b.classList.remove("active"));
+      document.querySelector(".pixel-tool-btn[data-tool='pen']").classList.add("active");
+    });
+  });
+
+  // Custom color picker
+  const customPicker = document.getElementById("pixel-custom-color");
+  if (customPicker) {
+    customPicker.addEventListener("input", (e) => {
+      document.querySelectorAll(".color-chip").forEach(c => c.classList.remove("active"));
+      setColor(e.target.value);
+      currentTool = "pen";
+      document.querySelectorAll(".pixel-tool-btn[data-tool='pen'], .pixel-tool-btn[data-tool='eraser']").forEach(b => b.classList.remove("active"));
+      document.querySelector(".pixel-tool-btn[data-tool='pen']").classList.add("active");
+    });
+  }
+}
+
+// Exports the pixel art grid to a base64 PNG string
+function exportPixelArtToBase64() {
+  const board = document.getElementById("pixel-grid-board");
+  const canvas = document.getElementById("pixel-export-canvas");
+  if (!board || !canvas) return null;
+
+  const GRID_SIZE = 30;
+  const CELL_SIZE = 10; // Each pixel = 10px in the exported image (300x300)
+  canvas.width = GRID_SIZE * CELL_SIZE;
+  canvas.height = GRID_SIZE * CELL_SIZE;
+  const ctx = canvas.getContext("2d");
+
+  // Clear with white background
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const cells = board.querySelectorAll(".pixel-cell");
+  let hasContent = false;
+  cells.forEach((cell, index) => {
+    const bg = cell.style.backgroundColor;
+    if (bg) {
+      hasContent = true;
+      ctx.fillStyle = bg;
+      const col = index % GRID_SIZE;
+      const row = Math.floor(index / GRID_SIZE);
+      ctx.fillRect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+    }
+  });
+
+  if (!hasContent) return null;
+  return canvas.toDataURL("image/png");
+}
+
 function setupEventListeners() {
   document.getElementById("contest-drawer-overlay").addEventListener("click", closeContestDrawer);
   document.getElementById("contest-drawer-close").addEventListener("click", closeContestDrawer);
@@ -1559,7 +1807,23 @@ function validateSubmissionForm() {
   let isValid = true;
   document.querySelectorAll("#submission-form .form-group").forEach(g => g.classList.remove("has-error"));
 
-  if (activeContest.submissionType === "image") {
+  if (activeContest.submissionType === "image" && activeContest.id === "pixelart") {
+    const isDrawActive = document.getElementById("toggle-pixel-draw")?.classList.contains("active");
+    if (isDrawActive) {
+      const testExport = exportPixelArtToBase64();
+      if (!testExport) {
+        const editorContainer = document.querySelector(".pixel-editor-container");
+        if (editorContainer) editorContainer.parentElement.classList.add("has-error");
+        isValid = false;
+      }
+    } else {
+      if (!uploadBase64Data) {
+        const dropzone = document.getElementById("file-dropzone");
+        if (dropzone) dropzone.parentElement.classList.add("has-error");
+        isValid = false;
+      }
+    }
+  } else if (activeContest.submissionType === "image") {
     if (!uploadBase64Data) {
       const dropzone = document.getElementById("file-dropzone");
       dropzone.parentElement.classList.add("has-error");
@@ -1619,7 +1883,16 @@ async function executeSubmit() {
     data: {}
   };
 
-  if (activeContest.submissionType === "image") {
+  if (activeContest.submissionType === "image" && activeContest.id === "pixelart") {
+    const isDrawActive = document.getElementById("toggle-pixel-draw")?.classList.contains("active");
+    if (isDrawActive) {
+      newEntry.data.type = "pixel_draw";
+      newEntry.data.image = exportPixelArtToBase64();
+    } else {
+      newEntry.data.type = "image";
+      newEntry.data.image = uploadBase64Data;
+    }
+  } else if (activeContest.submissionType === "image") {
     newEntry.data.image = uploadBase64Data;
   }
 
