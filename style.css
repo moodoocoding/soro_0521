@@ -1601,7 +1601,7 @@ textarea {
 
 
 .pixel-editor-shell {
-  position: absolute;
+  position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background-color: #0c0c0e; /* Extremely dark grey background */
   z-index: 1000;

@@ -66,6 +66,12 @@ const CONTESTS_DATA = [
     submissionType: "image",
     inputLabel: "컷툰 완성 원고 이미지",
     placeholder: "PNG, JPG 형식의 이미지 파일 (최대 5MB)",
+    examples: [
+      "asset/examples/cuttoon1.png",
+      "asset/examples/cuttoon2.png",
+      "asset/examples/cuttoon3.png",
+      "asset/examples/cuttoon4.png"
+    ],
     icon: `<svg class="card-visual-svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <rect x="8" y="8" width="48" height="48" rx="6" />
       <path d="M8 32h48M32 8v48" />
@@ -85,13 +91,8 @@ const CONTESTS_DATA = [
     rules: [
       "참가 대상: 3~6학년 학생 누구나",
       "제출 내용: 추천 책 제목, 저자, 그리고 150자 이내의 마음을 울리는 한 줄 평 및 추천 사유",
-      "심사 기준: 진정성(40%), 독창성(30%), 공감도(30%)",
-      "혜택: 선정된 추천평은 도서관 전시 공간 및 웹 사이트 메인에 배너 형태로 게재됩니다."
-    ],
-    evaluationCriteria: [
-      { category: "진정성", desc: "추천 도서에 대해 본인만의 진솔한 생각과 마음을 깊이 담았는지 평가합니다.", weight: "40%" },
-      { category: "독창성", desc: "친구들의 눈길을 끄는 참신하고 매력적인 소개 문구와 이유를 적었는지 평가합니다.", weight: "30%" },
-      { category: "공감도", desc: "많은 학생들이 해당 도서를 읽고 싶게 만드는 강한 공감대와 전달력을 평가합니다.", weight: "30%" }
+      "혜택: 선정된 추천평은 도서관 전시 공간 및 웹 사이트 메인에 배너 형태로 게재됩니다.",
+      "특별 혜택: 학급 인원의 2/3 이상이 참여하였을 경우 학급 전체에 소정의 기념품을 지급합니다."
     ],
     submissionType: "text_fields",
     textFields: [
@@ -115,12 +116,7 @@ const CONTESTS_DATA = [
     rules: [
       "참가 대상: 아름다운 한글을 사랑하는 3~6학년 학생 누구나",
       "제출 방식: [선택 1] 디지털 기기(아이패드, 갤럭시탭 등)로 필사한 이미지 파일 제출, [선택 2] 제공되는 양식에 타자로 텍스트 타이핑 제출",
-      "심사 기준: 글씨의 정성 및 가독성(50%), 디자인 조화(30%), 필사 완성도(20%)"
-    ],
-    evaluationCriteria: [
-      { category: "글씨의 정성 및 가독성", desc: "한 글자씩 정성을 들여 썼는지, 다른 사람이 읽기 쉬운 정갈한 글씨인지 평가합니다.", weight: "50%" },
-      { category: "디자인 조화", desc: "전체 이미지 레이아웃, 펜 두께/색상, 여백의 조화로운 미학적 완성도를 평가합니다.", weight: "30%" },
-      { category: "필사 완성도", desc: "오탈자나 누락된 문장 없이 맞춤법과 원본 시 구절을 완벽하게 적어냈는지 평가합니다.", weight: "20%" }
+      "특별 혜택: 학급 인원의 2/3 이상이 참여하였을 경우 학급 전체에 소정의 기념품을 지급합니다."
     ],
     submissionType: "image_or_text",
     inputLabel: "필사 작품 또는 감상",
@@ -170,13 +166,8 @@ const CONTESTS_DATA = [
     rules: [
       "참가 대상: 3~6학년 동급생 혹은 선후배 등 2인 이상이 함께 촬영한 사진",
       "제출물: 인화 가능한 수준의 선명한 단체/우정 사진 파일 및 사진 소개글",
-      "심사 기준: 따뜻함 및 우정 전달도(50%), 독창적인 포즈(30%), 사진의 구도(20%)",
-      "혜택: 선정작들은 12월 말 학교 복도 갤러리에 폴라로이드 감성 스타일로 대대적으로 인화/전시됩니다."
-    ],
-    evaluationCriteria: [
-      { category: "따뜻함 및 우정 전달도", desc: "사진 속에 친구들 간의 끈끈한 친밀감과 즐겁고 따뜻한 감성이 전달되는지 평가합니다.", weight: "50%" },
-      { category: "독창적인 포즈", desc: "개성 넘치고 개구쟁이 같은 아이디어로 독특하고 예쁜 연출 포즈를 취했는지 평가합니다.", weight: "30%" },
-      { category: "사진의 구도", desc: "전반적인 빛의 조화, 흔들림 없는 선명도, 인물이 돋보이는 훌륭한 구도인지 평가합니다.", weight: "20%" }
+      "혜택: 선정작들은 12월 말 학교 복도 갤러리에 폴라로이드 감성 스타일로 대대적으로 인화/전시됩니다.",
+      "특별 혜택: 학급 인원의 2/3 이상이 참여하였을 경우 학급 전체에 소정의 기념품을 지급합니다."
     ],
     submissionType: "image",
     inputLabel: "친구들과 함께 찍은 소중한 사진 파일",
@@ -846,10 +837,12 @@ function switchDrawerTab(tabName) {
   const tabGuide = document.getElementById("drawer-tab-guide");
   const tabCriteria = document.getElementById("drawer-tab-criteria");
   const tabGallery = document.getElementById("drawer-tab-gallery");
+  const tabExamples = document.getElementById("drawer-tab-examples");
   
   const guideContainer = document.getElementById("drawer-guide-container");
   const criteriaContainer = document.getElementById("drawer-criteria-container");
   const galleryContainer = document.getElementById("drawer-gallery-container");
+  const examplesContainer = document.getElementById("drawer-examples-container");
   
   const formContainer = document.getElementById("submission-form-container");
   const noticeContainer = document.getElementById("submission-notice");
@@ -860,6 +853,7 @@ function switchDrawerTab(tabName) {
   tabGuide.classList.remove("active");
   tabCriteria.classList.remove("active");
   tabGallery.classList.remove("active");
+  if (tabExamples) tabExamples.classList.remove("active");
 
   if (tabName === "guide") {
     tabGuide.classList.add("active");
@@ -867,6 +861,7 @@ function switchDrawerTab(tabName) {
     guideContainer.style.display = "block";
     criteriaContainer.style.display = "none";
     galleryContainer.style.display = "none";
+    if (examplesContainer) examplesContainer.style.display = "none";
     
     if (status === "active") {
       formContainer.style.display = "block";
@@ -881,6 +876,7 @@ function switchDrawerTab(tabName) {
     guideContainer.style.display = "none";
     criteriaContainer.style.display = "block";
     galleryContainer.style.display = "none";
+    if (examplesContainer) examplesContainer.style.display = "none";
     formContainer.style.display = "none";
     noticeContainer.style.display = "none";
   } else if (tabName === "gallery") {
@@ -889,6 +885,7 @@ function switchDrawerTab(tabName) {
     guideContainer.style.display = "none";
     criteriaContainer.style.display = "none";
     galleryContainer.style.display = "block";
+    if (examplesContainer) examplesContainer.style.display = "none";
     formContainer.style.display = "none";
     noticeContainer.style.display = "none";
     
@@ -901,6 +898,15 @@ function switchDrawerTab(tabName) {
         badge.classList.remove("active");
       }
     });
+  } else if (tabName === "examples") {
+    if (tabExamples) tabExamples.classList.add("active");
+    
+    guideContainer.style.display = "none";
+    criteriaContainer.style.display = "none";
+    galleryContainer.style.display = "none";
+    if (examplesContainer) examplesContainer.style.display = "block";
+    formContainer.style.display = "none";
+    noticeContainer.style.display = "none";
   }
 }
 
@@ -946,6 +952,8 @@ function openContestDetails(contestId) {
   criteriaListContainer.innerHTML = "";
   
   if (contest.evaluationCriteria && contest.evaluationCriteria.length > 0) {
+    const tabCriteria = document.getElementById("drawer-tab-criteria");
+    if (tabCriteria) tabCriteria.style.display = "flex";
     contest.evaluationCriteria.forEach(item => {
       const card = document.createElement("div");
       card.className = "criteria-card";
@@ -959,6 +967,8 @@ function openContestDetails(contestId) {
       criteriaListContainer.appendChild(card);
     });
   } else {
+    const tabCriteria = document.getElementById("drawer-tab-criteria");
+    if (tabCriteria) tabCriteria.style.display = "none";
     criteriaListContainer.innerHTML = `<div class="helper-text" style="text-align: center; padding: 20px;">심사 기준 정보가 등록되지 않았습니다.</div>`;
   }
 
@@ -991,6 +1001,49 @@ function openContestDetails(contestId) {
     } else {
       tabGallery.style.display = "none";
     }
+  }
+
+  // Dynamic Examples Tab
+  let tabExamples = document.getElementById("drawer-tab-examples");
+  if (!tabExamples) {
+    tabExamples = document.createElement("button");
+    tabExamples.type = "button";
+    tabExamples.id = "drawer-tab-examples";
+    tabExamples.className = "drawer-tab-btn";
+    tabExamples.textContent = "예시 작품 👀";
+    const drawerTabs = document.querySelector(".drawer-tabs");
+    if (drawerTabs) drawerTabs.appendChild(tabExamples);
+    tabExamples.addEventListener("click", () => switchDrawerTab("examples"));
+  }
+
+  let examplesContainer = document.getElementById("drawer-examples-container");
+  if (!examplesContainer) {
+    examplesContainer = document.createElement("div");
+    examplesContainer.id = "drawer-examples-container";
+    examplesContainer.className = "contest-gallery";
+    examplesContainer.style.display = "none";
+    const drawerBody = document.querySelector(".drawer-body");
+    if (drawerBody) drawerBody.appendChild(examplesContainer);
+  }
+
+  if (contest.examples && contest.examples.length > 0) {
+    tabExamples.style.display = "flex";
+    examplesContainer.innerHTML = `
+      <h3 class="gallery-title">예시 작품 👀</h3>
+      <p class="gallery-desc">공모전 준비를 도와줄 훌륭한 예시 작품들입니다. 참고해서 멋진 작품을 완성해 보세요!</p>
+      <div class="gallery-grid">
+        ${contest.examples.map(img => `
+          <div class="gallery-card">
+            <div class="gallery-card-img-wrapper" style="position: relative; overflow: hidden; padding-bottom: 75%;">
+              <img class="gallery-card-img" src="${img}" alt="예시 작품" loading="lazy" style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit: contain;">
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  } else {
+    tabExamples.style.display = "none";
+    examplesContainer.innerHTML = "";
   }
 
   // Always initialize to the guide & submission tab
@@ -1174,7 +1227,7 @@ window.cancelSubmissionInDrawer = async function (entryId) {
   if (confirm("정말 이 작품의 접수를 취소하고 삭제하시겠습니까? 한 번 지워진 접수 데이터는 복구할 수 없습니다.")) {
     // 1. Remote DB Cloud Mode
     if (GOOGLE_SHEET_API_URL) {
-      showToast("원격 구글 스프레드시트에서 접수를 파기하고 있습니다...", "info");
+      showToast("클라우드에서 접수를 파기하고 있습니다...", "info");
       const payload = {
         action: "deleteSubmission",
         id: entryId
@@ -1405,7 +1458,7 @@ function setupDynamicFormFields(contest) {
         </div>
         <div id="upload-preview-wrapper" style="display: none; margin-top: 12px;"></div>
         <div style="display: flex; gap: 10px; margin-top: 16px;">
-          <button type="button" class="btn btn-secondary btn-block" id="pixel-switch-draw">직접 도트 찍기로 전환</button>
+          <button type="button" class="btn btn-secondary btn-block" id="pixel-switch-draw">픽셀아트 에디터</button>
           <button type="button" class="btn btn-primary btn-block" id="pixel-submit-upload">업로드 파일 제출하기</button>
         </div>
         <span class="error-message">응모할 디자인 시안 이미지를 꼭 업로드해 주세요.</span>
@@ -3176,7 +3229,7 @@ window.confirmDeleteEntry = async function (entryId) {
 
     // 1. Remote DB Cloud Mode
     if (GOOGLE_SHEET_API_URL) {
-      showToast("원격 구글 스프레드시트에서 접수를 파기하고 있습니다...", "info");
+      showToast("클라우드에서 접수를 파기하고 있습니다...", "info");
       const payload = {
         action: "deleteSubmission",
         id: entryId
