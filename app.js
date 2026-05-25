@@ -1520,6 +1520,12 @@ function setupDynamicFormFields(contest) {
       drawToggle.classList.toggle("active", isDraw);
       drawContainer.style.display = isDraw ? "grid" : "none";
       uploadContainer.style.display = isDraw ? "none" : "block";
+      if (isDraw) {
+        const drawerContent = drawer.querySelector(".drawer-content");
+        if (drawerContent) {
+          drawerContent.scrollTop = 0;
+        }
+      }
     }
 
     document.getElementById("pixel-switch-draw").addEventListener("click", () => setPixelMode("draw"));
