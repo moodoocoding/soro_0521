@@ -922,6 +922,7 @@ function openContestDetails(contestId) {
   const noticeText = document.getElementById("submission-notice-text");
 
   const subForm = document.getElementById("submission-form");
+  document.getElementById("dynamic-fields-container").innerHTML = "";
   const authNotice = document.getElementById("auth-required-notice");
 
   drawerBadge.textContent = contest.monthText;
