@@ -798,6 +798,12 @@ h1, h2, h3, h4, .logo-text, .logo-sub, .badge, .stat-value, .month-btn, .auth-ta
   gap: 12px;
   margin-bottom: 16px;
 }
+
+#submission-form > .form-group-row,
+.submission-area.has-existing-submission .form-title {
+  display: none;
+}
+
 .school-fields {
   grid-template-columns: 2fr 1fr 1fr 1fr;
 }
@@ -1556,6 +1562,96 @@ textarea {
 /* ====================================================
    PIXEL ART EDITOR STYLING
    ==================================================== */
+.drawer.pixel-fullscreen .drawer-content {
+  max-width: 100%;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+}
+
+.drawer.pixel-fullscreen .drawer-body,
+.drawer.pixel-fullscreen .submission-area,
+.drawer.pixel-fullscreen #submission-form,
+.drawer.pixel-fullscreen #dynamic-fields-container {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.drawer.pixel-fullscreen .drawer-header-visual,
+.drawer.pixel-fullscreen .drawer-meta,
+.drawer.pixel-fullscreen .drawer-title,
+.drawer.pixel-fullscreen .drawer-summary,
+.drawer.pixel-fullscreen .drawer-tabs,
+.drawer.pixel-fullscreen .contest-guide,
+.drawer.pixel-fullscreen .contest-criteria,
+.drawer.pixel-fullscreen .form-title,
+.drawer.pixel-fullscreen #submit-btn,
+.drawer.pixel-fullscreen #submission-form > .form-group-row {
+  display: none !important;
+}
+
+.drawer.pixel-fullscreen .drawer-close-btn {
+  z-index: 120;
+}
+
+.pixel-editor-shell {
+  position: absolute;
+  inset: 0;
+  z-index: 99;
+  display: grid;
+  grid-template-columns: 56px 1fr 220px;
+  grid-template-rows: 1fr auto;
+  background: var(--bg-primary);
+  overflow: hidden;
+}
+
+.pixel-toolbar {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+}
+
+.pixel-stage {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 0;
+  overflow: auto;
+  padding: 20px;
+}
+
+.pixel-side-panel {
+  grid-column: 3;
+  grid-row: 1;
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border-color);
+  padding: 14px;
+  overflow-y: auto;
+}
+
+.pixel-action-bar {
+  grid-column: 2 / 4;
+  grid-row: 2;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+}
+
 .pixel-editor-container {
   display: flex;
   flex-direction: column;
@@ -1576,15 +1672,26 @@ textarea {
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
-  font-size: 0.75rem;
+  font-size: 1rem;
   font-weight: 700;
-  padding: 6px 10px;
+  width: 40px;
+  min-height: 38px;
+  padding: 0;
   cursor: pointer;
   transition: all var(--transition-fast);
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   font-family: var(--font-body);
+}
+
+.pixel-editor-toolbar .pixel-tool-btn,
+.pixel-action-bar .pixel-tool-btn {
+  width: auto;
+  min-height: auto;
+  padding: 6px 10px;
+  font-size: 0.75rem;
 }
 
 .pixel-tool-btn:hover {
@@ -1619,13 +1726,13 @@ textarea {
   display: grid;
   grid-template-columns: repeat(30, 1fr);
   grid-template-rows: repeat(30, 1fr);
-  border: 1px solid var(--border-color);
+  border: 2px solid var(--text-primary);
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
   aspect-ratio: 1;
-  width: 100%;
-  max-width: 360px;
+  width: min(70vh, 70vw, 620px);
+  max-width: 620px;
 }
 
 .pixel-cell {
@@ -1633,6 +1740,10 @@ textarea {
   border: 0.5px solid rgba(128, 128, 128, 0.15);
   cursor: crosshair;
   transition: none;
+}
+
+.pixel-grid-board.no-grid .pixel-cell {
+  border-color: transparent;
 }
 
 .pixel-cell:hover {
@@ -1660,6 +1771,11 @@ textarea {
   flex-wrap: wrap;
   gap: 5px;
   align-items: center;
+}
+
+.pixel-side-panel .pixel-palette-row {
+  display: grid;
+  grid-template-columns: repeat(4, 28px);
 }
 
 .color-chip {
@@ -1713,6 +1829,26 @@ textarea {
   width: 20px;
   height: 20px;
   border: 1px solid var(--border-color);
+}
+
+.pixel-editor-status,
+.pixel-current-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: min(70vh, 70vw, 620px);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.pixel-panel-label {
+  margin: 12px 0 8px;
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 .pixel-canvas-hidden {

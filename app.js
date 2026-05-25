@@ -47,6 +47,8 @@ const CONTESTS_DATA = [
     title: "안전 사고 예방 컷툰",
     month: 7,
     monthText: "7월",
+    activeMonths: [6, 7],
+    period: "2026. 6. 15.(월) ~ 2026. 7. 03.(월)",
     summary: "일상 속 안전의 중요성을 재미있고 유익한 4컷 만화로 표현해보세요.",
     description: "학교, 가정, 길거리 등 일상생활 속에서 일어날 수 있는 다양한 안전사고(교통안전, 실험실 안전, 미끄러짐 등)를 예방하기 위한 수칙이나 경각심을 주는 스토리를 4컷 만화로 공모합니다.",
     rules: [
@@ -75,6 +77,8 @@ const CONTESTS_DATA = [
     title: "온라인 도서관",
     month: 9,
     monthText: "9월",
+    activeMonths: [8, 9],
+    period: "2026. 8. 10.(목) ~ 2026. 9. 30.(수)",
     summary: "독서의 달을 맞이하여 내 인생의 책을 소개하고 감동을 나누어 주세요.",
     description: "9월 독서의 달을 기념하여 다른 친구들에게 꼭 추천하고 싶은 책이나 나의 인생에 깊은 영감을 준 도서를 한 편 골라 멋진 한 줄 평과 독서 리뷰를 남기는 비대면 도서 박람회 대회입니다.",
     rules: [
@@ -309,8 +313,20 @@ const GALLERY_2025_DATA = RAW_2025_KEYRING_DATA.trim().split("\n").map(line => {
 // STATE MANAGEMENT & USER SESSION CONFIGURATION
 // ====================================================
 let currentVirtualMonth = 6;
+const FORCE_ACTIVE_CONTESTS = ["pixelart"];
 
-function getContestStatus(contestMonth) {
+function getContestStatus(contestOrMonth) {
+  const contestMonth = typeof contestOrMonth === "object" ? contestOrMonth.month : contestOrMonth;
+  const contestId = typeof contestOrMonth === "object" ? contestOrMonth.id : null;
+
+  if (contestId && FORCE_ACTIVE_CONTESTS.includes(contestId)) {
+    return "active";
+  }
+
+  if (typeof contestOrMonth === "object" && contestOrMonth.activeMonths?.includes(currentVirtualMonth)) {
+    return "active";
+  }
+
   if (contestMonth === currentVirtualMonth) {
     return "active";
   } else if (contestMonth > currentVirtualMonth) {
@@ -725,7 +741,7 @@ function renderContestGrid() {
   let activeCount = 0;
 
   CONTESTS_DATA.forEach(contest => {
-    const status = getContestStatus(contest.month);
+    const status = getContestStatus(contest);
     let statusClass = "status-pending";
     let statusLabel = "접수 대기";
 
@@ -757,7 +773,7 @@ function renderContestGrid() {
       </div>
       
       <div class="card-bottom">
-        <span class="card-period">기간: 2026년 ${contest.month}월 한 달 간</span>
+        <span class="card-period">기간: ${contest.period || `2026년 ${contest.month}월 한 달 간`}</span>
         <button class="card-action-icon" aria-label="${contest.title} 보기">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16">
             <path d="M5 12h14M12 5l7 7-7 7"></path>
@@ -838,7 +854,7 @@ function switchDrawerTab(tabName) {
   const noticeContainer = document.getElementById("submission-notice");
 
   if (!activeContest) return;
-  const status = getContestStatus(activeContest.month);
+  const status = getContestStatus(activeContest);
 
   tabGuide.classList.remove("active");
   tabCriteria.classList.remove("active");
@@ -944,7 +960,7 @@ function openContestDetails(contestId) {
     criteriaListContainer.innerHTML = `<div class="helper-text" style="text-align: center; padding: 20px;">심사 기준 정보가 등록되지 않았습니다.</div>`;
   }
 
-  const status = getContestStatus(contest.month);
+  const status = getContestStatus(contest);
   document.getElementById("form-contest-id").value = contest.id;
 
   if (status === "active") {
@@ -956,11 +972,11 @@ function openContestDetails(contestId) {
   } else if (status === "pending") {
     drawerStatus.textContent = "접수 대기 중 (Upcoming)";
     drawerStatus.className = "status-indicator status-pending";
-    noticeText.innerHTML = `🔒 <strong>이 대회는 아직 접수 기간이 아닙니다.</strong><br>대회 접수 기간은 2026년 ${contest.month}월 1일부터 시작됩니다.`;
+    noticeText.innerHTML = `🔒 <strong>이 대회는 아직 접수 기간이 아닙니다.</strong><br>대회 접수 기간은 ${contest.period || `2026년 ${contest.month}월 1일부터 시작됩니다.`}`;
   } else {
     drawerStatus.textContent = "접수 마감됨 (Closed)";
     drawerStatus.className = "status-indicator status-closed";
-    noticeText.innerHTML = `🔒 <strong>이 대회의 접수가 종료되었습니다.</strong><br>2026년 ${contest.month}월 한 달 간 진행되었던 작품 접수가 완료되었습니다.`;
+    noticeText.innerHTML = `🔒 <strong>이 대회의 접수가 종료되었습니다.</strong><br>${contest.period || `2026년 ${contest.month}월 한 달 간`} 진행되었던 작품 접수가 완료되었습니다.`;
   }
 
   if (status === "active" && !currentUser) {
@@ -992,6 +1008,7 @@ function openContestDetails(contestId) {
 function closeContestDrawer() {
   const drawer = document.getElementById("contest-drawer");
   drawer.setAttribute("aria-hidden", "true");
+  drawer.classList.remove("pixel-fullscreen");
   document.body.style.overflow = "";
 
   document.getElementById("submission-form").reset();
@@ -1011,6 +1028,7 @@ async function checkAndRenderSubmissionArea(contest) {
   const formContainer = document.getElementById("submission-form-container");
   const subForm = document.getElementById("submission-form");
   const authNotice = document.getElementById("auth-required-notice");
+  formContainer.classList.remove("has-existing-submission");
 
   // 기존 뷰/로더 잔여물 소거
   const existingView = document.getElementById("existing-submission-view");
@@ -1073,6 +1091,7 @@ async function checkAndRenderSubmissionArea(contest) {
   const existingSubmission = mySubmissions.find(s => s.contestId === contest.id);
 
   if (existingSubmission) {
+    formContainer.classList.add("has-existing-submission");
     // 2. 이미 제출한 작품이 있을 때: 상세 정보 노출 및 삭제 유도
     const viewDiv = document.createElement("div");
     viewDiv.id = "existing-submission-view";
@@ -1212,64 +1231,80 @@ function getGradientForContest(id) {
 function setupDynamicFormFields(contest) {
   const container = document.getElementById("dynamic-fields-container");
   container.innerHTML = "";
+  const submitBtn = document.getElementById("submit-btn");
+  if (submitBtn) submitBtn.style.display = contest.id === "pixelart" ? "none" : "block";
 
   if (contest.submissionType === "image" && contest.id === "pixelart") {
-    // ===== PIXEL ART SPECIAL DUAL-TAB UI =====
+    // ===== PIXEL ART EXTENDED EDITOR UI =====
     container.innerHTML = `
-      <label style="margin-bottom: 8px;">제출 방식 선택</label>
-      <div class="form-group-row" style="margin-bottom: 16px;">
-        <button type="button" id="toggle-pixel-draw" class="btn btn-primary btn-block active">🎨 직접 도트 찍기</button>
-        <button type="button" id="toggle-pixel-upload" class="btn btn-secondary btn-block">🖼️ 이미지 파일 업로드</button>
-      </div>
-      
-      <!-- Pixel Art Draw Tab -->
-      <div id="pixel-draw-container">
-        <div class="pixel-editor-container">
-          <!-- Toolbar -->
-          <div class="pixel-editor-toolbar">
-            <button type="button" class="pixel-tool-btn active" data-tool="pen">✏️ 연필</button>
-            <button type="button" class="pixel-tool-btn" data-tool="eraser">🧹 지우개</button>
-            <div class="pixel-tool-separator"></div>
-            <button type="button" class="pixel-tool-btn" data-tool="clear">🗑️ 전체 지우기</button>
-          </div>
-          
-          <!-- Color Palette -->
-          <div class="pixel-palette-section">
-            <div class="pixel-palette-label">컬러 팔레트</div>
-            <div class="pixel-palette-row" id="pixel-palette-row">
-              <div class="color-chip active" data-color="#111111" style="background:#111111;" title="검정"></div>
-              <div class="color-chip" data-color="#ffffff" style="background:#ffffff;" title="흰색"></div>
-              <div class="color-chip" data-color="#ef4444" style="background:#ef4444;" title="빨강"></div>
-              <div class="color-chip" data-color="#f97316" style="background:#f97316;" title="주황"></div>
-              <div class="color-chip" data-color="#eab308" style="background:#eab308;" title="노랑"></div>
-              <div class="color-chip" data-color="#22c55e" style="background:#22c55e;" title="연두"></div>
-              <div class="color-chip" data-color="#3b82f6" style="background:#3b82f6;" title="파랑"></div>
-              <div class="color-chip" data-color="#8b5cf6" style="background:#8b5cf6;" title="보라"></div>
-              <div class="color-chip" data-color="#ec4899" style="background:#ec4899;" title="핑크"></div>
-              <div class="color-chip" data-color="#92400e" style="background:#92400e;" title="갈색"></div>
-              <div class="color-chip" data-color="#6b7280" style="background:#6b7280;" title="회색"></div>
-              <div class="color-chip" data-color="#67e8f9" style="background:#67e8f9;" title="하늘"></div>
-              <input type="color" class="pixel-custom-color" id="pixel-custom-color" value="#ff00ff" title="자유 색상 선택">
-            </div>
-            <div class="pixel-current-color-display">
-              현재 색상: <div class="pixel-current-swatch" id="pixel-current-swatch" style="background:#111111;"></div>
-              <span id="pixel-current-hex">#111111</span>
-            </div>
-          </div>
-          
-          <!-- 30x30 Grid Board -->
+      <div id="toggle-pixel-draw" class="active" style="display: none;"></div>
+      <div id="toggle-pixel-upload" style="display: none;"></div>
+
+      <div id="pixel-draw-container" class="pixel-editor-shell" style="display: none;">
+        <div class="pixel-toolbar">
+          <button type="button" class="pixel-tool-btn action" id="pixel-close-editor" title="업로드 화면으로 돌아가기">×</button>
+          <button type="button" class="pixel-tool-btn active" data-tool="pencil" title="연필">✏️</button>
+          <button type="button" class="pixel-tool-btn" data-tool="brush" title="브러시">🖌️</button>
+          <button type="button" class="pixel-tool-btn" data-tool="eraser" title="지우개">🧹</button>
+          <button type="button" class="pixel-tool-btn" data-tool="bucket" title="채우기">🪣</button>
+          <button type="button" class="pixel-tool-btn" data-tool="eyedropper" title="스포이트">💧</button>
+          <button type="button" class="pixel-tool-btn" data-tool="line" title="직선">╱</button>
+          <button type="button" class="pixel-tool-btn" data-tool="rect-outline" title="사각형 테두리">▢</button>
+          <button type="button" class="pixel-tool-btn" data-tool="rect-fill" title="채운 사각형">▣</button>
+          <button type="button" class="pixel-tool-btn" data-tool="circle-outline" title="원 테두리">○</button>
+          <button type="button" class="pixel-tool-btn" data-tool="circle-fill" title="채운 원">●</button>
+          <button type="button" class="pixel-tool-btn" data-tool="mirror-x" title="좌우 대칭">↔</button>
+          <button type="button" class="pixel-tool-btn" data-tool="mirror-y" title="상하 대칭">↕</button>
+          <button type="button" class="pixel-tool-btn" data-tool="dithering" title="디더링">░</button>
+          <button type="button" class="pixel-tool-btn" data-tool="replace-color" title="색 교체">⇄</button>
+          <button type="button" class="pixel-tool-btn action" id="pixel-undo" title="되돌리기">↶</button>
+          <button type="button" class="pixel-tool-btn action" id="pixel-redo" title="다시 실행">↷</button>
+          <button type="button" class="pixel-tool-btn action" id="pixel-grid-toggle" title="격자 토글">#</button>
+          <button type="button" class="pixel-tool-btn action" id="pixel-clear" title="전체 지우기">🗑️</button>
+        </div>
+
+        <div class="pixel-stage">
           <div class="pixel-grid-wrapper">
             <div class="pixel-grid-board" id="pixel-grid-board"></div>
           </div>
-          
-          <!-- Hidden Canvas for export -->
-          <canvas id="pixel-export-canvas" class="pixel-canvas-hidden" width="300" height="300"></canvas>
+          <div class="pixel-editor-status">
+            <span id="pixel-coords">X: -, Y: -</span>
+            <span id="pixel-tool-label">PENCIL</span>
+          </div>
         </div>
-        <span class="error-message">도트 그림판에 작품을 그려주세요.</span>
+
+        <div class="pixel-side-panel">
+          <div class="pixel-panel-label">현재 색상</div>
+          <div class="pixel-current-row">
+            <div class="pixel-current-swatch" id="pixel-current-swatch" style="background:#111111;"></div>
+            <span id="pixel-current-hex">#111111</span>
+          </div>
+          <input type="color" class="pixel-custom-color" id="pixel-custom-color" value="#111111" title="자유 색상 선택">
+          <div class="pixel-panel-label">팔레트</div>
+          <div class="pixel-palette-row" id="pixel-palette-row">
+            <div class="color-chip active" data-color="#111111" style="background:#111111;" title="검정"></div>
+            <div class="color-chip" data-color="#ffffff" style="background:#ffffff;" title="흰색"></div>
+            <div class="color-chip" data-color="#ef4444" style="background:#ef4444;" title="빨강"></div>
+            <div class="color-chip" data-color="#f97316" style="background:#f97316;" title="주황"></div>
+            <div class="color-chip" data-color="#eab308" style="background:#eab308;" title="노랑"></div>
+            <div class="color-chip" data-color="#22c55e" style="background:#22c55e;" title="연두"></div>
+            <div class="color-chip" data-color="#3b82f6" style="background:#3b82f6;" title="파랑"></div>
+            <div class="color-chip" data-color="#8b5cf6" style="background:#8b5cf6;" title="보라"></div>
+            <div class="color-chip" data-color="#ec4899" style="background:#ec4899;" title="핑크"></div>
+            <div class="color-chip" data-color="#92400e" style="background:#92400e;" title="갈색"></div>
+            <div class="color-chip" data-color="#6b7280" style="background:#6b7280;" title="회색"></div>
+            <div class="color-chip" data-color="#67e8f9" style="background:#67e8f9;" title="하늘"></div>
+          </div>
+        </div>
+
+        <div class="pixel-action-bar">
+          <button type="button" class="btn btn-secondary" id="pixel-switch-upload">이미지 파일 업로드로 전환</button>
+          <button type="button" class="btn btn-primary" id="pixel-submit-draw">최종 제출</button>
+        </div>
       </div>
-      
-      <!-- Standard File Upload Tab -->
-      <div id="pixel-upload-container" style="display: none;">
+
+      <div id="pixel-upload-container" style="display: block; padding: 20px 0;">
+        <label style="margin-bottom: 8px;">작품 이미지 업로드</label>
         <div id="file-dropzone" class="file-dropzone">
           <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
@@ -1280,41 +1315,45 @@ function setupDynamicFormFields(contest) {
           <div class="helper-text">${contest.placeholder}</div>
           <input type="file" id="submission-file" accept="image/*" style="display: none;" required>
         </div>
-        <div id="upload-preview-wrapper" style="display: none;"></div>
+        <div id="upload-preview-wrapper" style="display: none; margin-top: 12px;"></div>
+        <div style="display: flex; gap: 10px; margin-top: 16px;">
+          <button type="button" class="btn btn-secondary btn-block" id="pixel-switch-draw">직접 도트 찍기로 전환</button>
+          <button type="button" class="btn btn-primary btn-block" id="pixel-submit-upload">업로드 파일 제출하기</button>
+        </div>
         <span class="error-message">응모할 디자인 시안 이미지를 꼭 업로드해 주세요.</span>
       </div>
+      <canvas id="pixel-export-canvas" class="pixel-canvas-hidden" width="300" height="300"></canvas>
     `;
-
-    // Setup tab toggle
-    const btnDraw = document.getElementById("toggle-pixel-draw");
-    const btnUpload = document.getElementById("toggle-pixel-upload");
-    const cDraw = document.getElementById("pixel-draw-container");
-    const cUpload = document.getElementById("pixel-upload-container");
-
-    btnDraw.addEventListener("click", () => {
-      btnDraw.classList.add("active");
-      btnDraw.classList.replace("btn-secondary", "btn-primary");
-      btnUpload.classList.remove("active");
-      btnUpload.classList.replace("btn-primary", "btn-secondary");
-      cDraw.style.display = "block";
-      cUpload.style.display = "none";
-      uploadBase64Data = null;
-    });
-
-    btnUpload.addEventListener("click", () => {
-      btnUpload.classList.add("active");
-      btnUpload.classList.replace("btn-secondary", "btn-primary");
-      btnDraw.classList.remove("active");
-      btnDraw.classList.replace("btn-primary", "btn-secondary");
-      cDraw.style.display = "none";
-      cUpload.style.display = "block";
-      uploadBase64Data = null;
-    });
 
     // Init pixel art editor
     initPixelArtEditor();
     // Init file uploader for the upload tab
     setupFileUploader();
+
+    const drawToggle = document.getElementById("toggle-pixel-draw");
+    const drawContainer = document.getElementById("pixel-draw-container");
+    const uploadContainer = document.getElementById("pixel-upload-container");
+    const drawer = document.getElementById("contest-drawer");
+
+    function setPixelMode(mode) {
+      const isDraw = mode === "draw";
+      drawer.classList.toggle("pixel-fullscreen", isDraw);
+      drawToggle.classList.toggle("active", isDraw);
+      drawContainer.style.display = isDraw ? "grid" : "none";
+      uploadContainer.style.display = isDraw ? "none" : "block";
+    }
+
+    document.getElementById("pixel-switch-draw").addEventListener("click", () => setPixelMode("draw"));
+    document.getElementById("pixel-switch-upload").addEventListener("click", () => setPixelMode("upload"));
+    document.getElementById("pixel-close-editor").addEventListener("click", () => setPixelMode("upload"));
+    document.getElementById("pixel-submit-draw").addEventListener("click", () => {
+      drawToggle.classList.add("active");
+      if (validateSubmissionForm()) executeSubmit();
+    });
+    document.getElementById("pixel-submit-upload").addEventListener("click", () => {
+      drawToggle.classList.remove("active");
+      if (validateSubmissionForm()) executeSubmit();
+    });
 
   } else if (contest.submissionType === "image") {
     container.innerHTML = `
@@ -1509,84 +1548,175 @@ function initPixelArtEditor() {
   const board = document.getElementById("pixel-grid-board");
   if (!board) return;
 
+  const totalCells = GRID_SIZE * GRID_SIZE;
+  let pixelData = Array(totalCells).fill("");
   let currentColor = "#111111";
-  let currentTool = "pen"; // "pen" or "eraser"
+  let currentTool = "pencil";
   let isDrawing = false;
-  const EMPTY_COLOR = "";
+  let startIndex = null;
+  let undoStack = [];
+  let redoStack = [];
 
-  // Build the 30x30 grid cells
   board.innerHTML = "";
-  for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+  for (let i = 0; i < totalCells; i++) {
     const cell = document.createElement("div");
     cell.className = "pixel-cell";
     cell.dataset.index = i;
     board.appendChild(cell);
   }
 
-  // ==== Drawing handlers ====
-  function paintCell(cell) {
-    if (!cell || !cell.classList.contains("pixel-cell")) return;
-    if (currentTool === "pen") {
-      cell.style.backgroundColor = currentColor;
-    } else if (currentTool === "eraser") {
-      cell.style.backgroundColor = "";
+  function xy(index) {
+    return { x: index % GRID_SIZE, y: Math.floor(index / GRID_SIZE) };
+  }
+
+  function idx(x, y) {
+    return y * GRID_SIZE + x;
+  }
+
+  function inBounds(x, y) {
+    return x >= 0 && y >= 0 && x < GRID_SIZE && y < GRID_SIZE;
+  }
+
+  function pushUndo() {
+    undoStack.push([...pixelData]);
+    if (undoStack.length > 60) undoStack.shift();
+    redoStack = [];
+  }
+
+  function renderGrid() {
+    board.querySelectorAll(".pixel-cell").forEach((cell, index) => {
+      cell.style.backgroundColor = pixelData[index] || "";
+    });
+  }
+
+  function setPixel(x, y, color = currentColor) {
+    if (!inBounds(x, y)) return;
+    pixelData[idx(x, y)] = color;
+  }
+
+  function drawBrush(x, y) {
+    [[0, 0], [1, 0], [0, 1], [1, 1]].forEach(([dx, dy]) => setPixel(x + dx, y + dy));
+  }
+
+  function drawLine(x0, y0, x1, y1) {
+    let dx = Math.abs(x1 - x0);
+    let dy = Math.abs(y1 - y0);
+    let sx = x0 < x1 ? 1 : -1;
+    let sy = y0 < y1 ? 1 : -1;
+    let err = dx - dy;
+    while (true) {
+      setPixel(x0, y0);
+      if (x0 === x1 && y0 === y1) break;
+      const e2 = 2 * err;
+      if (e2 > -dy) { err -= dy; x0 += sx; }
+      if (e2 < dx) { err += dx; y0 += sy; }
     }
   }
 
-  // Mouse events
-  board.addEventListener("mousedown", (e) => {
-    if (e.button !== 0) return;
-    isDrawing = true;
-    paintCell(e.target);
-  });
-  board.addEventListener("mouseover", (e) => {
-    if (isDrawing) paintCell(e.target);
-  });
-  document.addEventListener("mouseup", () => { isDrawing = false; });
+  function drawRect(x0, y0, x1, y1, fill) {
+    const minX = Math.min(x0, x1);
+    const maxX = Math.max(x0, x1);
+    const minY = Math.min(y0, y1);
+    const maxY = Math.max(y0, y1);
+    for (let y = minY; y <= maxY; y++) {
+      for (let x = minX; x <= maxX; x++) {
+        if (fill || x === minX || x === maxX || y === minY || y === maxY) setPixel(x, y);
+      }
+    }
+  }
 
-  // Touch events (mobile support)
-  board.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    isDrawing = true;
-    const touch = e.touches[0];
-    const target = document.elementFromPoint(touch.clientX, touch.clientY);
-    paintCell(target);
-  }, { passive: false });
+  function drawCircle(x0, y0, x1, y1, fill) {
+    const cx = Math.round((x0 + x1) / 2);
+    const cy = Math.round((y0 + y1) / 2);
+    const rx = Math.max(1, Math.abs(x1 - x0) / 2);
+    const ry = Math.max(1, Math.abs(y1 - y0) / 2);
+    for (let y = 0; y < GRID_SIZE; y++) {
+      for (let x = 0; x < GRID_SIZE; x++) {
+        const value = ((x - cx) ** 2) / (rx ** 2) + ((y - cy) ** 2) / (ry ** 2);
+        if (fill ? value <= 1 : Math.abs(value - 1) < 0.18) setPixel(x, y);
+      }
+    }
+  }
 
-  board.addEventListener("touchmove", (e) => {
-    e.preventDefault();
-    if (!isDrawing) return;
-    const touch = e.touches[0];
-    const target = document.elementFromPoint(touch.clientX, touch.clientY);
-    paintCell(target);
-  }, { passive: false });
+  function floodFill(start, replacement) {
+    const target = pixelData[start] || "";
+    if (target === replacement) return;
+    const stack = [start];
+    while (stack.length) {
+      const current = stack.pop();
+      if ((pixelData[current] || "") !== target) continue;
+      pixelData[current] = replacement;
+      const { x, y } = xy(current);
+      [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]].forEach(([nx, ny]) => {
+        if (inBounds(nx, ny)) stack.push(idx(nx, ny));
+      });
+    }
+  }
 
-  board.addEventListener("touchend", () => { isDrawing = false; });
+  function mirrorX(index) {
+    const { x, y } = xy(index);
+    setPixel(x, y);
+    setPixel(GRID_SIZE - 1 - x, y);
+  }
 
-  // ==== Tool buttons ====
-  document.querySelectorAll(".pixel-tool-btn").forEach(btn => {
+  function mirrorY(index) {
+    const { x, y } = xy(index);
+    setPixel(x, y);
+    setPixel(x, GRID_SIZE - 1 - y);
+  }
+
+  function replaceColorAt(index) {
+    const target = pixelData[index] || "";
+    pixelData = pixelData.map(color => (color || "") === target ? currentColor : color);
+  }
+
+  function applyPoint(index) {
+    const { x, y } = xy(index);
+    if (currentTool === "pencil") setPixel(x, y);
+    else if (currentTool === "brush") drawBrush(x, y);
+    else if (currentTool === "eraser") setPixel(x, y, "");
+    else if (currentTool === "bucket") floodFill(index, currentColor);
+    else if (currentTool === "eyedropper") setColor(pixelData[index] || "#ffffff");
+    else if (currentTool === "mirror-x") mirrorX(index);
+    else if (currentTool === "mirror-y") mirrorY(index);
+    else if (currentTool === "dithering") setPixel(x, y, (x + y) % 2 === 0 ? currentColor : "");
+    else if (currentTool === "replace-color") replaceColorAt(index);
+  }
+
+  function commitShape(endIndex) {
+    if (startIndex === null) return;
+    const a = xy(startIndex);
+    const b = xy(endIndex);
+    if (currentTool === "line") drawLine(a.x, a.y, b.x, b.y);
+    else if (currentTool === "rect-outline") drawRect(a.x, a.y, b.x, b.y, false);
+    else if (currentTool === "rect-fill") drawRect(a.x, a.y, b.x, b.y, true);
+    else if (currentTool === "circle-outline") drawCircle(a.x, a.y, b.x, b.y, false);
+    else if (currentTool === "circle-fill") drawCircle(a.x, a.y, b.x, b.y, true);
+  }
+
+  function setTool(tool) {
+    currentTool = tool;
+    document.querySelectorAll(".pixel-tool-btn[data-tool]").forEach(btn => btn.classList.toggle("active", btn.dataset.tool === tool));
+    const label = document.getElementById("pixel-tool-label");
+    if (label) label.textContent = tool.toUpperCase();
+  }
+
+  document.querySelectorAll(".pixel-tool-btn[data-tool]").forEach(btn => {
     btn.addEventListener("click", () => {
       const tool = btn.dataset.tool;
-      if (tool === "clear") {
-        if (!confirm("도트 그림판을 전체 지우시겠습니까?")) return;
-        board.querySelectorAll(".pixel-cell").forEach(c => {
-          c.style.backgroundColor = "";
-        });
-        return;
-      }
-      currentTool = tool;
-      document.querySelectorAll(".pixel-tool-btn[data-tool='pen'], .pixel-tool-btn[data-tool='eraser']").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
+      setTool(tool);
     });
   });
 
-  // ==== Color palette ====
-  const swatch = document.getElementById("pixel-current-swatch");
-  const hexLabel = document.getElementById("pixel-current-hex");
   function setColor(color) {
+    if (!color) return;
     currentColor = color;
-    swatch.style.backgroundColor = color;
-    hexLabel.textContent = color;
+    const swatch = document.getElementById("pixel-current-swatch");
+    const hexLabel = document.getElementById("pixel-current-hex");
+    const picker = document.getElementById("pixel-custom-color");
+    if (swatch) swatch.style.backgroundColor = color;
+    if (hexLabel) hexLabel.textContent = color;
+    if (picker) picker.value = color;
   }
 
   document.querySelectorAll(".color-chip").forEach(chip => {
@@ -1594,23 +1724,91 @@ function initPixelArtEditor() {
       document.querySelectorAll(".color-chip").forEach(c => c.classList.remove("active"));
       chip.classList.add("active");
       setColor(chip.dataset.color);
-      currentTool = "pen";
-      document.querySelectorAll(".pixel-tool-btn[data-tool='pen'], .pixel-tool-btn[data-tool='eraser']").forEach(b => b.classList.remove("active"));
-      document.querySelector(".pixel-tool-btn[data-tool='pen']").classList.add("active");
+      setTool("pencil");
     });
   });
 
-  // Custom color picker
   const customPicker = document.getElementById("pixel-custom-color");
   if (customPicker) {
     customPicker.addEventListener("input", (e) => {
       document.querySelectorAll(".color-chip").forEach(c => c.classList.remove("active"));
       setColor(e.target.value);
-      currentTool = "pen";
-      document.querySelectorAll(".pixel-tool-btn[data-tool='pen'], .pixel-tool-btn[data-tool='eraser']").forEach(b => b.classList.remove("active"));
-      document.querySelector(".pixel-tool-btn[data-tool='pen']").classList.add("active");
+      setTool("pencil");
     });
   }
+
+  function cellFromEvent(e) {
+    const point = e.touches?.[0] || e.changedTouches?.[0] || e;
+    if (typeof point.clientX !== "number" || typeof point.clientY !== "number") return null;
+    const el = document.elementFromPoint(point.clientX, point.clientY);
+    return el?.classList.contains("pixel-cell") ? el : null;
+  }
+
+  function startDraw(e) {
+    const cell = cellFromEvent(e);
+    if (!cell) return;
+    e.preventDefault();
+    pushUndo();
+    isDrawing = true;
+    startIndex = Number(cell.dataset.index);
+    if (["line", "rect-outline", "rect-fill", "circle-outline", "circle-fill"].includes(currentTool)) return;
+    applyPoint(startIndex);
+    renderGrid();
+  }
+
+  function moveDraw(e) {
+    const cell = cellFromEvent(e);
+    if (!cell) return;
+    const index = Number(cell.dataset.index);
+    const { x, y } = xy(index);
+    const coords = document.getElementById("pixel-coords");
+    if (coords) coords.textContent = `X: ${x}, Y: ${y}`;
+    if (!isDrawing || ["line", "rect-outline", "rect-fill", "circle-outline", "circle-fill", "bucket", "eyedropper", "replace-color"].includes(currentTool)) return;
+    e.preventDefault();
+    applyPoint(index);
+    renderGrid();
+  }
+
+  function endDraw(e) {
+    if (!isDrawing) return;
+    const cell = cellFromEvent(e) || document.querySelector(`.pixel-cell[data-index="${startIndex}"]`);
+    const index = Number(cell.dataset.index);
+    if (["line", "rect-outline", "rect-fill", "circle-outline", "circle-fill"].includes(currentTool)) {
+      commitShape(index);
+      renderGrid();
+    }
+    isDrawing = false;
+    startIndex = null;
+  }
+
+  board.addEventListener("mousedown", startDraw);
+  board.addEventListener("mouseover", moveDraw);
+  document.addEventListener("mouseup", endDraw);
+  board.addEventListener("touchstart", startDraw, { passive: false });
+  board.addEventListener("touchmove", moveDraw, { passive: false });
+  board.addEventListener("touchend", endDraw, { passive: false });
+
+  document.getElementById("pixel-undo")?.addEventListener("click", () => {
+    if (!undoStack.length) return;
+    redoStack.push([...pixelData]);
+    pixelData = undoStack.pop();
+    renderGrid();
+  });
+  document.getElementById("pixel-redo")?.addEventListener("click", () => {
+    if (!redoStack.length) return;
+    undoStack.push([...pixelData]);
+    pixelData = redoStack.pop();
+    renderGrid();
+  });
+  document.getElementById("pixel-grid-toggle")?.addEventListener("click", () => board.classList.toggle("no-grid"));
+  document.getElementById("pixel-clear")?.addEventListener("click", () => {
+    if (!confirm("도트 그림판을 전체 지우시겠습니까?")) return;
+    pushUndo();
+    pixelData = Array(totalCells).fill("");
+    renderGrid();
+  });
+
+  renderGrid();
 }
 
 // Exports the pixel art grid to a base64 PNG string
@@ -1812,7 +2010,7 @@ function validateSubmissionForm() {
     if (isDrawActive) {
       const testExport = exportPixelArtToBase64();
       if (!testExport) {
-        const editorContainer = document.querySelector(".pixel-editor-container");
+        const editorContainer = document.querySelector(".pixel-editor-shell");
         if (editorContainer) editorContainer.parentElement.classList.add("has-error");
         isValid = false;
       }
