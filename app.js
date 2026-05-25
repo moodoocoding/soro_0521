@@ -1239,54 +1239,14 @@ function setupDynamicFormFields(contest) {
       <div id="toggle-pixel-upload" style="display: none;"></div>
 
       <div id="pixel-draw-container" class="pixel-editor-shell" style="display: none;">
-        <!-- Top Options Bar -->
-        <div class="pixel-top-options-bar">
-          <div class="pixel-top-left">
-            <button type="button" class="pixel-back-btn" id="pixel-close-editor" title="업로드 화면으로 돌아가기">
-              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            </button>
-            <span class="pixel-top-tool-name" id="pixel-tool-label">PENCIL</span>
-          </div>
-
-          <div class="pixel-top-center">
-            <!-- Dynamic Tool Options: Brush sizes -->
-            <div class="pixel-option-group">
-              <span class="pixel-option-title">크기</span>
-              <div class="pixel-size-buttons" id="pixel-brush-size-container">
-                <button type="button" class="pixel-size-btn active" data-size="1" title="1 픽셀 (1x1)">1px</button>
-                <button type="button" class="pixel-size-btn" data-size="2" title="2 픽셀 (2x2)">2px</button>
-                <button type="button" class="pixel-size-btn" data-size="3" title="3 픽셀 (3x3)">3px</button>
-                <button type="button" class="pixel-size-btn" data-size="4" title="4 픽셀 (4x4)">4px</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="pixel-top-right">
-            <!-- Horizontal Palette & Picker -->
-            <div class="pixel-palette-wrapper">
-              <div class="pixel-top-palette" id="pixel-palette-row">
-                <div class="color-chip active" data-color="#111111" style="background:#111111;" title="검정 (마우스 우클릭 시 배경색 지정)"></div>
-                <div class="color-chip" data-color="#ffffff" style="background:#ffffff;" title="흰색 (마우스 우클릭 시 배경색 지정)"></div>
-                <div class="color-chip" data-color="#ef4444" style="background:#ef4444;" title="빨강 (마우스 우클릭 시 배경색 지정)"></div>
-                <div class="color-chip" data-color="#f97316" style="background:#f97316;" title="주황 (마우스 우클릭 시 배경색 지정)"></div>
-                <div class="color-chip" data-color="#eab308" style="background:#eab308;" title="노랑 (마우스 우클릭 시 배경색 지정)"></div>
-                <div class="color-chip" data-color="#22c55e" style="background:#22c55e;" title="연두 (마우스 우클릭 시 배경색 지정)"></div>
-                <div class="color-chip" data-color="#3b82f6" style="background:#3b82f6;" title="파랑 (마우스 우클릭 시 배경색 지정)"></div>
-                <div class="color-chip" data-color="#8b5cf6" style="background:#8b5cf6;" title="보라 (마우스 우클릭 시 배경색 지정)"></div>
-                <div class="color-chip" data-color="#ec4899" style="background:#ec4899;" title="핑크 (마우스 우클릭 시 배경색 지정)"></div>
-                <div class="color-chip" data-color="#92400e" style="background:#92400e;" title="갈색 (마우스 우클릭 시 배경색 지정)"></div>
-                <div class="color-chip" data-color="#6b7280" style="background:#6b7280;" title="회색 (마우스 우클릭 시 배경색 지정)"></div>
-                <div class="color-chip" data-color="#67e8f9" style="background:#67e8f9;" title="하늘 (마우스 우클릭 시 배경색 지정)"></div>
-              </div>
-              <div class="pixel-custom-picker-btn">
-                <input type="color" class="pixel-custom-color" id="pixel-custom-color" value="#111111" title="자유 색상 선택">
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- Left Toolbar -->
         <div class="pixel-toolbar">
+          <!-- Back button reinstated at the top of Left Toolbar -->
+          <button type="button" class="pixel-tool-btn pixel-back-tool-btn" id="pixel-close-editor" title="업로드 화면으로 돌아가기">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          </button>
+          <div class="pixel-tool-separator"></div>
+
           <div class="pixel-tool-group">
             <button type="button" class="pixel-tool-btn active" data-tool="pencil" title="연필">
               <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
@@ -1352,33 +1312,78 @@ function setupDynamicFormFields(contest) {
               <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             </button>
           </div>
-
-          <!-- Photoshop Style Overlapping Dual Color Swatch -->
-          <div class="pixel-tool-color-swatches-container">
-            <div class="pixel-overlapping-swatches">
-              <!-- Background Swatch (Right click) -->
-              <div class="pixel-swatch-rect secondary" id="pixel-secondary-swatch" style="background-color: #ffffff;" title="오른쪽 클릭 색상 (배경색)"></div>
-              <!-- Foreground Swatch (Left click) -->
-              <div class="pixel-swatch-rect primary active" id="pixel-primary-swatch" style="background-color: #111111;" title="왼쪽 클릭 색상 (전경색 - 클릭하여 활성화)"></div>
-              
-              <!-- Swap arrow button (Photoshop style) -->
-              <button type="button" class="pixel-swatch-swap-btn" id="pixel-swatch-swap" title="전경색/배경색 전환 (단축키: X)">
-                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M16 3h5v5"></path><path d="M4 20h5v5"></path><path d="M21 3C14.5 3 9.5 8 9.5 14.5"></path><path d="M3 21C9.5 21 14.5 16 14.5 9.5"></path></svg>
-              </button>
-              
-              <!-- Reset button (D hotkey) -->
-              <button type="button" class="pixel-swatch-reset-btn" id="pixel-swatch-reset" title="기본값 검정/흰색 리셋 (단축키: D)">
-                <div class="reset-black"></div>
-                <div class="reset-white"></div>
-              </button>
-            </div>
-          </div>
         </div>
 
         <!-- Center Stage -->
         <div class="pixel-stage">
           <div class="pixel-grid-wrapper">
             <div class="pixel-grid-board" id="pixel-grid-board"></div>
+          </div>
+        </div>
+
+        <!-- Right Side Panel -->
+        <div class="pixel-side-panel">
+          <!-- 1단: 현재 색상 -->
+          <div class="pixel-panel-section">
+            <div class="pixel-panel-label">현재 색상</div>
+            <div class="pixel-color-swatches-section">
+              <div class="pixel-overlapping-swatches">
+                <!-- Background Swatch (Right click) -->
+                <div class="pixel-swatch-rect secondary" id="pixel-secondary-swatch" style="background-color: #ffffff;" title="오른쪽 클릭 색상 (배경색)"></div>
+                <!-- Foreground Swatch (Left click) -->
+                <div class="pixel-swatch-rect primary active" id="pixel-primary-swatch" style="background-color: #111111;" title="왼쪽 클릭 색상 (전경색 - 클릭하여 활성화)"></div>
+                
+                <!-- Swap arrow button (Photoshop style) -->
+                <button type="button" class="pixel-swatch-swap-btn" id="pixel-swatch-swap" title="전경색/배경색 전환 (단축키: X)">
+                  <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M16 3h5v5"></path><path d="M4 20h5v5"></path><path d="M21 3C14.5 3 9.5 8 9.5 14.5"></path><path d="M3 21C9.5 21 14.5 16 14.5 9.5"></path></svg>
+                </button>
+                
+                <!-- Reset button (D hotkey) -->
+                <button type="button" class="pixel-swatch-reset-btn" id="pixel-swatch-reset" title="기본값 검정/흰색 리셋 (단축키: D)">
+                  <div class="reset-black"></div>
+                  <div class="reset-white"></div>
+                </button>
+              </div>
+              <div class="pixel-custom-picker-btn">
+                <input type="color" class="pixel-custom-color" id="pixel-custom-color" value="#111111" title="자유 색상 선택">
+              </div>
+            </div>
+          </div>
+
+          <!-- 2단: 팔레트 -->
+          <div class="pixel-panel-section">
+            <div class="pixel-panel-label">팔레트</div>
+            <div class="pixel-palette-grid" id="pixel-palette-row">
+              <div class="color-chip active" data-color="#111111" style="background:#111111;" title="검정 (마우스 우클릭 시 배경색 지정)"></div>
+              <div class="color-chip" data-color="#ffffff" style="background:#ffffff;" title="흰색 (마우스 우클릭 시 배경색 지정)"></div>
+              <div class="color-chip" data-color="#ef4444" style="background:#ef4444;" title="빨강 (마우스 우클릭 시 배경색 지정)"></div>
+              <div class="color-chip" data-color="#f97316" style="background:#f97316;" title="주황 (마우스 우클릭 시 배경색 지정)"></div>
+              <div class="color-chip" data-color="#eab308" style="background:#eab308;" title="노랑 (마우스 우클릭 시 배경색 지정)"></div>
+              <div class="color-chip" data-color="#22c55e" style="background:#22c55e;" title="연두 (마우스 우클릭 시 배경색 지정)"></div>
+              <div class="color-chip" data-color="#3b82f6" style="background:#3b82f6;" title="파랑 (마우스 우클릭 시 배경색 지정)"></div>
+              <div class="color-chip" data-color="#8b5cf6" style="background:#8b5cf6;" title="보라 (마우스 우클릭 시 배경색 지정)"></div>
+              <div class="color-chip" data-color="#ec4899" style="background:#ec4899;" title="핑크 (마우스 우클릭 시 배경색 지정)"></div>
+              <div class="color-chip" data-color="#92400e" style="background:#92400e;" title="갈색 (마우스 우클릭 시 배경색 지정)"></div>
+              <div class="color-chip" data-color="#6b7280" style="background:#6b7280;" title="회색 (마우스 우클릭 시 배경색 지정)"></div>
+              <div class="color-chip" data-color="#67e8f9" style="background:#67e8f9;" title="하늘 (마우스 우클릭 시 배경색 지정)"></div>
+            </div>
+          </div>
+
+          <!-- 세로 구분선 (Divider Line) -->
+          <div class="pixel-tool-separator horizontal"></div>
+
+          <!-- 3단: 도구 옵션 -->
+          <div class="pixel-panel-section">
+            <div class="pixel-panel-label">도구 옵션</div>
+            <div class="pixel-brush-size-container-vertical">
+              <span class="pixel-size-title">브러시/지우개 크기</span>
+              <div class="pixel-size-buttons" id="pixel-brush-size-container">
+                <button type="button" class="pixel-size-btn active" data-size="1" title="1 픽셀 (1x1)">1px</button>
+                <button type="button" class="pixel-size-btn" data-size="2" title="2 픽셀 (2x2)">2px</button>
+                <button type="button" class="pixel-size-btn" data-size="3" title="3 픽셀 (3x3)">3px</button>
+                <button type="button" class="pixel-size-btn" data-size="4" title="4 픽셀 (4x4)">4px</button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1651,6 +1656,7 @@ function initPixelArtEditor() {
 
   const totalCells = GRID_SIZE * GRID_SIZE;
   let pixelData = Array(totalCells).fill("");
+  let activeBuffer = pixelData; // Double-buffering target pointer for shape previews
   
   // Photoshop Style Swatch Color State
   let primaryColor = "#111111";
@@ -1701,14 +1707,15 @@ function initPixelArtEditor() {
         const parsed = JSON.parse(draftData);
         if (Array.isArray(parsed) && parsed.length === totalCells) {
           pixelData = parsed;
+          activeBuffer = pixelData;
         }
       } catch (e) {}
     }
   }
 
-  function renderGrid() {
+  function renderGrid(buffer = pixelData) {
     board.querySelectorAll(".pixel-cell").forEach((cell, index) => {
-      cell.style.backgroundColor = pixelData[index] || "";
+      cell.style.backgroundColor = buffer[index] || "";
     });
   }
 
@@ -1854,7 +1861,7 @@ function initPixelArtEditor() {
 
   function setPixel(x, y, color = currentColorForDraw) {
     if (!inBounds(x, y)) return;
-    pixelData[idx(x, y)] = color;
+    activeBuffer[idx(x, y)] = color;
   }
 
   function setPixelWithSize(x, y, color) {
@@ -1915,13 +1922,13 @@ function initPixelArtEditor() {
   }
 
   function floodFill(start, replacement) {
-    const target = pixelData[start] || "";
+    const target = activeBuffer[start] || "";
     if (target === replacement) return;
     const stack = [start];
     while (stack.length) {
       const current = stack.pop();
-      if ((pixelData[current] || "") !== target) continue;
-      pixelData[current] = replacement;
+      if ((activeBuffer[current] || "") !== target) continue;
+      activeBuffer[current] = replacement;
       const { x, y } = xy(current);
       [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]].forEach(([nx, ny]) => {
         if (inBounds(nx, ny)) stack.push(idx(nx, ny));
@@ -1956,8 +1963,12 @@ function initPixelArtEditor() {
   }
 
   function replaceColorAt(index, color) {
-    const target = pixelData[index] || "";
-    pixelData = pixelData.map(c => (c || "") === target ? color : c);
+    const target = activeBuffer[index] || "";
+    for (let i = 0; i < activeBuffer.length; i++) {
+      if ((activeBuffer[i] || "") === target) {
+        activeBuffer[i] = color;
+      }
+    }
   }
 
   function applyPoint(index, color) {
@@ -1969,7 +1980,7 @@ function initPixelArtEditor() {
     } else if (currentTool === "bucket") {
       floodFill(index, color);
     } else if (currentTool === "eyedropper") {
-      const picked = pixelData[index] || "#ffffff";
+      const picked = activeBuffer[index] || "#ffffff";
       if (activeColorSlot === "primary") {
         primaryColor = picked;
       } else {
@@ -2060,10 +2071,21 @@ function initPixelArtEditor() {
     const { x, y } = xy(index);
     const coords = document.getElementById("pixel-coords");
     if (coords) coords.textContent = `X: ${x}, Y: ${y}`;
-    if (!isDrawing || ["line", "rect-outline", "rect-fill", "circle-outline", "circle-fill", "bucket", "eyedropper", "replace-color"].includes(currentTool)) return;
+    if (!isDrawing) return;
     e.preventDefault();
-    applyPoint(index, currentColorForDraw);
-    renderGrid();
+
+    if (["line", "rect-outline", "rect-fill", "circle-outline", "circle-fill"].includes(currentTool)) {
+      const tempBuffer = [...pixelData];
+      activeBuffer = tempBuffer;
+      commitShape(index, currentColorForDraw);
+      renderGrid(tempBuffer);
+      activeBuffer = pixelData; // Restore
+    } else if (["bucket", "eyedropper", "replace-color"].includes(currentTool)) {
+      return;
+    } else {
+      applyPoint(index, currentColorForDraw);
+      renderGrid();
+    }
   }
 
   function endDraw(e) {
@@ -2071,6 +2093,7 @@ function initPixelArtEditor() {
     const cell = cellFromEvent(e) || document.querySelector(`.pixel-cell[data-index="${startIndex}"]`);
     const index = Number(cell.dataset.index);
     if (["line", "rect-outline", "rect-fill", "circle-outline", "circle-fill"].includes(currentTool)) {
+      activeBuffer = pixelData; // Ensure we draw to main buffer
       commitShape(index, currentColorForDraw);
       renderGrid();
     }
