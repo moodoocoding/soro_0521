@@ -23,7 +23,8 @@ const CONTESTS_DATA = [
       "공모 주제: 청주소로초를 상징할 수 있는 것",
       "규격: 최대 50mm x 50mm 이내 규격 (해상도 300dpi 이상 PNG/SVG 권장)",
       "제출물: 키링 앞면 디자인 시안 이미지 파일",
-      "시상 계획: 학년에 상관 없이 최우수 1명, 우수 1명, 장려 1명"
+      "시상 계획: 학년에 상관 없이 최우수 1명, 우수 1명, 장려 1명",
+      "참고 링크: <a href=\"https://canva.link/7al5bl4pt23j015\" target=\"_blank\" class=\"contest-link\">키링 템플릿(Canva) 바로가기</a>"
     ],
     evaluationCriteria: [
       { category: "주제의 이해 및 표현", desc: "청주소로초와 디지털 활용 수업을 잘 이해하고 표현했는지 평가합니다.", weight: "20%" },
@@ -943,7 +944,7 @@ function openContestDetails(contestId) {
   guideList.innerHTML = "";
   contest.rules.forEach(rule => {
     const li = document.createElement("li");
-    li.textContent = rule;
+    li.innerHTML = rule;
     guideList.appendChild(li);
   });
 
