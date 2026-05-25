@@ -1080,9 +1080,24 @@ async function checkAndRenderSubmissionArea(contest) {
     }
 
     if (entryData.image) {
+      const isDrive = entryData.image.includes("drive.google.com");
+      const displayUrl = isDrive ? getGoogleDriveDirectLink(entryData.image) : entryData.image;
+      const driveId = isDrive ? extractDriveId(entryData.image) : "";
+      const downloadUrl = isDrive ? `https://drive.google.com/uc?export=download&id=${driveId}` : entryData.image;
+
       contentHtml += `
-        <div class="submitted-media-preview">
-          <img src="${entryData.image}" alt="제출 작품 이미지">
+        <div class="submitted-media-preview-container" style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <div class="submitted-media-preview" style="border: 1px solid var(--border-color); padding: 8px; background: var(--bg-tertiary); display: flex; justify-content: center; overflow: hidden; max-height: 240px;">
+            <img src="${displayUrl}" alt="제출 작품 이미지" style="max-width: 100%; max-height: 220px; object-fit: contain; border: 1px solid var(--border-color); transition: transform var(--transition-smooth);">
+          </div>
+          <div style="text-align: center;">
+            <a href="${downloadUrl}" target="_blank" download="submission_art.png" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.75rem; font-weight: 700; padding: 6px 14px; border-radius: 0; background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); text-decoration: none; cursor: pointer; transition: all var(--transition-fast);">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
+              </svg>
+              제출 작품 다운로드
+            </a>
+          </div>
         </div>
       `;
     } else if (entryData["book-title"]) {
@@ -1731,9 +1746,26 @@ async function executeLoggedInLookup() {
     }
 
     if (entryData && entryData.image) {
+      const isDrive = entryData.image.includes("drive.google.com");
+      const displayUrl = isDrive ? getGoogleDriveDirectLink(entryData.image) : entryData.image;
+      const driveId = isDrive ? extractDriveId(entryData.image) : "";
+      const downloadUrl = isDrive ? `https://drive.google.com/uc?export=download&id=${driveId}` : entryData.image;
+
       contentHtml += `
-        <div><strong>제출한 이미지 시안:</strong></div>
-        <img class="submission-thumbnail" src="${entryData.image}" alt="제출 이미지">
+        <div style="margin-top: 10px;"><strong>제출한 이미지 시안:</strong></div>
+        <div class="submitted-media-preview-container" style="margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="border: 1px solid var(--border-color); padding: 6px; background: var(--bg-tertiary); display: flex; justify-content: center; overflow: hidden; max-height: 180px;">
+            <img class="submission-thumbnail" src="${displayUrl}" alt="제출 이미지" style="max-width: 100%; max-height: 160px; object-fit: contain; border: 1px solid var(--border-color);">
+          </div>
+          <div>
+            <a href="${downloadUrl}" target="_blank" download="submission_art.png" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 0; background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); text-decoration: none; cursor: pointer; transition: all var(--transition-fast);">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
+              </svg>
+              제출 이미지 다운로드
+            </a>
+          </div>
+        </div>
       `;
     }
 
