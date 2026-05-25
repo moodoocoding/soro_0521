@@ -1394,11 +1394,7 @@ function setupDynamicFormFields(contest) {
           <div class="pixel-action-buttons">
             <button type="button" class="btn btn-secondary" id="pixel-save-draft" style="color: #3b82f6;">
               <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-              임시저장 (클라우드)
-            </button>
-            <button type="button" class="btn btn-secondary" id="pixel-switch-upload">
-              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-              업로드 화면으로 가기
+              임시저장
             </button>
             <button type="button" class="btn btn-primary" id="pixel-submit-draw">
               <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
@@ -1449,7 +1445,7 @@ function setupDynamicFormFields(contest) {
     }
 
     document.getElementById("pixel-switch-draw").addEventListener("click", () => setPixelMode("draw"));
-    document.getElementById("pixel-switch-upload").addEventListener("click", () => setPixelMode("upload"));
+    document.getElementById("pixel-switch-upload")?.addEventListener("click", () => setPixelMode("upload"));
     document.getElementById("pixel-close-editor").addEventListener("click", () => setPixelMode("upload"));
     document.getElementById("pixel-submit-draw").addEventListener("click", () => {
       drawToggle.classList.add("active");
