@@ -979,13 +979,7 @@ function openContestDetails(contestId) {
     noticeText.innerHTML = `🔒 <strong>이 대회의 접수가 종료되었습니다.</strong><br>${contest.period || `2026년 ${contest.month}월 한 달 간`} 진행되었던 작품 접수가 완료되었습니다.`;
   }
 
-  if (status === "active" && !currentUser) {
-    authNotice.style.display = "flex";
-    subForm.style.display = "none";
-  } else if (status === "active" && currentUser) {
-    authNotice.style.display = "none";
-    subForm.style.display = "block";
-  }
+
 
   // Show 3rd tab only for keyring contest
   const tabGallery = document.getElementById("drawer-tab-gallery");
