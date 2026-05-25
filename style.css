@@ -1600,26 +1600,181 @@ textarea {
 
 
 
-/* =========================================================================
-   PIXEL ART EXTENDED EDITOR UI OVERHAUL (Premium Redesign)
-   ========================================================================= */
-
 .pixel-editor-shell {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   background-color: #0c0c0e; /* Extremely dark grey background */
   z-index: 1000;
   display: grid;
-  grid-template-columns: 64px 1fr 280px;
-  grid-template-rows: 1fr 60px;
+  grid-template-columns: 64px 1fr;
+  grid-template-rows: 56px 1fr 50px;
   grid-template-areas:
-    "toolbar stage panel"
-    "toolbar bottom panel";
+    "toolbar topbar"
+    "toolbar stage"
+    "toolbar bottom";
   font-family: 'Outfit', 'Noto Sans KR', sans-serif;
   color: #fff;
 }
 
-/* === 1. Left Toolbar === */
+/* === 1. Top Options Bar === */
+.pixel-top-options-bar {
+  grid-area: topbar;
+  background-color: #161619;
+  border-bottom: 1px solid #2c2c32;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  height: 100%;
+}
+
+.pixel-top-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.pixel-back-btn {
+  background: transparent;
+  border: none;
+  color: #909099;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.pixel-back-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.pixel-top-tool-name {
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  color: #ec4899; /* Pink highlight for tool */
+  background: rgba(236, 72, 153, 0.1);
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(236, 72, 153, 0.2);
+}
+
+.pixel-top-center {
+  display: flex;
+  align-items: center;
+}
+
+.pixel-option-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pixel-option-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #909099;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pixel-size-buttons {
+  display: flex;
+  background: #0c0c0e;
+  border: 1px solid #2c2c32;
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.pixel-size-btn {
+  background: transparent;
+  border: none;
+  color: #909099;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.pixel-size-btn:hover {
+  color: #fff;
+}
+.pixel-size-btn.active {
+  background-color: #ec4899;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(236, 72, 153, 0.4);
+}
+
+.pixel-top-right {
+  display: flex;
+  align-items: center;
+}
+
+.pixel-palette-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #0c0c0e;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid #2c2c32;
+}
+
+.pixel-top-palette {
+  display: flex;
+  gap: 6px;
+}
+
+.pixel-top-palette .color-chip {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2);
+  transition: transform 0.1s, border-color 0.2s;
+}
+.pixel-top-palette .color-chip:hover {
+  transform: scale(1.15);
+  border-color: rgba(255,255,255,0.6);
+}
+.pixel-top-palette .color-chip.active {
+  border: 2px solid #fff;
+  transform: scale(1.2);
+  box-shadow: 0 0 8px rgba(255,255,255,0.6);
+}
+
+.pixel-custom-picker-btn {
+  display: flex;
+  align-items: center;
+  border-left: 1px solid #2c2c32;
+  padding-left: 10px;
+}
+
+.pixel-custom-color {
+  -webkit-appearance: none;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+  background: none;
+}
+.pixel-custom-color::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.pixel-custom-color::-webkit-color-swatch {
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* === 2. Left Toolbar === */
 .pixel-toolbar {
   grid-area: toolbar;
   background-color: #161619;
@@ -1643,7 +1798,7 @@ textarea {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .pixel-tool-btn {
@@ -1679,30 +1834,124 @@ textarea {
   color: #ef4444;
 }
 
-.pixel-btn-primary {
-  color: #3b82f6;
-}
-.pixel-btn-primary:hover {
-  background-color: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
+/* Photoshop Style Swatch CSS */
+.pixel-tool-color-swatches-container {
+  margin-top: auto;
+  padding: 12px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* === 2. Center Stage (Responsive Canvas) === */
+.pixel-overlapping-swatches {
+  position: relative;
+  width: 50px;
+  height: 50px;
+}
+
+.pixel-swatch-rect {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  border: 1.5px solid #2c2c32;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.pixel-swatch-rect.primary {
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+
+.pixel-swatch-rect.secondary {
+  bottom: 0;
+  right: 0;
+  z-index: 5;
+}
+
+.pixel-swatch-rect:hover {
+  border-color: #888;
+}
+
+.pixel-swatch-rect.active {
+  border-color: #ec4899; /* Glowing pink border for active slot */
+  z-index: 12;
+  box-shadow: 0 0 8px rgba(236, 72, 153, 0.5), 0 4px 10px rgba(0,0,0,0.6);
+}
+
+/* Photoshop Swap Arrows */
+.pixel-swatch-swap-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 18px;
+  height: 18px;
+  background: #202024;
+  border: 1px solid #2c2c32;
+  color: #909099;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 15;
+  padding: 0;
+  transition: all 0.2s;
+}
+.pixel-swatch-swap-btn:hover {
+  background: #303036;
+  color: #fff;
+  transform: rotate(180deg);
+}
+
+/* Default D Hotkey Button */
+.pixel-swatch-reset-btn {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 15;
+  padding: 0;
+  display: flex;
+  gap: 1px;
+}
+.pixel-swatch-reset-btn .reset-black {
+  width: 8px;
+  height: 8px;
+  background-color: #000;
+  border: 1px solid #555;
+}
+.pixel-swatch-reset-btn .reset-white {
+  width: 8px;
+  height: 8px;
+  background-color: #fff;
+  border: 1px solid #555;
+  align-self: flex-end;
+}
+
+/* === 3. Center Stage (Responsive Canvas) === */
 .pixel-stage {
   grid-area: stage;
   background-color: #0c0c0e;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 24px;
+  padding: 16px;
   overflow: hidden;
 }
 
 .pixel-grid-wrapper {
   width: 100%;
   height: 100%;
-  max-width: 800px;
-  max-height: 800px;
+  max-width: 80vh;
+  max-height: 80vh;
   aspect-ratio: 1/1;
   display: flex;
   justify-content: center;
@@ -1717,8 +1966,8 @@ textarea {
   grid-template-rows: repeat(30, 1fr);
   background-color: #000;
   border: 1px solid #333;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  cursor: crosshair; /* Custom cursor for canvas */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  cursor: crosshair;
 }
 
 .pixel-grid-board.no-grid .pixel-cell {
@@ -1735,127 +1984,6 @@ textarea {
 .pixel-cell:nth-child(30n) { border-right: none; }
 .pixel-cell:nth-last-child(-n+30) { border-bottom: none; }
 
-/* === 3. Right Side Panel === */
-.pixel-side-panel {
-  grid-area: panel;
-  background-color: #161619;
-  border-left: 1px solid #2c2c32;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-}
-
-.pixel-close-main-btn {
-  align-self: flex-end;
-  background: transparent;
-  border: none;
-  color: #909099;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-.pixel-close-main-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
-.pixel-panel-section {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.pixel-panel-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #909099;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.pixel-current-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: #0c0c0e;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #2c2c32;
-}
-
-.pixel-current-swatch {
-  width: 40px;
-  height: 40px;
-  border-radius: 6px;
-  border: 1px solid rgba(255,255,255,0.2);
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.5);
-}
-
-#pixel-current-hex {
-  font-family: monospace;
-  font-size: 16px;
-  font-weight: 500;
-  color: #fff;
-}
-
-.pixel-color-picker-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: #909099;
-  font-size: 14px;
-}
-
-.pixel-custom-color {
-  -webkit-appearance: none;
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
-  cursor: pointer;
-  padding: 0;
-  background: none;
-}
-.pixel-custom-color::-webkit-color-swatch-wrapper {
-  padding: 0;
-}
-.pixel-custom-color::-webkit-color-swatch {
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 4px;
-}
-
-/* Palette Row */
-.pixel-palette-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-}
-
-.color-chip {
-  aspect-ratio: 1/1;
-  border-radius: 6px;
-  cursor: pointer;
-  border: 1px solid rgba(255,255,255,0.15);
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2);
-  transition: transform 0.1s, border-color 0.2s;
-}
-
-.color-chip:hover {
-  transform: scale(1.05);
-  border-color: rgba(255,255,255,0.5);
-}
-
-.color-chip.active {
-  border: 2px solid #fff;
-  transform: scale(1.1);
-  box-shadow: 0 0 8px rgba(255,255,255,0.5);
-}
-
 /* === 4. Bottom Action & Status Bar === */
 .pixel-bottom-bar {
   grid-area: bottom;
@@ -1864,16 +1992,17 @@ textarea {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 24px;
+  padding: 0 20px;
+  height: 100%;
 }
 
 .pixel-status-info {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
   color: #909099;
   font-family: monospace;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .pixel-status-tool {
@@ -1881,23 +2010,24 @@ textarea {
   align-items: center;
   gap: 8px;
   background: rgba(255, 255, 255, 0.05);
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 4px 10px;
+  border-radius: 4px;
   color: #fff;
   font-weight: 500;
 }
 
 .pixel-action-buttons {
   display: flex;
-  gap: 12px;
+  gap: 10px;
 }
 
 .pixel-action-buttons .btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  font-size: 15px;
-  font-weight: 600;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 4px;
 }
 

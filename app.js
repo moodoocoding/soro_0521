@@ -1239,6 +1239,52 @@ function setupDynamicFormFields(contest) {
       <div id="toggle-pixel-upload" style="display: none;"></div>
 
       <div id="pixel-draw-container" class="pixel-editor-shell" style="display: none;">
+        <!-- Top Options Bar -->
+        <div class="pixel-top-options-bar">
+          <div class="pixel-top-left">
+            <button type="button" class="pixel-back-btn" id="pixel-close-editor" title="업로드 화면으로 돌아가기">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            </button>
+            <span class="pixel-top-tool-name" id="pixel-tool-label">PENCIL</span>
+          </div>
+
+          <div class="pixel-top-center">
+            <!-- Dynamic Tool Options: Brush sizes -->
+            <div class="pixel-option-group">
+              <span class="pixel-option-title">크기</span>
+              <div class="pixel-size-buttons" id="pixel-brush-size-container">
+                <button type="button" class="pixel-size-btn active" data-size="1" title="1 픽셀 (1x1)">1px</button>
+                <button type="button" class="pixel-size-btn" data-size="2" title="2 픽셀 (2x2)">2px</button>
+                <button type="button" class="pixel-size-btn" data-size="3" title="3 픽셀 (3x3)">3px</button>
+                <button type="button" class="pixel-size-btn" data-size="4" title="4 픽셀 (4x4)">4px</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pixel-top-right">
+            <!-- Horizontal Palette & Picker -->
+            <div class="pixel-palette-wrapper">
+              <div class="pixel-top-palette" id="pixel-palette-row">
+                <div class="color-chip active" data-color="#111111" style="background:#111111;" title="검정 (마우스 우클릭 시 배경색 지정)"></div>
+                <div class="color-chip" data-color="#ffffff" style="background:#ffffff;" title="흰색 (마우스 우클릭 시 배경색 지정)"></div>
+                <div class="color-chip" data-color="#ef4444" style="background:#ef4444;" title="빨강 (마우스 우클릭 시 배경색 지정)"></div>
+                <div class="color-chip" data-color="#f97316" style="background:#f97316;" title="주황 (마우스 우클릭 시 배경색 지정)"></div>
+                <div class="color-chip" data-color="#eab308" style="background:#eab308;" title="노랑 (마우스 우클릭 시 배경색 지정)"></div>
+                <div class="color-chip" data-color="#22c55e" style="background:#22c55e;" title="연두 (마우스 우클릭 시 배경색 지정)"></div>
+                <div class="color-chip" data-color="#3b82f6" style="background:#3b82f6;" title="파랑 (마우스 우클릭 시 배경색 지정)"></div>
+                <div class="color-chip" data-color="#8b5cf6" style="background:#8b5cf6;" title="보라 (마우스 우클릭 시 배경색 지정)"></div>
+                <div class="color-chip" data-color="#ec4899" style="background:#ec4899;" title="핑크 (마우스 우클릭 시 배경색 지정)"></div>
+                <div class="color-chip" data-color="#92400e" style="background:#92400e;" title="갈색 (마우스 우클릭 시 배경색 지정)"></div>
+                <div class="color-chip" data-color="#6b7280" style="background:#6b7280;" title="회색 (마우스 우클릭 시 배경색 지정)"></div>
+                <div class="color-chip" data-color="#67e8f9" style="background:#67e8f9;" title="하늘 (마우스 우클릭 시 배경색 지정)"></div>
+              </div>
+              <div class="pixel-custom-picker-btn">
+                <input type="color" class="pixel-custom-color" id="pixel-custom-color" value="#111111" title="자유 색상 선택">
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Left Toolbar -->
         <div class="pixel-toolbar">
           <div class="pixel-tool-group">
@@ -1305,9 +1351,27 @@ function setupDynamicFormFields(contest) {
             <button type="button" class="pixel-tool-btn action pixel-btn-danger" id="pixel-clear" title="전체 지우기">
               <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             </button>
-            <button type="button" class="pixel-tool-btn action pixel-btn-primary" id="pixel-save-draft" title="임시 저장">
-              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-            </button>
+          </div>
+
+          <!-- Photoshop Style Overlapping Dual Color Swatch -->
+          <div class="pixel-tool-color-swatches-container">
+            <div class="pixel-overlapping-swatches">
+              <!-- Background Swatch (Right click) -->
+              <div class="pixel-swatch-rect secondary" id="pixel-secondary-swatch" style="background-color: #ffffff;" title="오른쪽 클릭 색상 (배경색)"></div>
+              <!-- Foreground Swatch (Left click) -->
+              <div class="pixel-swatch-rect primary active" id="pixel-primary-swatch" style="background-color: #111111;" title="왼쪽 클릭 색상 (전경색 - 클릭하여 활성화)"></div>
+              
+              <!-- Swap arrow button (Photoshop style) -->
+              <button type="button" class="pixel-swatch-swap-btn" id="pixel-swatch-swap" title="전경색/배경색 전환 (단축키: X)">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M16 3h5v5"></path><path d="M4 20h5v5"></path><path d="M21 3C14.5 3 9.5 8 9.5 14.5"></path><path d="M3 21C9.5 21 14.5 16 14.5 9.5"></path></svg>
+              </button>
+              
+              <!-- Reset button (D hotkey) -->
+              <button type="button" class="pixel-swatch-reset-btn" id="pixel-swatch-reset" title="기본값 검정/흰색 리셋 (단축키: D)">
+                <div class="reset-black"></div>
+                <div class="reset-white"></div>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1318,56 +1382,23 @@ function setupDynamicFormFields(contest) {
           </div>
         </div>
 
-        <!-- Right Panel -->
-        <div class="pixel-side-panel">
-          <button type="button" class="pixel-close-main-btn" id="pixel-close-editor" title="업로드 화면으로 돌아가기">
-            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-          </button>
-          
-          <div class="pixel-panel-section">
-            <div class="pixel-panel-label">현재 색상</div>
-            <div class="pixel-current-row">
-              <div class="pixel-current-swatch" id="pixel-current-swatch" style="background:#111111;"></div>
-              <span id="pixel-current-hex">#111111</span>
-            </div>
-            <div class="pixel-color-picker-wrapper">
-              <input type="color" class="pixel-custom-color" id="pixel-custom-color" value="#111111" title="자유 색상 선택">
-              <span>사용자 지정 색상</span>
-            </div>
-          </div>
-          
-          <div class="pixel-panel-section">
-            <div class="pixel-panel-label">팔레트</div>
-            <div class="pixel-palette-row" id="pixel-palette-row">
-              <div class="color-chip active" data-color="#111111" style="background:#111111;" title="검정"></div>
-              <div class="color-chip" data-color="#ffffff" style="background:#ffffff;" title="흰색"></div>
-              <div class="color-chip" data-color="#ef4444" style="background:#ef4444;" title="빨강"></div>
-              <div class="color-chip" data-color="#f97316" style="background:#f97316;" title="주황"></div>
-              <div class="color-chip" data-color="#eab308" style="background:#eab308;" title="노랑"></div>
-              <div class="color-chip" data-color="#22c55e" style="background:#22c55e;" title="연두"></div>
-              <div class="color-chip" data-color="#3b82f6" style="background:#3b82f6;" title="파랑"></div>
-              <div class="color-chip" data-color="#8b5cf6" style="background:#8b5cf6;" title="보라"></div>
-              <div class="color-chip" data-color="#ec4899" style="background:#ec4899;" title="핑크"></div>
-              <div class="color-chip" data-color="#92400e" style="background:#92400e;" title="갈색"></div>
-              <div class="color-chip" data-color="#6b7280" style="background:#6b7280;" title="회색"></div>
-              <div class="color-chip" data-color="#67e8f9" style="background:#67e8f9;" title="하늘"></div>
-            </div>
-          </div>
-        </div>
-
         <!-- Bottom Action Bar & Status Bar -->
         <div class="pixel-bottom-bar">
           <div class="pixel-status-info">
-            <span class="pixel-status-tool" id="pixel-tool-label">
+            <span class="pixel-status-tool">
               <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path></svg>
-              <span>PENCIL</span>
+              <span id="pixel-tool-label-bottom">PENCIL</span>
             </span>
             <span class="pixel-status-coords" id="pixel-coords">X: -, Y: -</span>
           </div>
           <div class="pixel-action-buttons">
+            <button type="button" class="btn btn-secondary" id="pixel-save-draft" style="color: #3b82f6;">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+              임시저장 (클라우드)
+            </button>
             <button type="button" class="btn btn-secondary" id="pixel-switch-upload">
               <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-              이미지 업로드로 전환
+              업로드 화면으로 가기
             </button>
             <button type="button" class="btn btn-primary" id="pixel-submit-draw">
               <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
@@ -1624,12 +1655,20 @@ function initPixelArtEditor() {
 
   const totalCells = GRID_SIZE * GRID_SIZE;
   let pixelData = Array(totalCells).fill("");
-  let currentColor = "#111111";
+  
+  // Photoshop Style Swatch Color State
+  let primaryColor = "#111111";
+  let secondaryColor = "#ffffff";
+  let currentColor = primaryColor; // default fallback
+  let activeColorSlot = "primary"; // "primary" or "secondary"
+  
+  let currentBrushSize = 1;
   let currentTool = "pencil";
   let isDrawing = false;
   let startIndex = null;
   let undoStack = [];
   let redoStack = [];
+  let currentColorForDraw = primaryColor; // color used for active stroke
 
   board.innerHTML = "";
   for (let i = 0; i < totalCells; i++) {
@@ -1657,7 +1696,7 @@ function initPixelArtEditor() {
     redoStack = [];
   }
 
-  // ==== Load Draft ====
+  // ==== Load Draft (Local Backup First) ====
   if (currentUser) {
     const draftKey = `soro_pixelart_draft_${currentUser.userKey}`;
     const draftData = localStorage.getItem(draftKey);
@@ -1677,23 +1716,166 @@ function initPixelArtEditor() {
     });
   }
 
-  function setPixel(x, y, color = currentColor) {
+  // Swatch Elements & Controls
+  const primarySwatchEl = document.getElementById("pixel-primary-swatch");
+  const secondarySwatchEl = document.getElementById("pixel-secondary-swatch");
+  const swapBtn = document.getElementById("pixel-swatch-swap");
+  const resetBtn = document.getElementById("pixel-swatch-reset");
+  const customPicker = document.getElementById("pixel-custom-color");
+
+  function updateSwatchUI() {
+    if (primarySwatchEl) {
+      primarySwatchEl.style.backgroundColor = primaryColor;
+      primarySwatchEl.classList.toggle("active", activeColorSlot === "primary");
+    }
+    if (secondarySwatchEl) {
+      secondarySwatchEl.style.backgroundColor = secondaryColor;
+      secondarySwatchEl.classList.toggle("active", activeColorSlot === "secondary");
+    }
+    if (customPicker) {
+      customPicker.value = activeColorSlot === "primary" ? primaryColor : secondaryColor;
+    }
+  }
+
+  if (primarySwatchEl) {
+    primarySwatchEl.addEventListener("click", () => {
+      activeColorSlot = "primary";
+      updateSwatchUI();
+      updatePaletteHighlight();
+    });
+  }
+  if (secondarySwatchEl) {
+    secondarySwatchEl.addEventListener("click", () => {
+      activeColorSlot = "secondary";
+      updateSwatchUI();
+      updatePaletteHighlight();
+    });
+  }
+
+  function swapColors() {
+    const temp = primaryColor;
+    primaryColor = secondaryColor;
+    secondaryColor = temp;
+    updateSwatchUI();
+    updatePaletteHighlight();
+  }
+
+  function resetColors() {
+    primaryColor = "#111111";
+    secondaryColor = "#ffffff";
+    activeColorSlot = "primary";
+    updateSwatchUI();
+    updatePaletteHighlight();
+  }
+
+  if (swapBtn) swapBtn.addEventListener("click", (e) => { e.stopPropagation(); swapColors(); });
+  if (resetBtn) resetBtn.addEventListener("click", (e) => { e.stopPropagation(); resetColors(); });
+
+  // Keyboard Shortcuts (X and D)
+  const handleKeyboardShortcuts = (e) => {
+    const activeEl = document.activeElement;
+    if (activeEl && (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA")) return;
+    const container = document.getElementById("pixel-draw-container");
+    if (!container || container.style.display === "none") return;
+
+    if (e.code === "KeyX") {
+      e.preventDefault();
+      swapColors();
+    } else if (e.code === "KeyD") {
+      e.preventDefault();
+      resetColors();
+    }
+  };
+  document.removeEventListener("keydown", handleKeyboardShortcuts); // prevent duplicate binding
+  document.addEventListener("keydown", handleKeyboardShortcuts);
+
+  // Palette Row Highlighting and Left/Right click selection
+  function updatePaletteHighlight() {
+    const activeColor = activeColorSlot === "primary" ? primaryColor : secondaryColor;
+    document.querySelectorAll(".color-chip").forEach(chip => {
+      chip.classList.toggle("active", chip.dataset.color.toLowerCase() === activeColor.toLowerCase());
+    });
+  }
+
+  document.querySelectorAll(".color-chip").forEach(chip => {
+    // Left click color selection (Primary)
+    chip.addEventListener("click", (e) => {
+      e.preventDefault();
+      const color = chip.dataset.color;
+      primaryColor = color;
+      activeColorSlot = "primary";
+      updateSwatchUI();
+      updatePaletteHighlight();
+      if (currentTool === "eraser") setTool("pencil");
+    });
+    
+    // Right click color selection (Secondary)
+    chip.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      const color = chip.dataset.color;
+      secondaryColor = color;
+      activeColorSlot = "secondary";
+      updateSwatchUI();
+      updatePaletteHighlight();
+      if (currentTool === "eraser") setTool("pencil");
+    });
+  });
+
+  if (customPicker) {
+    customPicker.addEventListener("input", (e) => {
+      const color = e.target.value;
+      if (activeColorSlot === "primary") {
+        primaryColor = color;
+      } else {
+        secondaryColor = color;
+      }
+      updateSwatchUI();
+      updatePaletteHighlight();
+    });
+  }
+
+  // Brush Size Button Group
+  document.querySelectorAll(".pixel-size-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".pixel-size-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentBrushSize = parseInt(btn.dataset.size) || 1;
+    });
+  });
+
+  // Dynamic Size Draw Math
+  function getBrushOffsets(size) {
+    const offsets = [];
+    const start = -Math.floor((size - 1) / 2);
+    const end = Math.floor(size / 2);
+    for (let dy = start; dy <= end; dy++) {
+      for (let dx = start; dx <= end; dx++) {
+        offsets.push([dx, dy]);
+      }
+    }
+    return offsets;
+  }
+
+  function setPixel(x, y, color = currentColorForDraw) {
     if (!inBounds(x, y)) return;
     pixelData[idx(x, y)] = color;
   }
 
-  function drawBrush(x, y) {
-    [[0, 0], [1, 0], [0, 1], [1, 1]].forEach(([dx, dy]) => setPixel(x + dx, y + dy));
+  function setPixelWithSize(x, y, color) {
+    const offsets = getBrushOffsets(currentBrushSize);
+    offsets.forEach(([dx, dy]) => {
+      setPixel(x + dx, y + dy, color);
+    });
   }
 
-  function drawLine(x0, y0, x1, y1) {
+  function drawLine(x0, y0, x1, y1, color) {
     let dx = Math.abs(x1 - x0);
     let dy = Math.abs(y1 - y0);
     let sx = x0 < x1 ? 1 : -1;
     let sy = y0 < y1 ? 1 : -1;
     let err = dx - dy;
     while (true) {
-      setPixel(x0, y0);
+      setPixelWithSize(x0, y0, color);
       if (x0 === x1 && y0 === y1) break;
       const e2 = 2 * err;
       if (e2 > -dy) { err -= dy; x0 += sx; }
@@ -1701,19 +1883,25 @@ function initPixelArtEditor() {
     }
   }
 
-  function drawRect(x0, y0, x1, y1, fill) {
+  function drawRect(x0, y0, x1, y1, fill, color) {
     const minX = Math.min(x0, x1);
     const maxX = Math.max(x0, x1);
     const minY = Math.min(y0, y1);
     const maxY = Math.max(y0, y1);
     for (let y = minY; y <= maxY; y++) {
       for (let x = minX; x <= maxX; x++) {
-        if (fill || x === minX || x === maxX || y === minY || y === maxY) setPixel(x, y);
+        if (fill) {
+          setPixel(x, y, color);
+        } else {
+          if (x === minX || x === maxX || y === minY || y === maxY) {
+            setPixelWithSize(x, y, color);
+          }
+        }
       }
     }
   }
 
-  function drawCircle(x0, y0, x1, y1, fill) {
+  function drawCircle(x0, y0, x1, y1, fill, color) {
     const cx = Math.round((x0 + x1) / 2);
     const cy = Math.round((y0 + y1) / 2);
     const rx = Math.max(1, Math.abs(x1 - x0) / 2);
@@ -1721,7 +1909,11 @@ function initPixelArtEditor() {
     for (let y = 0; y < GRID_SIZE; y++) {
       for (let x = 0; x < GRID_SIZE; x++) {
         const value = ((x - cx) ** 2) / (rx ** 2) + ((y - cy) ** 2) / (ry ** 2);
-        if (fill ? value <= 1 : Math.abs(value - 1) < 0.18) setPixel(x, y);
+        if (fill) {
+          if (value <= 1) setPixel(x, y, color);
+        } else {
+          if (Math.abs(value - 1) < 0.18) setPixelWithSize(x, y, color);
+        }
       }
     }
   }
@@ -1741,52 +1933,90 @@ function initPixelArtEditor() {
     }
   }
 
-  function mirrorX(index) {
+  function mirrorX(index, color) {
     const { x, y } = xy(index);
-    setPixel(x, y);
-    setPixel(GRID_SIZE - 1 - x, y);
+    setPixelWithSize(x, y, color);
+    const offsets = getBrushOffsets(currentBrushSize);
+    offsets.forEach(([dx, dy]) => {
+      const nx = x + dx;
+      const ny = y + dy;
+      if (inBounds(nx, ny)) {
+        setPixel(GRID_SIZE - 1 - nx, ny, color);
+      }
+    });
   }
 
-  function mirrorY(index) {
+  function mirrorY(index, color) {
     const { x, y } = xy(index);
-    setPixel(x, y);
-    setPixel(x, GRID_SIZE - 1 - y);
+    setPixelWithSize(x, y, color);
+    const offsets = getBrushOffsets(currentBrushSize);
+    offsets.forEach(([dx, dy]) => {
+      const nx = x + dx;
+      const ny = y + dy;
+      if (inBounds(nx, ny)) {
+        setPixel(nx, GRID_SIZE - 1 - ny, color);
+      }
+    });
   }
 
-  function replaceColorAt(index) {
+  function replaceColorAt(index, color) {
     const target = pixelData[index] || "";
-    pixelData = pixelData.map(color => (color || "") === target ? currentColor : color);
+    pixelData = pixelData.map(c => (c || "") === target ? color : c);
   }
 
-  function applyPoint(index) {
+  function applyPoint(index, color) {
     const { x, y } = xy(index);
-    if (currentTool === "pencil") setPixel(x, y);
-    else if (currentTool === "brush") drawBrush(x, y);
-    else if (currentTool === "eraser") setPixel(x, y, "");
-    else if (currentTool === "bucket") floodFill(index, currentColor);
-    else if (currentTool === "eyedropper") setColor(pixelData[index] || "#ffffff");
-    else if (currentTool === "mirror-x") mirrorX(index);
-    else if (currentTool === "mirror-y") mirrorY(index);
-    else if (currentTool === "dithering") setPixel(x, y, (x + y) % 2 === 0 ? currentColor : "");
-    else if (currentTool === "replace-color") replaceColorAt(index);
+    if (currentTool === "pencil" || currentTool === "brush") {
+      setPixelWithSize(x, y, color);
+    } else if (currentTool === "eraser") {
+      setPixelWithSize(x, y, "");
+    } else if (currentTool === "bucket") {
+      floodFill(index, color);
+    } else if (currentTool === "eyedropper") {
+      const picked = pixelData[index] || "#ffffff";
+      if (activeColorSlot === "primary") {
+        primaryColor = picked;
+      } else {
+        secondaryColor = picked;
+      }
+      updateSwatchUI();
+      updatePaletteHighlight();
+    } else if (currentTool === "mirror-x") {
+      mirrorX(index, color);
+    } else if (currentTool === "mirror-y") {
+      mirrorY(index, color);
+    } else if (currentTool === "dithering") {
+      const offsets = getBrushOffsets(currentBrushSize);
+      offsets.forEach(([dx, dy]) => {
+        const nx = x + dx;
+        const ny = y + dy;
+        if (inBounds(nx, ny)) {
+          setPixel(nx, ny, (nx + ny) % 2 === 0 ? color : "");
+        }
+      });
+    } else if (currentTool === "replace-color") {
+      replaceColorAt(index, color);
+    }
   }
 
-  function commitShape(endIndex) {
+  function commitShape(endIndex, color) {
     if (startIndex === null) return;
     const a = xy(startIndex);
     const b = xy(endIndex);
-    if (currentTool === "line") drawLine(a.x, a.y, b.x, b.y);
-    else if (currentTool === "rect-outline") drawRect(a.x, a.y, b.x, b.y, false);
-    else if (currentTool === "rect-fill") drawRect(a.x, a.y, b.x, b.y, true);
-    else if (currentTool === "circle-outline") drawCircle(a.x, a.y, b.x, b.y, false);
-    else if (currentTool === "circle-fill") drawCircle(a.x, a.y, b.x, b.y, true);
+    if (currentTool === "line") drawLine(a.x, a.y, b.x, b.y, color);
+    else if (currentTool === "rect-outline") drawRect(a.x, a.y, b.x, b.y, false, color);
+    else if (currentTool === "rect-fill") drawRect(a.x, a.y, b.x, b.y, true, color);
+    else if (currentTool === "circle-outline") drawCircle(a.x, a.y, b.x, b.y, false, color);
+    else if (currentTool === "circle-fill") drawCircle(a.x, a.y, b.x, b.y, true, color);
   }
 
   function setTool(tool) {
     currentTool = tool;
     document.querySelectorAll(".pixel-tool-btn[data-tool]").forEach(btn => btn.classList.toggle("active", btn.dataset.tool === tool));
-    const label = document.getElementById("pixel-tool-label");
-    if (label) label.textContent = tool.toUpperCase();
+    const labelBottom = document.getElementById("pixel-tool-label-bottom");
+    const labelTop = document.getElementById("pixel-tool-label");
+    if (labelBottom) labelBottom.textContent = tool.toUpperCase();
+    if (labelTop) labelTop.textContent = tool.toUpperCase();
   }
 
   document.querySelectorAll(".pixel-tool-btn[data-tool]").forEach(btn => {
@@ -1795,35 +2025,6 @@ function initPixelArtEditor() {
       setTool(tool);
     });
   });
-
-  function setColor(color) {
-    if (!color) return;
-    currentColor = color;
-    const swatch = document.getElementById("pixel-current-swatch");
-    const hexLabel = document.getElementById("pixel-current-hex");
-    const picker = document.getElementById("pixel-custom-color");
-    if (swatch) swatch.style.backgroundColor = color;
-    if (hexLabel) hexLabel.textContent = color;
-    if (picker) picker.value = color;
-  }
-
-  document.querySelectorAll(".color-chip").forEach(chip => {
-    chip.addEventListener("click", () => {
-      document.querySelectorAll(".color-chip").forEach(c => c.classList.remove("active"));
-      chip.classList.add("active");
-      setColor(chip.dataset.color);
-      setTool("pencil");
-    });
-  });
-
-  const customPicker = document.getElementById("pixel-custom-color");
-  if (customPicker) {
-    customPicker.addEventListener("input", (e) => {
-      document.querySelectorAll(".color-chip").forEach(c => c.classList.remove("active"));
-      setColor(e.target.value);
-      setTool("pencil");
-    });
-  }
 
   function cellFromEvent(e) {
     const point = e.touches?.[0] || e.changedTouches?.[0] || e;
@@ -1839,8 +2040,20 @@ function initPixelArtEditor() {
     pushUndo();
     isDrawing = true;
     startIndex = Number(cell.dataset.index);
+
+    // Left click -> primaryColor, Right click -> secondaryColor
+    if (e.button === 2) {
+      currentColorForDraw = secondaryColor;
+    } else {
+      currentColorForDraw = primaryColor;
+    }
+
+    if (["eyedropper"].includes(currentTool)) {
+      activeColorSlot = e.button === 2 ? "secondary" : "primary";
+    }
+
     if (["line", "rect-outline", "rect-fill", "circle-outline", "circle-fill"].includes(currentTool)) return;
-    applyPoint(startIndex);
+    applyPoint(startIndex, currentColorForDraw);
     renderGrid();
   }
 
@@ -1853,7 +2066,7 @@ function initPixelArtEditor() {
     if (coords) coords.textContent = `X: ${x}, Y: ${y}`;
     if (!isDrawing || ["line", "rect-outline", "rect-fill", "circle-outline", "circle-fill", "bucket", "eyedropper", "replace-color"].includes(currentTool)) return;
     e.preventDefault();
-    applyPoint(index);
+    applyPoint(index, currentColorForDraw);
     renderGrid();
   }
 
@@ -1862,7 +2075,7 @@ function initPixelArtEditor() {
     const cell = cellFromEvent(e) || document.querySelector(`.pixel-cell[data-index="${startIndex}"]`);
     const index = Number(cell.dataset.index);
     if (["line", "rect-outline", "rect-fill", "circle-outline", "circle-fill"].includes(currentTool)) {
-      commitShape(index);
+      commitShape(index, currentColorForDraw);
       renderGrid();
     }
     isDrawing = false;
@@ -1872,7 +2085,12 @@ function initPixelArtEditor() {
   board.addEventListener("mousedown", startDraw);
   board.addEventListener("mouseover", moveDraw);
   document.addEventListener("mouseup", endDraw);
-  board.addEventListener("touchstart", startDraw, { passive: false });
+  board.addEventListener("contextmenu", (e) => e.preventDefault()); // Prevent browser default right click
+
+  board.addEventListener("touchstart", (e) => {
+    currentColorForDraw = primaryColor;
+    startDraw(e);
+  }, { passive: false });
   board.addEventListener("touchmove", moveDraw, { passive: false });
   board.addEventListener("touchend", endDraw, { passive: false });
 
@@ -1896,18 +2114,114 @@ function initPixelArtEditor() {
     renderGrid();
   });
 
-  // ==== Save Draft ====
+  // ==== Save Draft to 구글 클라우드 & 로컬 백업 ====
   const saveDraftBtn = document.getElementById("pixel-save-draft");
   if (saveDraftBtn) {
-    saveDraftBtn.addEventListener("click", () => {
+    saveDraftBtn.addEventListener("click", async () => {
       if (!currentUser) return;
+
+      // 1. Local backup first
       const draftKey = `soro_pixelart_draft_${currentUser.userKey}`;
       localStorage.setItem(draftKey, JSON.stringify(pixelData));
-      showToast("픽셀아트 작업 내역이 임시 저장되었습니다. 💾", "success");
+
+      // 2. Remote sheets database cloud sync
+      if (GOOGLE_SHEET_API_URL) {
+        showToast("임시저장 파일을 클라우드에 안전하게 보관하고 있습니다...", "info");
+        const draftId = `pixelart_draft_${currentUser.userKey}`;
+        
+        // delete previous draft first
+        const delPayload = {
+          action: "deleteSubmission",
+          id: draftId
+        };
+
+        try {
+          await fetch(GOOGLE_SHEET_API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: JSON.stringify(delPayload)
+          });
+
+          // save new draft
+          const newDraftEntry = {
+            id: draftId,
+            contestId: "pixelart_draft",
+            contestTitle: "픽셀아트 임시저장",
+            studentUsername: currentUser.userKey,
+            studentName: currentUser.name,
+            studentGrade: currentUser.grade,
+            studentClass: currentUser.classNum,
+            studentNumber: currentUser.number,
+            timestamp: new Date().toLocaleString("ko-KR"),
+            data: {
+              type: "pixel_draft",
+              pixelData: pixelData
+            }
+          };
+
+          const savePayload = {
+            action: "submitContest",
+            entry: newDraftEntry
+          };
+
+          const response = await fetch(GOOGLE_SHEET_API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: JSON.stringify(savePayload)
+          });
+          const result = await response.json();
+          if (result.status === "success") {
+            showToast("픽셀아트 작업 내역이 클라우드에 보관 완료되었습니다! ☁️💾", "success");
+          } else {
+            showToast("클라우드 임시저장에 실패했습니다. 브라우저 보관본을 유지합니다.", "error");
+          }
+        } catch (e) {
+          console.error("Cloud save draft error:", e);
+          showToast("네트워크 지연으로 임시저장에 실패했습니다. 브라우저 보관본을 유지합니다.", "error");
+        }
+      } else {
+        showToast("픽셀아트 작업 내역이 로컬 저장소에 임시 저장되었습니다. 💾", "success");
+      }
     });
   }
 
+  // ==== Load Draft from Cloud quietly in the background ====
+  async function loadCloudDraft() {
+    if (!currentUser || !GOOGLE_SHEET_API_URL) return;
+    const payload = {
+      action: "getSubmissions",
+      studentUsername: currentUser.userKey
+    };
+    try {
+      const response = await fetch(GOOGLE_SHEET_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json();
+      if (result.status === "success" && Array.isArray(result.data)) {
+        const cloudDraft = result.data.find(entry => entry.id === `pixelart_draft_${currentUser.userKey}`);
+        if (cloudDraft && cloudDraft.data && Array.isArray(cloudDraft.data.pixelData)) {
+          pixelData = cloudDraft.data.pixelData;
+          renderGrid();
+          // update local backup
+          const draftKey = `soro_pixelart_draft_${currentUser.userKey}`;
+          localStorage.setItem(draftKey, JSON.stringify(pixelData));
+          showToast("클라우드에서 이전 작업 내역을 동기화했습니다. ☁️✨", "success");
+        }
+      }
+    } catch (err) {
+      console.error("Cloud draft load failed:", err);
+    }
+  }
+
+  // Initial updates
+  updateSwatchUI();
+  updatePaletteHighlight();
   renderGrid();
+
+  // Load cloud draft quietly after load
+  setTimeout(loadCloudDraft, 400);
 }
 
 // Exports the pixel art grid to a base64 PNG string
@@ -2292,6 +2606,9 @@ async function executeLoggedInLookup() {
     );
   }
 
+  // 임시저장 본은 제출 목록 리스트에서 제외
+  mySubmissions = mySubmissions.filter(entry => entry.contestId !== "pixelart_draft");
+
   container.innerHTML = "";
 
   if (mySubmissions.length === 0) {
@@ -2466,7 +2783,8 @@ async function updateLiveCounters() {
         });
         const result = await response.json();
         if (result.status === "success") {
-          count = result.data.length;
+          const filtered = result.data.filter(entry => entry.contestId !== "pixelart_draft");
+          count = filtered.length;
           document.getElementById("stat-my-submissions").textContent = `${count}개`;
           return;
         }
@@ -2477,7 +2795,8 @@ async function updateLiveCounters() {
 
     const allSubmissions = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
     const mySubmissions = allSubmissions.filter(entry =>
-      entry.studentUsername.toLowerCase() === currentUser.userKey.toLowerCase()
+      entry.studentUsername.toLowerCase() === currentUser.userKey.toLowerCase() &&
+      entry.contestId !== "pixelart_draft"
     );
     count = mySubmissions.length;
     document.getElementById("stat-my-submissions").textContent = `${count}개`;
