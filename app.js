@@ -1,4 +1,4 @@
-// ====================================================
+﻿// ====================================================
 // GOOGLE SPREADSHEET DATABASE CONFIGURATION (Vercel Cloud Setup)
 // ====================================================
 // [가이드] 구글 스프레드시트 연동 완료 후, 아래 공란에 구글 Apps Script 웹앱 배포 URL을 입력해 주세요.
@@ -988,6 +988,20 @@ function openContestDetails(contestId) {
   document.body.style.overflow = "hidden";
 }
 
+function hideSubmissionIdentityFields() {
+  document.querySelectorAll("#submission-form > .form-group-row").forEach(row => {
+    row.style.display = "none";
+  });
+
+  const submitBtn = document.getElementById("submit-btn");
+  if (submitBtn) submitBtn.style.display = "none";
+}
+
+function handleDynamicSubmitClick() {
+  if (validateSubmissionForm()) {
+    executeSubmit();
+  }
+}
 
 function closeContestDrawer() {
   const drawer = document.getElementById("contest-drawer");
@@ -1059,7 +1073,7 @@ async function checkAndRenderSubmissionArea(contest) {
     }
   }
 
-  if (!GOOGLE_SHEET_API_URL || mySubmissions.length === 0) {
+  if (!GOOGLE_SHEET_API_URL) {
     const allSubmissions = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
     mySubmissions = allSubmissions.filter(entry =>
       entry.studentUsername.toLowerCase() === currentUser.userKey.toLowerCase()
@@ -1073,6 +1087,10 @@ async function checkAndRenderSubmissionArea(contest) {
   const existingSubmission = mySubmissions.find(s => s.contestId === contest.id);
 
   if (existingSubmission) {
+    const formTitle = formContainer.querySelector(".form-title");
+    if (formTitle) formTitle.style.display = "none";
+    subForm.style.display = "none";
+
     // 2. 이미 제출한 작품이 있을 때: 상세 정보 노출 및 삭제 유도
     const viewDiv = document.createElement("div");
     viewDiv.id = "existing-submission-view";
@@ -1142,12 +1160,15 @@ async function checkAndRenderSubmissionArea(contest) {
     formContainer.appendChild(viewDiv);
   } else {
     // 3. 제출한 작품이 없을 때: 정상 제출 폼 렌더링
+    const formTitle = formContainer.querySelector(".form-title");
+    if (formTitle) formTitle.style.display = "";
     subForm.style.display = "block";
     document.getElementById("student-name").value = currentUser.name;
     document.getElementById("student-grade").value = `${currentUser.grade}학년`;
     document.getElementById("student-class").value = `${currentUser.classNum}반`;
     document.getElementById("student-number").value = `${currentUser.number}번`;
     setupDynamicFormFields(contest);
+    hideSubmissionIdentityFields();
   }
 }
 
@@ -1283,6 +1304,7 @@ function setupDynamicFormFields(contest) {
         <div id="upload-preview-wrapper" style="display: none;"></div>
         <span class="error-message">응모할 디자인 시안 이미지를 꼭 업로드해 주세요.</span>
       </div>
+      <button type="button" class="btn btn-primary btn-block dynamic-submit-btn">제출하기</button>
     `;
 
     // Setup tab toggle
@@ -1330,6 +1352,7 @@ function setupDynamicFormFields(contest) {
         <input type="file" id="submission-file" accept="image/*" style="display: none;" required>
       </div>
       <div id="upload-preview-wrapper" style="display: none;"></div>
+      <button type="button" class="btn btn-primary btn-block dynamic-submit-btn">제출하기</button>
       <span class="error-message">응모할 디자인 시안 이미지를 꼭 업로드해 주세요.</span>
     `;
     setupFileUploader();
@@ -1356,6 +1379,9 @@ function setupDynamicFormFields(contest) {
         </div>
       `;
     });
+    html += `
+      <button type="button" class="btn btn-primary btn-block dynamic-submit-btn">제출하기</button>
+    `;
     container.innerHTML = html;
   }
 
@@ -1387,6 +1413,8 @@ function setupDynamicFormFields(contest) {
         <textarea id="sub-transcribe-text" placeholder="한글 명문장을 아래에 한 자 한 자 정성을 담아 입력해주세요..." maxlength="500"></textarea>
         <span class="error-message">필사 감상평을 최소 10자 이상 채워주세요.</span>
       </div>
+
+      <button type="button" class="btn btn-primary btn-block dynamic-submit-btn">제출하기</button>
     `;
 
     setupFileUploader();
@@ -1419,6 +1447,10 @@ function setupDynamicFormFields(contest) {
       document.getElementById("upload-preview-wrapper").innerHTML = "";
     });
   }
+
+  document.querySelectorAll(".dynamic-submit-btn").forEach(btn => {
+    btn.addEventListener("click", handleDynamicSubmitClick);
+  });
 }
 
 // ====================================================
@@ -1934,7 +1966,7 @@ async function executeSubmit() {
       }
 
       showToast(`${activeContest.title} 대회의 작품 접수가 성공적으로 구글 시트에 기록되었습니다! 🎨`, "success");
-      closeContestDrawer();
+      await checkAndRenderSubmissionArea(activeContest);
       updateLiveCounters();
       return;
     } catch (e) {
@@ -1949,7 +1981,7 @@ async function executeSubmit() {
   localStorage.setItem("soro_submissions", JSON.stringify(allSubmissions));
 
   showToast(`${activeContest.title} 대회의 작품 접수가 성공적으로 완료되었습니다! 🎨`, "success");
-  closeContestDrawer();
+  await checkAndRenderSubmissionArea(activeContest);
   updateLiveCounters();
 }
 
@@ -1988,7 +2020,7 @@ async function executeLoggedInLookup() {
   }
 
   // 2. Fallback Local Mode
-  if (!GOOGLE_SHEET_API_URL || mySubmissions.length === 0) {
+  if (!GOOGLE_SHEET_API_URL) {
     const allSubmissions = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
     mySubmissions = allSubmissions.filter(entry =>
       entry.studentUsername.toLowerCase() === currentUser.userKey.toLowerCase()
