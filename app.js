@@ -658,7 +658,7 @@ async function handleLogin(grade, classNum, number, name, password) {
       return true;
     } catch (error) {
       console.error(error);
-      showToast("구글 클라우드 접속 지연. 로컬 저장소를 활용합니다.", "error");
+      showToast("클라우드 접속 지연. 로컬 저장소를 활용합니다.", "error");
     }
   }
 
@@ -2991,7 +2991,7 @@ async function executeSubmit() {
 
   // 1. Remote DB Cloud Mode
   if (GOOGLE_SHEET_API_URL) {
-    showToast("작품을 구글 클라우드 시트에 업로드 중...", "info");
+    showToast("작품을 클라우드에 업로드 중...", "info");
     const payload = {
       action: "submitContest",
       entry: newEntry
@@ -3009,13 +3009,13 @@ async function executeSubmit() {
         return;
       }
 
-      showToast(`${activeContest.title} 대회의 작품 접수가 성공적으로 구글 시트에 기록되었습니다! 🎨`, "success");
+      showToast(`${activeContest.title} 대회의 작품 접수가 성공적으로 클라우드에 기록되었습니다! 🎨`, "success");
       closeContestDrawer();
       updateLiveCounters();
       return;
     } catch (e) {
       console.error(e);
-      showToast("원격 구글 서버 연동 지연. 로컬 브라우저에 임시 백업됩니다.", "error");
+      showToast("원격 서버 연동 지연. 로컬 브라우저에 임시 백업됩니다.", "error");
     }
   }
 
