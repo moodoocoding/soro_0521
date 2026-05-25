@@ -1033,7 +1033,7 @@ function openContestDetails(contestId) {
       <p class="gallery-desc">공모전 준비를 도와줄 훌륭한 예시 작품들입니다. 참고해서 멋진 작품을 완성해 보세요!</p>
       <div class="gallery-grid">
         ${contest.examples.map(img => `
-          <div class="gallery-card">
+          <div class="gallery-card" onclick="window.openImageModal('${img}')" style="cursor: zoom-in;">
             <div class="gallery-card-img-wrapper" style="position: relative; overflow: hidden; padding-bottom: 75%;">
               <img class="gallery-card-img" src="${img}" alt="예시 작품" loading="lazy" style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit: contain;">
             </div>
@@ -1052,6 +1052,44 @@ function openContestDetails(contestId) {
   drawer.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
 }
+
+window.openImageModal = function(src) {
+  let modal = document.getElementById("image-fullscreen-modal");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "image-fullscreen-modal";
+    modal.style.position = "fixed";
+    modal.style.top = "0";
+    modal.style.left = "0";
+    modal.style.width = "100vw";
+    modal.style.height = "100dvh";
+    modal.style.backgroundColor = "rgba(0, 0, 0, 0.9)";
+    modal.style.zIndex = "99999";
+    modal.style.display = "flex";
+    modal.style.alignItems = "center";
+    modal.style.justifyContent = "center";
+    modal.style.cursor = "zoom-out";
+    
+    const img = document.createElement("img");
+    img.id = "image-fullscreen-img";
+    img.style.maxWidth = "90%";
+    img.style.maxHeight = "90%";
+    img.style.objectFit = "contain";
+    img.style.borderRadius = "8px";
+    img.style.boxShadow = "0 10px 30px rgba(0,0,0,0.5)";
+    
+    modal.appendChild(img);
+    document.body.appendChild(modal);
+    
+    modal.addEventListener("click", () => {
+      modal.style.display = "none";
+    });
+  }
+  
+  const img = document.getElementById("image-fullscreen-img");
+  img.src = src;
+  modal.style.display = "flex";
+};
 
 
 function closeContestDrawer() {
