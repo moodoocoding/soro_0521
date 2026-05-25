@@ -805,8 +805,15 @@ function renderGallery2025(gradeFilter = "all") {
     const card = document.createElement("div");
     card.className = "gallery-card";
     
+    // Check for '4-6' '김다은' to attach Special '최우수' (Grand Prize) title badge
+    const isSpecialAward = (item.gradeClass === "4-6" && item.name === "김다은");
+    const awardBadgeHtml = isSpecialAward 
+      ? `<span class="gallery-card-award" style="position: absolute; top: 8px; left: 8px; background: #eab308; color: #000; font-size: 0.65rem; font-weight: 800; padding: 2px 6px; z-index: 10; border: 1px solid #000;">🏆 최우수</span>` 
+      : "";
+    
     card.innerHTML = `
-      <div class="gallery-card-img-wrapper loading">
+      <div class="gallery-card-img-wrapper loading" style="position: relative;">
+        ${awardBadgeHtml}
         <img class="gallery-card-img" src="${item.imageUrl}" alt="${item.name}" loading="lazy" onload="this.parentElement.classList.remove('loading')" onerror="this.src='https://placehold.co/150/0c0c0e/ffffff?text=No+Image'; this.parentElement.classList.remove('loading')">
       </div>
       <div class="gallery-card-info">
