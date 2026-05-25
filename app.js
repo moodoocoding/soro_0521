@@ -3206,9 +3206,9 @@ async function executeLoggedInLookup() {
       const isCompleted = completedContests.has(contest.id);
       return `
         <div class="stage-badge ${isCompleted ? 'completed' : 'locked'}">
-          <div class="badge-icon">${isCompleted ? '🟢' : '🔒'}</div>
+          <div class="badge-icon">${contest.icon}</div>
           <div class="badge-title" title="${contest.title}">${contest.title}</div>
-          <div class="badge-status">${isCompleted ? '완료' : '대기 중'}</div>
+          <div class="badge-status">${isCompleted ? '완료 🟢' : '대기 중 🔒'}</div>
         </div>
       `;
     }).join("");
