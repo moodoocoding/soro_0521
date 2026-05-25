@@ -49,7 +49,7 @@ const CONTESTS_DATA = [
     title: "안전 사고 예방 컷툰",
     month: 7,
     monthText: "7월",
-    activeMonths: [6, 7],
+    activeMonths: [7],
     period: "2026. 6. 15.(월) ~ 2026. 7. 03.(월)",
     summary: "일상 속 안전의 중요성을 재미있고 유익한 4컷 만화로 표현해보세요.",
     description: "학교, 가정, 길거리 등 일상생활 속에서 일어날 수 있는 다양한 안전사고(교통안전, 실험실 안전, 미끄러짐 등)를 예방하기 위한 수칙이나 경각심을 주는 스토리를 4컷 만화로 공모합니다.",
@@ -306,7 +306,7 @@ const GALLERY_2025_DATA = RAW_2025_KEYRING_DATA.trim().split("\n").map(line => {
 // STATE MANAGEMENT & USER SESSION CONFIGURATION
 // ====================================================
 let currentVirtualMonth = 6;
-const FORCE_ACTIVE_CONTESTS = ["pixelart"];
+const FORCE_ACTIVE_CONTESTS = [];
 
 function getContestStatus(contestOrMonth) {
   const contestMonth = typeof contestOrMonth === "object" ? contestOrMonth.month : contestOrMonth;
