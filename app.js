@@ -1259,6 +1259,7 @@ function setupDynamicFormFields(contest) {
           <button type="button" class="pixel-tool-btn action" id="pixel-redo" title="다시 실행">↷</button>
           <button type="button" class="pixel-tool-btn action" id="pixel-grid-toggle" title="격자 토글">#</button>
           <button type="button" class="pixel-tool-btn action" id="pixel-clear" title="전체 지우기">🗑️</button>
+          <button type="button" class="pixel-tool-btn action" id="pixel-save-draft" title="임시 저장">💾</button>
         </div>
 
         <div class="pixel-stage">
@@ -1581,6 +1582,20 @@ function initPixelArtEditor() {
     redoStack = [];
   }
 
+  // ==== Load Draft ====
+  if (currentUser) {
+    const draftKey = `soro_pixelart_draft_${currentUser.userKey}`;
+    const draftData = localStorage.getItem(draftKey);
+    if (draftData) {
+      try {
+        const parsed = JSON.parse(draftData);
+        if (Array.isArray(parsed) && parsed.length === totalCells) {
+          pixelData = parsed;
+        }
+      } catch (e) {}
+    }
+  }
+
   function renderGrid() {
     board.querySelectorAll(".pixel-cell").forEach((cell, index) => {
       cell.style.backgroundColor = pixelData[index] || "";
@@ -1805,6 +1820,17 @@ function initPixelArtEditor() {
     pixelData = Array(totalCells).fill("");
     renderGrid();
   });
+
+  // ==== Save Draft ====
+  const saveDraftBtn = document.getElementById("pixel-save-draft");
+  if (saveDraftBtn) {
+    saveDraftBtn.addEventListener("click", () => {
+      if (!currentUser) return;
+      const draftKey = `soro_pixelart_draft_${currentUser.userKey}`;
+      localStorage.setItem(draftKey, JSON.stringify(pixelData));
+      showToast("픽셀아트 작업 내역이 임시 저장되었습니다. 💾", "success");
+    });
+  }
 
   renderGrid();
 }
