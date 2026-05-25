@@ -1187,3 +1187,262 @@ textarea {
     grid-column: span 2;
   }
 }
+
+/* ====================================================
+   DRAWER SEGMENTED TABS STYLING (OPTION 1)
+   ==================================================== */
+.drawer-tabs {
+  display: flex;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 4px;
+  border-radius: 0;
+  margin-bottom: 24px;
+  gap: 4px;
+}
+
+.drawer-tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 10px 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.drawer-tab-btn:hover {
+  color: var(--text-primary);
+  background: var(--accent-light);
+}
+
+.drawer-tab-btn.active {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+}
+
+/* ====================================================
+   DYNAMIC EVALUATION CRITERIA CARDS STYLING
+   ==================================================== */
+.contest-criteria {
+  border-top: 1px solid var(--border-color);
+  padding-top: 28px;
+}
+
+.criteria-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  border-left: 2px solid var(--text-primary);
+  padding-left: 8px;
+}
+
+.criteria-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.criteria-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.criteria-card:hover {
+  border-color: var(--text-primary);
+  transform: translateY(-2px);
+}
+
+.criteria-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.criteria-card-name {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.criteria-card-weight {
+  font-size: 0.7rem;
+  font-weight: 800;
+  background: var(--accent-light);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 2px 8px;
+  border-radius: 0;
+}
+
+.criteria-card-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ====================================================
+   DYNAMIC 2025 GALLERY STYLING
+   ==================================================== */
+.contest-gallery {
+  border-top: 1px solid var(--border-color);
+  padding-top: 28px;
+}
+
+.gallery-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  border-left: 2px solid var(--text-primary);
+  padding-left: 8px;
+}
+
+.gallery-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* Gallery Filter Bar */
+.gallery-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.gallery-filter-badge {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border-radius: 0;
+}
+
+.gallery-filter-badge:hover {
+  border-color: var(--text-primary);
+  color: var(--text-primary);
+  background: var(--accent-light);
+}
+
+.gallery-filter-badge.active {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border-color: var(--text-primary);
+}
+
+/* Gallery Grid & Cards */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.gallery-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.gallery-card:hover {
+  border-color: var(--text-primary);
+  transform: translateY(-2px);
+}
+
+.gallery-card-img-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gallery-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-smooth);
+}
+
+.gallery-card:hover .gallery-card-img {
+  transform: scale(1.05);
+}
+
+/* Skeleton Loading State or Loading Indicator */
+.gallery-card-img-wrapper.loading::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.gallery-card-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border-color);
+  padding-top: 8px;
+}
+
+.gallery-card-class {
+  font-size: 0.75rem;
+  font-weight: 800;
+  background: var(--accent-light);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 2px 6px;
+  border-radius: 0;
+}
+
+.gallery-card-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+@media (max-width: 480px) {
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+

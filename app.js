@@ -16,12 +16,20 @@ const CONTESTS_DATA = [
     month: 6,
     monthText: "6월",
     summary: "나만의 예쁜 키링 디자인을 설계하고 실제 키링 굿즈로 탄생시킬 특별한 기회!",
-    description: "독창적이고 실용적인 키링 디자인 시안을 공모합니다. 캐릭터, 로고, 타이포그래피 등 자유로운 주제로 참여하세요. 수상작은 실제 고품질 아크릴 키링으로 무료 제작되어 참가자와 학급원 전체에 증정됩니다.",
+    description: "독창적이고 실용적인 키링 디자인 시안을 공모합니다. 캐릭터, 로고, 타이포그래피 등 자유로운 주제로 참여하세요. 수상작은 실제 고품질 아크릴 키링으로 무료 제작되어 참가자 전원에게 제공됩니다.",
     rules: [
       "참가 대상: 3~6학년 학생 누구나 (개인 참여)",
+      "공모 주제: 청주소로초를 상징할 수 있는 것",
       "규격: 최대 50mm x 50mm 이내 규격 (해상도 300dpi 이상 PNG/SVG 권장)",
       "제출물: 키링 앞면 디자인 시안 이미지 파일",
-      "심사 기준: 창의성(40%), 실용성(30%), 완성도(30%)"
+      "시상 계획: 학년에 상관 없이 최우수 1명, 우수 1명, 장려 1명"
+    ],
+    evaluationCriteria: [
+      { category: "주제의 이해 및 표현", desc: "청주소로초와 디지털 활용 수업을 잘 이해하고 표현했는지 평가합니다.", weight: "20%" },
+      { category: "창의성", desc: "이미지를 얼마나 창의적이고 독특한 방법으로 디자인했는지 평가합니다.", weight: "20%" },
+      { category: "시각적 효과", desc: "색상, 레이아웃, 그림체 등 시각적 요소의 조화와 효과를 평가합니다.", weight: "20%" },
+      { category: "메시지 전달력", desc: "디자인을 통해 전달하고자 하는 메시지나 감정이 잘 전달되었는지 평가합니다.", weight: "20%" },
+      { category: "제작 적합성", desc: "이미지가 키링 형태에 잘 어울리는지 평가합니다.", weight: "20%" }
     ],
     submissionType: "image",
     inputLabel: "키링 디자인 도안 이미지",
@@ -47,6 +55,11 @@ const CONTESTS_DATA = [
       "제출물: 완결된 만화 원고 이미지 파일",
       "심사 기준: 주제 전달력(50%), 흥미성(30%), 표현력(20%)"
     ],
+    evaluationCriteria: [
+      { category: "주제 전달력", desc: "일상생활 속 안전사고에 대한 경각심과 수칙이 만화 스토리에 잘 드러나는지 평가합니다.", weight: "50%" },
+      { category: "흥미성", desc: "독자에게 재미와 교훈을 동시에 줄 수 있는 흥미로운 구성을 가졌는지 평가합니다.", weight: "30%" },
+      { category: "표현력", desc: "4컷 구성의 완성도와 그림체, 폰트 조화 등 시각적 완성도를 평가합니다.", weight: "20%" }
+    ],
     submissionType: "image",
     inputLabel: "컷툰 완성 원고 이미지",
     placeholder: "PNG, JPG 형식의 이미지 파일 (최대 5MB)",
@@ -69,6 +82,11 @@ const CONTESTS_DATA = [
       "제출 내용: 추천 책 제목, 저자, 그리고 150자 이내의 마음을 울리는 한 줄 평 및 추천 사유",
       "심사 기준: 진정성(40%), 독창성(30%), 공감도(30%)",
       "혜택: 선정된 추천평은 도서관 전시 공간 및 웹 사이트 메인에 배너 형태로 게재됩니다."
+    ],
+    evaluationCriteria: [
+      { category: "진정성", desc: "추천 도서에 대해 본인만의 진솔한 생각과 마음을 깊이 담았는지 평가합니다.", weight: "40%" },
+      { category: "독창성", desc: "친구들의 눈길을 끄는 참신하고 매력적인 소개 문구와 이유를 적었는지 평가합니다.", weight: "30%" },
+      { category: "공감도", desc: "많은 학생들이 해당 도서를 읽고 싶게 만드는 강한 공감대와 전달력을 평가합니다.", weight: "30%" }
     ],
     submissionType: "text_fields",
     textFields: [
@@ -94,6 +112,11 @@ const CONTESTS_DATA = [
       "제출 방식: [선택 1] 디지털 기기(아이패드, 갤럭시탭 등)로 필사한 이미지 파일 제출, [선택 2] 제공되는 양식에 타자로 텍스트 타이핑 제출",
       "심사 기준: 글씨의 정성 및 가독성(50%), 디자인 조화(30%), 필사 완성도(20%)"
     ],
+    evaluationCriteria: [
+      { category: "글씨의 정성 및 가독성", desc: "한 글자씩 정성을 들여 썼는지, 다른 사람이 읽기 쉬운 정갈한 글씨인지 평가합니다.", weight: "50%" },
+      { category: "디자인 조화", desc: "전체 이미지 레이아웃, 펜 두께/색상, 여백의 조화로운 미학적 완성도를 평가합니다.", weight: "30%" },
+      { category: "필사 완성도", desc: "오탈자나 누락된 문장 없이 맞춤법과 원본 시 구절을 완벽하게 적어냈는지 평가합니다.", weight: "20%" }
+    ],
     submissionType: "image_or_text",
     inputLabel: "필사 작품 또는 감상",
     placeholder: "필사한 손글씨 이미지(PNG/JPG)를 업로드하거나 아래 텍스트 상자에 마음을 담아 입력해주세요.",
@@ -115,6 +138,11 @@ const CONTESTS_DATA = [
       "규격: 16x16, 32x32, 64x64 도트 사이즈의 디지털 픽셀 이미지",
       "제출물: 픽셀아트 제작 툴이나 웹앱에서 그린 도트 결과물 이미지 파일",
       "심사 기준: 창의성(40%), 도트 정밀성(30%), 색상 조화(30%)"
+    ],
+    evaluationCriteria: [
+      { category: "창의성", desc: "도트라는 제약을 활용해 자신만의 창의적이고 유니크한 세계를 묘사했는지 평가합니다.", weight: "40%" },
+      { category: "도트 정밀성", desc: "어색한 부분 없이 세밀하고 깨끗한 픽셀 터치와 형태 구현력을 평가합니다.", weight: "30%" },
+      { category: "색상 조화", desc: "제한된 픽셀 팔레트 내에서 세련되고 감각적인 색상 배합을 이루었는지 평가합니다.", weight: "30%" }
     ],
     submissionType: "image",
     inputLabel: "도트 픽셀아트 이미지 파일",
@@ -140,6 +168,11 @@ const CONTESTS_DATA = [
       "심사 기준: 따뜻함 및 우정 전달도(50%), 독창적인 포즈(30%), 사진의 구도(20%)",
       "혜택: 선정작들은 12월 말 학교 복도 갤러리에 폴라로이드 감성 스타일로 대대적으로 인화/전시됩니다."
     ],
+    evaluationCriteria: [
+      { category: "따뜻함 및 우정 전달도", desc: "사진 속에 친구들 간의 끈끈한 친밀감과 즐겁고 따뜻한 감성이 전달되는지 평가합니다.", weight: "50%" },
+      { category: "독창적인 포즈", desc: "개성 넘치고 개구쟁이 같은 아이디어로 독특하고 예쁜 연출 포즈를 취했는지 평가합니다.", weight: "30%" },
+      { category: "사진의 구도", desc: "전반적인 빛의 조화, 흔들림 없는 선명도, 인물이 돋보이는 훌륭한 구도인지 평가합니다.", weight: "20%" }
+    ],
     submissionType: "image",
     inputLabel: "친구들과 함께 찍은 소중한 사진 파일",
     placeholder: "JPEG, PNG 원본 사진 파일 (최대 8MB)",
@@ -152,6 +185,125 @@ const CONTESTS_DATA = [
     </svg>`
   }
 ];
+
+// ====================================================
+// STATIC GALLERY DATA (2025 KEYRING SUBMISSIONS)
+// ====================================================
+const RAW_2025_KEYRING_DATA = `3-1,윤정민,https://drive.google.com/open?id=1p6_HRRsGOrqoja43s3-3QU1xiq-F-Owg
+3-1,이도,https://drive.google.com/open?id=1GanqBkGLjS5tUcljCkTjkQWOke_S1_yS
+3-1,김예은 ,https://drive.google.com/open?id=1xzZiycSCB4o_Wy1gzAhPlyCJLtM9SY6i
+3-4,이수지,https://drive.google.com/open?id=1PV9DrKFtY3qjZ09AIVkGhd5YYk84GpkP
+3-7,김민서,https://drive.google.com/open?id=11W0x9_A43_sGoLfdkY8aMjdvbIcpp1As
+4-1,이예서,https://drive.google.com/open?id=14RVLCB3NTjbZ-J8B1dLK2o8GBTsRI6_d
+4-1,신아윤 ,https://drive.google.com/open?id=1OonJHLjYlCUQeqCYL5eAkRrYdimDJJVI
+4-3,김별,https://drive.google.com/open?id=1-9CE9QOGCJ9L5f_y3nFhfO2qg18UkV7W
+4-3,윤성준,https://drive.google.com/open?id=1jJxzoLKRp6-A76XIoEY29RTK8IsW_Crj
+4-3,이서은,https://drive.google.com/open?id=1XXm-zmLWsJdCZyim5bEygDOUcweiZxAP
+4-3,신지아,https://drive.google.com/open?id=1QE48dS8EnNzO1bOz7w5ezQfrKke9Hslh
+4-3,김우희,https://drive.google.com/open?id=1aRBOqeirvAdvobnmlPSYyv0dhQiI_KBQ
+4-6,정윤채,https://drive.google.com/open?id=1O1RcNBqEOnhq2qtZIoDj9nkzPDzbcE_l
+4-6,김다은,https://drive.google.com/open?id=1_wtCpaQZgvFYpLccIQ8yul6fBMScOmDu
+5-2,남승민,https://drive.google.com/open?id=1qzQv6PtrNI1NH2rsnnmWen5V5QiePL0U
+5-2,이예슬,https://drive.google.com/open?id=1Q7ukx4s6L3r0Aif8EDJM9TPOasNKJ_q3
+5-2,김재윤,https://drive.google.com/open?id=1azlnKIwm43FNla9AL7A6A7Ym6_VV-8xF
+5-2,홍지유,https://drive.google.com/open?id=17o2OwBpPnMF_KomfOtHBa1dR4cgYDMPD
+5-2,김영준,https://drive.google.com/open?id=1Z3WgzmNGtfMgtJbDuH33RuJeTQw03o0q
+5-2,남승민,https://drive.google.com/open?id=1qDgBMCu5ZnKo6Tmb_1DDS4Bu0xD8VZb4
+5-2,홍지유,https://drive.google.com/open?id=1lmSbD2oKn7rCc4Yf2lFlyzvNzd7gQyOX
+5-2,김영준,https://drive.google.com/open?id=1waNGFqlgcBYlfrSpvd65QV8iTpZ9Ue4X
+5-2,유선우,https://drive.google.com/open?id=10G5Fh2TU6uAIZ_WoU9h27gc0cKclLZRP
+5-2,유선우,https://drive.google.com/open?id=1wAGBi4_A8Ny3JSUA16nbDC9JSB94COnT
+5-2,김영준,https://drive.google.com/open?id=1qCqZk5Zv3itgbiJOSuE5oZ9MmXqfOikE
+5-2,이예슬,https://drive.google.com/open?id=1SZayQ-FLUtydJH6HdVDcMbc_7VjXDPxj
+5-2,공도윤,https://drive.google.com/open?id=1K2f2Nd8T7h7F6LNVfHpf4ymuGvll8GX2
+5-2,김민선,https://drive.google.com/open?id=1JjAY3JJsd4Q9PtEpbCTxr4g2ZAxgGWFF
+5-2,김보빈,https://drive.google.com/open?id=1-VOfs_P4Xu2f4BPqMWKjd9PjBulNJB5c
+5-2,김시완,https://drive.google.com/open?id=1LfYtpyMzekL5_FaxnIIdKycuFwr_99rt
+5-2,김지율,https://drive.google.com/open?id=15FxyIkJi7IM8oucELYci9big5lVgWgmD
+5-2,박나경,https://drive.google.com/open?id=1DbI0lLm02-_1iWxGU32BE6pe1YZFsFCl
+5-2,박지후,https://drive.google.com/open?id=17vs8roUvLnyqUNDBEb7UlfKCmqR4yDa_
+5-2,박지후2,https://drive.google.com/open?id=159_dpFKwuU-uXT-aLc0KtncV2f2RXmNK
+5-2,방채민,https://drive.google.com/open?id=16IlFfENgBrA-lUq64NKichSxUfpAWDsz
+5-2,백지민,https://drive.google.com/open?id=1RJc1mJUZsHq8MIXtBqFia4geTN25Ilyg
+5-2,백지민,https://drive.google.com/open?id=16_rRTWuZfhnhff4PvH7RrpRGkAGUbmEa
+5-2,유다은,https://drive.google.com/open?id=1tG_3tnVtLzGHs6J3MGjpDSoAV1Lv1Tkf
+5-2,이건형,https://drive.google.com/open?id=1RH19vXf3l0AiHWHObqfXFacs30Z_kziQ
+5-2,이재령,https://drive.google.com/open?id=1x-PhZLK_I_tCPoPE6cGN6FGamkK-KUqi
+5-2,이재령,https://drive.google.com/open?id=1rlGkuFDiqlBMwfQZAtUzxTcry0EarOYd
+5-2,임우현,https://drive.google.com/open?id=1MQX0M0p1fdbEun-buNjCHiqL1tAScLre
+5-2,정하윤,https://drive.google.com/open?id=1RGqli6Ykvt4crdaiQw8fCpifXXNOv0zN
+5-2,지준영,https://drive.google.com/open?id=1cDDjjL43fPt_GCeQDS7jZPtI_3vHIjOP
+5-2,황주연,https://drive.google.com/open?id=1msqDyU0H9ZRrYEvcIj5in_qI3ZZGgRNF
+5-2,황주연,https://drive.google.com/open?id=1-Y44EhbEOY4re5fzJWI2ZcNx4wp3FXkC
+5-2,권대현,https://drive.google.com/open?id=1RrzRXKYpoEIoNqe0q33j4wlC1eOFSxy6
+5-2,마준민,https://drive.google.com/open?id=1haJkab5JK26OOYZwpOxltAs5-M9NELsZ
+5-2,마준민,https://drive.google.com/open?id=1uj0wBZTZvUPFnpYMgmsngCaNY_2_4vi9
+5-3,조하준 ,https://drive.google.com/open?id=16SQT0S7azBPtD5nI4eJ1wSBE11nfT9r3
+5-3,김하루 ,https://drive.google.com/open?id=1vexfwpbc7tKd_xIsjpvVWzOuxyq_yccj
+5-3,김채빈,https://drive.google.com/open?id=1IlI9fZM1U3Cp_3_cWPPa7YsLTlHKeK_B
+5-3,고윤서,https://drive.google.com/open?id=1xzcVhhZPvi38jcpURR_s3Noo2K35bt86
+5-3,김서윤,https://drive.google.com/open?id=1MiVKmQAIL4jh-CQ92afpKcl6NJGft9dV
+5-3,김서윤,https://drive.google.com/open?id=1PkaZnjINFSx_kX8QJSGbsk3dsaw4MRix
+5-3,김서윤,https://drive.google.com/open?id=1OdvhE8dcnAmdU3eC_eCroWQEErm7PQL7
+5-3,방채현,https://drive.google.com/open?id=1FKO2gPIwQLjH9PLZzu19jZE8SHCC8Ci-
+5-3,정서현,https://drive.google.com/open?id=1eY8nLEkEl4hq3wKlWaeK6ZyGU25bvaM6
+5-3,유서린,https://drive.google.com/open?id=10gsjoqaRTv9LsH8p5YYMyx70u0sp0_ju
+5-3,이라임,https://drive.google.com/open?id=1lpbtGNhTYbchCGTmjD02Fqlx8fZR5Xz6
+5-3,이효민,https://drive.google.com/open?id=1G7E1zKwrX6JW6gdSeQ9i5UNK-cPw6P4j
+5-3,이은서,https://drive.google.com/open?id=1BzoajAIuGNdpGP3IEt18yTPrPRmWuKUv
+5-3,이하빈 ,https://drive.google.com/open?id=1qJjWfmP7jAC2QZpUXtcu1i9iI_pAWpf2
+3-6,김범준,https://drive.google.com/open?id=1okuiUWogXz8BWMWiKdZOAbEzXmLL1iTq
+3-4,최예원,https://drive.google.com/open?id=1Ti4HIfP9MNR7Ew8c1I31bekzQYdut7a0
+3-3,박홍비,https://drive.google.com/open?id=1jBFcCAYV6gpYC0ocjnPXJvOJPas1eH6X
+4-6,양수아,https://drive.google.com/open?id=1ZfrhWLYU8T5xUU9pdeL196QYDuZKjNi5
+5-1,곽로희,https://drive.google.com/file/d/1zUpqwg5N_ThduldaYIpVMIQHcPNrQz_O/
+5-1,곽호영,https://drive.google.com/file/d/1YDGn3nots8gS2PoHyUs3u6DewlmUFtHd
+5-1,김가현,https://drive.google.com/file/d/1T3vh5O9Fgoz_Wg76Ck5rOISA1cQRpDn-
+5-1,김건우,https://drive.google.com/file/d/1T4T1EZzBf_WSkisGbSqXhnaVK0MOmtqk
+5-1,김라임,https://drive.google.com/file/d/15pVserNg7-mir3xQJn3zg1ku0Gp5argx/view?usp=drive_link
+5-1,김시유,https://drive.google.com/file/d/1bagLFa4zwvI8Tz5jDeoMTTYNuBYgsPAg/view?usp=drive_link
+5-1,김하윤,https://drive.google.com/file/d/1QnRf3ll4QTOAw-luIZBFZUPpQpCUBZVu/view?usp=drive_link
+5-1,문재현,https://drive.google.com/file/d/1T-kpv270q0dr3RxdTzICcJ0DmgCoAKUT/view?usp=drive_link
+5-1,어현준,https://drive.google.com/file/d/1xjb4u9Yj1TbbWKNwBQDPfzHkZPSx5DHr/view?usp=drive_link
+5-1,이종호,https://drive.google.com/file/d/1zSJMD37SNP0ymeKZMV-XIM7F_DbpDMtp/view?usp=drive_link
+5-1,이지호,https://drive.google.com/file/d/1dgtM3HfVBs0ZNShTAx1yODzsnMrqaBWO/view?usp=drive_link
+5-1,이하늘,https://drive.google.com/file/d/1Wx8oQkQV12NnbYrLgdWDtJXDtuUHJ66s/view?usp=drive_link
+5-1,임예서,https://drive.google.com/file/d/19kL4Nm2bCbvMYNnc3dQK4HG5iGQlbH3X/view?usp=drive_link
+5-1,임재열,https://drive.google.com/file/d/1yWfrLxU89g4nIqZoBgNwH_1MZNJ1oIGU/view?usp=drive_link
+5-1,임채연,https://drive.google.com/file/d/1LuBmm5_vd0JgD3kWVaI2pot86ERCMm0Z/view?usp=drive_link
+5-1,전서현,https://drive.google.com/file/d/1QNwyAfY88D5TeFV9bmvk35Eq7JR15ZoU/view?usp=drive_link
+5-1,정은명,https://drive.google.com/file/d/1Gcn0aPhdOh48UFNwec67vOrhCqqlNCx9/view?usp=drive_link
+5-1,정지후,https://drive.google.com/file/d/11lCwNooH_O2bUZJqbtCl-JKdYoW4lUXj/view?usp=drive_link
+5-1,조하늬,https://drive.google.com/file/d/1gWqytQWilFffJjw4L_2ssUgrv4_uDfAp/view?usp=drive_link
+5-1,최지유,https://drive.google.com/file/d/1j84Fzs5C_OO4IHGlUZeoNAIyXRsbR3Db/view?usp=drive_link
+5-1,양온유,https://drive.google.com/file/d/1-Ce_BsEI_XFrY6XcMEZFs5O4a70fq0tX/view?usp=drive_link
+5-1,박소율,https://drive.google.com/file/d/1Ce7nTT6jJd5cz0Mr3YJ_xqKHfUPls2Gj`;
+
+function extractDriveId(url) {
+  let id = "";
+  if (url.includes("id=")) {
+    id = url.split("id=")[1].split("&")[0];
+  } else if (url.includes("/file/d/")) {
+    id = url.split("/file/d/")[1].split("/")[0];
+  }
+  return id.trim();
+}
+
+function getGoogleDriveDirectLink(url) {
+  const id = extractDriveId(url);
+  return id ? `https://drive.google.com/thumbnail?id=${id}&sz=w600` : url;
+}
+
+const GALLERY_2025_DATA = RAW_2025_KEYRING_DATA.trim().split("\n").map(line => {
+  const [gradeClass, name, url] = line.split(",");
+  const grade = parseInt(gradeClass.split("-")[0], 10);
+  return {
+    gradeClass,
+    grade,
+    name: name.trim(),
+    imageUrl: getGoogleDriveDirectLink(url)
+  };
+});
 
 // ====================================================
 // STATE MANAGEMENT & USER SESSION CONFIGURATION
@@ -175,12 +327,86 @@ let uploadBase64Data = null;
 let currentUser = null;
 let GOOGLE_SHEET_API_URL_error = false;
 
+// Auth Form Grade/Class/Number dropdown config
+const GRADE_CLASS_LIMITS = {
+  "3": 6,
+  "4": 7,
+  "5": 6,
+  "6": 5
+};
+
+function setupAuthFormDropdowns() {
+  const loginGrade = document.getElementById("login-grade");
+  const loginClass = document.getElementById("login-class");
+  const loginNumber = document.getElementById("login-number");
+
+  const signupGrade = document.getElementById("signup-grade");
+  const signupClass = document.getElementById("signup-class");
+  const signupNumber = document.getElementById("signup-number");
+
+  // Populate number options (1 to 27)
+  function populateNumbers(selectElement) {
+    if (!selectElement) return;
+    selectElement.innerHTML = '<option value="" disabled selected>선택</option>';
+    for (let i = 1; i <= 27; i++) {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = `${i}번`;
+      selectElement.appendChild(opt);
+    }
+  }
+
+  // Populate class options dynamically based on grade
+  function updateClassDropdown(gradeVal, classSelectElement) {
+    if (!classSelectElement) return;
+    classSelectElement.innerHTML = '<option value="" disabled selected>선택</option>';
+    
+    if (!gradeVal) {
+      const disabledOpt = document.createElement("option");
+      disabledOpt.value = "";
+      disabledOpt.disabled = true;
+      disabledOpt.selected = true;
+      disabledOpt.textContent = "학년 선택 필요";
+      classSelectElement.appendChild(disabledOpt);
+      return;
+    }
+
+    const maxClass = GRADE_CLASS_LIMITS[gradeVal] || 0;
+    for (let i = 1; i <= maxClass; i++) {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = `${i}반`;
+      classSelectElement.appendChild(opt);
+    }
+  }
+
+  // Initialize Numbers
+  populateNumbers(loginNumber);
+  populateNumbers(signupNumber);
+
+  // Initialize dynamic class updates
+  if (loginGrade && loginClass) {
+    loginGrade.addEventListener("change", (e) => {
+      updateClassDropdown(e.target.value, loginClass);
+    });
+    updateClassDropdown("", loginClass);
+  }
+
+  if (signupGrade && signupClass) {
+    signupGrade.addEventListener("change", (e) => {
+      updateClassDropdown(e.target.value, signupClass);
+    });
+    updateClassDropdown("", signupClass);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
   initVirtualTime();
   initUserSession();
   renderContestGrid();
   setupEventListeners();
+  setupAuthFormDropdowns();
   updateLiveCounters();
 });
 
@@ -469,6 +695,17 @@ function closeAuthDrawer() {
 
   document.getElementById("login-form").reset();
   document.getElementById("signup-form").reset();
+
+  // Reset dynamic class dropdowns to '학년 선택 필요' state
+  const loginClass = document.getElementById("login-class");
+  if (loginClass) {
+    loginClass.innerHTML = '<option value="" disabled selected>학년 선택 필요</option>';
+  }
+  const signupClass = document.getElementById("signup-class");
+  if (signupClass) {
+    signupClass.innerHTML = '<option value="" disabled selected>학년 선택 필요</option>';
+  }
+
   document.querySelectorAll(".auth-panel .form-group.has-error").forEach(g => g.classList.remove("has-error"));
 }
 
@@ -559,6 +796,102 @@ function renderContestGrid() {
 // ====================================================
 // CONTEST DRAWER DETAILS & LOGGED-IN CONDITIONAL FORM
 // ====================================================
+
+
+function renderGallery2025(gradeFilter = "all") {
+  const gridContainer = document.getElementById("gallery-grid-list");
+  if (!gridContainer) return;
+
+  gridContainer.innerHTML = "";
+
+  const filteredData = gradeFilter === "all" 
+    ? GALLERY_2025_DATA 
+    : GALLERY_2025_DATA.filter(item => item.grade === parseInt(gradeFilter, 10));
+
+  if (filteredData.length === 0) {
+    gridContainer.innerHTML = `<div class="helper-text" style="text-align: center; grid-column: span 2; padding: 40px;">해당 학년의 작품이 존재하지 않습니다.</div>`;
+    return;
+  }
+
+  filteredData.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "gallery-card";
+    
+    card.innerHTML = `
+      <div class="gallery-card-img-wrapper loading">
+        <img class="gallery-card-img" src="${item.imageUrl}" alt="${item.name}" loading="lazy" onload="this.parentElement.classList.remove('loading')" onerror="this.src='https://placehold.co/150/0c0c0e/ffffff?text=No+Image'; this.parentElement.classList.remove('loading')">
+      </div>
+      <div class="gallery-card-info">
+        <span class="gallery-card-class">${item.gradeClass}</span>
+        <span class="gallery-card-name">${item.name}</span>
+      </div>
+    `;
+    gridContainer.appendChild(card);
+  });
+}
+
+function switchDrawerTab(tabName) {
+  const tabGuide = document.getElementById("drawer-tab-guide");
+  const tabCriteria = document.getElementById("drawer-tab-criteria");
+  const tabGallery = document.getElementById("drawer-tab-gallery");
+  
+  const guideContainer = document.getElementById("drawer-guide-container");
+  const criteriaContainer = document.getElementById("drawer-criteria-container");
+  const galleryContainer = document.getElementById("drawer-gallery-container");
+  
+  const formContainer = document.getElementById("submission-form-container");
+  const noticeContainer = document.getElementById("submission-notice");
+
+  if (!activeContest) return;
+  const status = getContestStatus(activeContest.month);
+
+  tabGuide.classList.remove("active");
+  tabCriteria.classList.remove("active");
+  tabGallery.classList.remove("active");
+
+  if (tabName === "guide") {
+    tabGuide.classList.add("active");
+    
+    guideContainer.style.display = "block";
+    criteriaContainer.style.display = "none";
+    galleryContainer.style.display = "none";
+    
+    if (status === "active") {
+      formContainer.style.display = "block";
+      noticeContainer.style.display = "none";
+    } else {
+      formContainer.style.display = "none";
+      noticeContainer.style.display = "block";
+    }
+  } else if (tabName === "criteria") {
+    tabCriteria.classList.add("active");
+    
+    guideContainer.style.display = "none";
+    criteriaContainer.style.display = "block";
+    galleryContainer.style.display = "none";
+    formContainer.style.display = "none";
+    noticeContainer.style.display = "none";
+  } else if (tabName === "gallery") {
+    tabGallery.classList.add("active");
+    
+    guideContainer.style.display = "none";
+    criteriaContainer.style.display = "none";
+    galleryContainer.style.display = "block";
+    formContainer.style.display = "none";
+    noticeContainer.style.display = "none";
+    
+    renderGallery2025("all");
+    
+    document.querySelectorAll(".gallery-filter-badge").forEach(badge => {
+      if (badge.getAttribute("data-grade") === "all") {
+        badge.classList.add("active");
+      } else {
+        badge.classList.remove("active");
+      }
+    });
+  }
+}
+
 function openContestDetails(contestId) {
   const contest = CONTESTS_DATA.find(c => c.id === contestId);
   if (!contest) return;
@@ -595,46 +928,77 @@ function openContestDetails(contestId) {
     guideList.appendChild(li);
   });
 
+  // Render Dynamic Evaluation Criteria Cards
+  const criteriaListContainer = document.getElementById("criteria-cards-list");
+  criteriaListContainer.innerHTML = "";
+  
+  if (contest.evaluationCriteria && contest.evaluationCriteria.length > 0) {
+    contest.evaluationCriteria.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "criteria-card";
+      card.innerHTML = `
+        <div class="criteria-card-header">
+          <span class="criteria-card-name">${item.category}</span>
+          <span class="criteria-card-weight">${item.weight}</span>
+        </div>
+        <p class="criteria-card-desc">${item.desc}</p>
+      `;
+      criteriaListContainer.appendChild(card);
+    });
+  } else {
+    criteriaListContainer.innerHTML = `<div class="helper-text" style="text-align: center; padding: 20px;">심사 기준 정보가 등록되지 않았습니다.</div>`;
+  }
+
   const status = getContestStatus(contest.month);
   document.getElementById("form-contest-id").value = contest.id;
 
   if (status === "active") {
     drawerStatus.textContent = "접수 진행 중 (Active)";
     drawerStatus.className = "status-indicator status-active";
-    formContainer.style.display = "block";
-    noticeContainer.style.display = "none";
 
     if (currentUser) {
-      authNotice.style.display = "none";
-      subForm.style.display = "block";
-
       document.getElementById("student-name").value = currentUser.name;
       document.getElementById("student-grade").value = `${currentUser.grade}학년`;
       document.getElementById("student-class").value = `${currentUser.classNum}반`;
       document.getElementById("student-number").value = `${currentUser.number}번`;
 
       setupDynamicFormFields(contest);
-    } else {
-      authNotice.style.display = "flex";
-      subForm.style.display = "none";
     }
   } else if (status === "pending") {
     drawerStatus.textContent = "접수 대기 중 (Upcoming)";
     drawerStatus.className = "status-indicator status-pending";
-    formContainer.style.display = "none";
-    noticeContainer.style.display = "block";
     noticeText.innerHTML = `🔒 <strong>이 대회는 아직 접수 기간이 아닙니다.</strong><br>대회 접수 기간은 2026년 ${contest.month}월 1일부터 시작됩니다.`;
   } else {
     drawerStatus.textContent = "접수 마감됨 (Closed)";
     drawerStatus.className = "status-indicator status-closed";
-    formContainer.style.display = "none";
-    noticeContainer.style.display = "block";
     noticeText.innerHTML = `🔒 <strong>이 대회의 접수가 종료되었습니다.</strong><br>2026년 ${contest.month}월 한 달 간 진행되었던 작품 접수가 완료되었습니다.`;
   }
+
+  if (status === "active" && !currentUser) {
+    authNotice.style.display = "flex";
+    subForm.style.display = "none";
+  } else if (status === "active" && currentUser) {
+    authNotice.style.display = "none";
+    subForm.style.display = "block";
+  }
+
+  // Show 3rd tab only for keyring contest
+  const tabGallery = document.getElementById("drawer-tab-gallery");
+  if (tabGallery) {
+    if (contest.id === "keyring") {
+      tabGallery.style.display = "flex";
+    } else {
+      tabGallery.style.display = "none";
+    }
+  }
+
+  // Always initialize to the guide & submission tab
+  switchDrawerTab("guide");
 
   drawer.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
 }
+
 
 function closeContestDrawer() {
   const drawer = document.getElementById("contest-drawer");
@@ -849,12 +1213,24 @@ function setupFileUploader() {
   }
 }
 
-// ====================================================
-// EVENT LISTENERS & ROUTINGS
-// ====================================================
 function setupEventListeners() {
   document.getElementById("contest-drawer-overlay").addEventListener("click", closeContestDrawer);
   document.getElementById("contest-drawer-close").addEventListener("click", closeContestDrawer);
+  
+  // Drawer Tab Switcher Event Listeners
+  document.getElementById("drawer-tab-guide").addEventListener("click", () => switchDrawerTab("guide"));
+  document.getElementById("drawer-tab-criteria").addEventListener("click", () => switchDrawerTab("criteria"));
+  document.getElementById("drawer-tab-gallery").addEventListener("click", () => switchDrawerTab("gallery"));
+
+  // 2025 Gallery Filter Badges Event Listeners
+  document.querySelectorAll(".gallery-filter-badge").forEach(badge => {
+    badge.addEventListener("click", (e) => {
+      document.querySelectorAll(".gallery-filter-badge").forEach(b => b.classList.remove("active"));
+      e.currentTarget.classList.add("active");
+      const grade = e.currentTarget.getAttribute("data-grade");
+      renderGallery2025(grade);
+    });
+  });
 
   document.getElementById("auth-trigger-btn").addEventListener("click", () => openAuthDrawer("login"));
   document.getElementById("auth-redirect-btn").addEventListener("click", () => {

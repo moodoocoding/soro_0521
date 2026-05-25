@@ -119,8 +119,15 @@
         <h2 id="drawer-title" class="drawer-title">키링 공모전</h2>
         <p id="drawer-summary" class="drawer-summary">나만의 예쁜 키링 디자인을 설계하고 실제 키링 굿즈로 탄생시킬 특별한 기회!</p>
 
+        <!-- Drawer Tab Navigation -->
+        <div class="drawer-tabs">
+          <button type="button" id="drawer-tab-guide" class="drawer-tab-btn active">공모 안내 & 접수</button>
+          <button type="button" id="drawer-tab-criteria" class="drawer-tab-btn">심사 기준표</button>
+          <button type="button" id="drawer-tab-gallery" class="drawer-tab-btn" style="display: none;">2025 수상작 🏆</button>
+        </div>
+
         <!-- Contest Info Tab -->
-        <div class="contest-guide">
+        <div class="contest-guide" id="drawer-guide-container">
           <h3>공모 요강</h3>
           <ul class="guide-list" id="drawer-guide-list"></ul>
         </div>
@@ -171,6 +178,33 @@
         <div class="submission-disabled-notice" id="submission-notice" style="display: none;">
           <div class="notice-icon">🔒</div>
           <p id="submission-notice-text">지금은 이 대회의 접수 기간이 아닙니다.</p>
+        </div>
+
+        <!-- Dynamic Evaluation Criteria Section -->
+        <div class="contest-criteria" id="drawer-criteria-container" style="display: none;">
+          <h3 class="criteria-title">심사 기준표</h3>
+          <div id="criteria-cards-list" class="criteria-cards-list">
+            <!-- Dynamic Criteria Cards Here -->
+          </div>
+        </div>
+
+        <!-- Dynamic 2025 Gallery Section -->
+        <div class="contest-gallery" id="drawer-gallery-container" style="display: none;">
+          <h3 class="gallery-title">2025년도 수상작 갤러리</h3>
+          <p class="gallery-desc">작년에 선배들이 실제로 그린 소중한 키링 공모작들입니다. 아래 학년 필터를 통해 자유롭게 감상해 보세요.</p>
+          
+          <!-- Grade Filter Badges -->
+          <div class="gallery-filter-bar" id="gallery-filter-bar">
+            <button type="button" class="gallery-filter-badge active" data-grade="all">전체</button>
+            <button type="button" class="gallery-filter-badge" data-grade="3">3학년</button>
+            <button type="button" class="gallery-filter-badge" data-grade="4">4학년</button>
+            <button type="button" class="gallery-filter-badge" data-grade="5">5학년</button>
+          </div>
+          
+          <!-- Gallery Grid -->
+          <div class="gallery-grid" id="gallery-grid-list">
+            <!-- Dynamic Gallery Cards Here -->
+          </div>
         </div>
       </div>
     </div>
@@ -236,16 +270,20 @@
               </div>
               <div class="form-group">
                 <label for="login-class">반</label>
-                <input type="number" id="login-class" required min="1" max="25" placeholder="2">
-                <span class="error-message">입력</span>
+                <select id="login-class" required>
+                  <option value="" disabled selected>선택</option>
+                </select>
+                <span class="error-message">선택</span>
               </div>
             </div>
             
             <div class="form-group-row">
               <div class="form-group">
                 <label for="login-number">번호</label>
-                <input type="number" id="login-number" required min="1" max="45" placeholder="15">
-                <span class="error-message">입력</span>
+                <select id="login-number" required>
+                  <option value="" disabled selected>선택</option>
+                </select>
+                <span class="error-message">선택</span>
               </div>
               <div class="form-group">
                 <label for="login-name">이름</label>
@@ -284,16 +322,20 @@
               </div>
               <div class="form-group">
                 <label for="signup-class">반</label>
-                <input type="number" id="signup-class" required min="1" max="25" placeholder="2">
-                <span class="error-message">입력</span>
+                <select id="signup-class" required>
+                  <option value="" disabled selected>선택</option>
+                </select>
+                <span class="error-message">선택</span>
               </div>
             </div>
 
             <div class="form-group-row">
               <div class="form-group">
                 <label for="signup-number">번호</label>
-                <input type="number" id="signup-number" required min="1" max="45" placeholder="15">
-                <span class="error-message">입력</span>
+                <select id="signup-number" required>
+                  <option value="" disabled selected>선택</option>
+                </select>
+                <span class="error-message">선택</span>
               </div>
               <div class="form-group">
                 <label for="signup-name">학생 이름</label>
