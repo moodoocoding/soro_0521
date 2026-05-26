@@ -182,114 +182,114 @@ const CONTESTS_DATA = [
 
 const CALLIGRAPHY_THEMES_IMAGES = {
   sky: [
-    "https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1502134249126-9f3755a50d78?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1537498424275-c27702672948?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1436891620584-376571ef2f40?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1475274047050-1d0c0975c63e?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1532974297617-c0f05fe4c415?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1543722530-d2c3201371e7?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1504333631150-c8ab2fe93b05?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1528722828814-77b9b83aafb2?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1464802686167-b939a6910659?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1505506819548-f9b5c35b801a?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1484503786284-5f50af9ccddf?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1435224668246-86a2d53efd31?auto=format&fit=crop&w=800&q=80"
+    "asset/backgrounds/sky_0.jpg",
+    "asset/backgrounds/sky_1.jpg",
+    "asset/backgrounds/sky_2.jpg",
+    "asset/backgrounds/sky_3.jpg",
+    "asset/backgrounds/sky_4.jpg",
+    "asset/backgrounds/sky_5.jpg",
+    "asset/backgrounds/sky_6.jpg",
+    "asset/backgrounds/sky_7.jpg",
+    "asset/backgrounds/sky_8.jpg",
+    "asset/backgrounds/sky_9.jpg",
+    "asset/backgrounds/sky_10.jpg",
+    "asset/backgrounds/sky_11.jpg",
+    "asset/backgrounds/sky_12.jpg",
+    "asset/backgrounds/sky_13.jpg",
+    "asset/backgrounds/sky_14.jpg",
+    "asset/backgrounds/sky_15.jpg",
+    "asset/backgrounds/sky_16.jpg",
+    "asset/backgrounds/sky_17.jpg",
+    "asset/backgrounds/sky_18.jpg",
+    "asset/backgrounds/sky_19.jpg"
   ],
   forest: [
-    "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1463740839922-2d3b7e426a56?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1425913397330-cf8af2ff40a1?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1500627869374-13cd993b1115?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1470115636472-72479574400c?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1418065460487-3e41a6c84dc5?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1505245208761-ba872912fac0?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1472214222541-d510753a8707?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1501183007986-d0d080b147f9?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1500485035595-cbe6f645feb1?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80"
+    "asset/backgrounds/forest_0.jpg",
+    "asset/backgrounds/forest_1.jpg",
+    "asset/backgrounds/forest_2.jpg",
+    "asset/backgrounds/forest_3.jpg",
+    "asset/backgrounds/forest_4.jpg",
+    "asset/backgrounds/forest_5.jpg",
+    "asset/backgrounds/forest_6.jpg",
+    "asset/backgrounds/forest_7.jpg",
+    "asset/backgrounds/forest_8.jpg",
+    "asset/backgrounds/forest_9.jpg",
+    "asset/backgrounds/forest_10.jpg",
+    "asset/backgrounds/forest_11.jpg",
+    "asset/backgrounds/forest_12.jpg",
+    "asset/backgrounds/forest_13.jpg",
+    "asset/backgrounds/forest_14.jpg",
+    "asset/backgrounds/forest_15.jpg",
+    "asset/backgrounds/forest_16.jpg",
+    "asset/backgrounds/forest_17.jpg",
+    "asset/backgrounds/forest_18.jpg",
+    "asset/backgrounds/forest_19.jpg"
   ],
   ocean: [
-    "https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1473116763269-255ea7b2b5f1?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1545490387-c379b7c154ee?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1439066615861-d1af74d74000?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1501426026826-31c667bdf23d?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1520116468816-90b61400c357?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1515260268569-9271009adfdb?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1496034563008-7207c424de41?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1538964173425-93884d739596?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1468413253725-0d5181026218?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1506953823976-52e1fdc0149a?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1510414842594-fc614bad157c?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1509043759401-164b1d1791b3?auto=format&fit=crop&w=800&q=80"
+    "asset/backgrounds/ocean_0.jpg",
+    "asset/backgrounds/ocean_1.jpg",
+    "asset/backgrounds/ocean_2.jpg",
+    "asset/backgrounds/ocean_3.jpg",
+    "asset/backgrounds/ocean_4.jpg",
+    "asset/backgrounds/ocean_5.jpg",
+    "asset/backgrounds/ocean_6.jpg",
+    "asset/backgrounds/ocean_7.jpg",
+    "asset/backgrounds/ocean_8.jpg",
+    "asset/backgrounds/ocean_9.jpg",
+    "asset/backgrounds/ocean_10.jpg",
+    "asset/backgrounds/ocean_11.jpg",
+    "asset/backgrounds/ocean_12.jpg",
+    "asset/backgrounds/ocean_13.jpg",
+    "asset/backgrounds/ocean_14.jpg",
+    "asset/backgrounds/ocean_15.jpg",
+    "asset/backgrounds/ocean_16.jpg",
+    "asset/backgrounds/ocean_17.jpg",
+    "asset/backgrounds/ocean_18.jpg",
+    "asset/backgrounds/ocean_19.jpg"
   ],
   room: [
-    "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1544207240-8b1025eb7a6c?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1565538810844-1e119ba18520?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1541123437800-1bb1317badc2?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1505693395321-883724634266?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1532372320978-9b4d8a32cb24?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=800&q=80"
+    "asset/backgrounds/room_0.jpg",
+    "asset/backgrounds/room_1.jpg",
+    "asset/backgrounds/room_2.jpg",
+    "asset/backgrounds/room_3.jpg",
+    "asset/backgrounds/room_4.jpg",
+    "asset/backgrounds/room_5.jpg",
+    "asset/backgrounds/room_6.jpg",
+    "asset/backgrounds/room_7.jpg",
+    "asset/backgrounds/room_8.jpg",
+    "asset/backgrounds/room_9.jpg",
+    "asset/backgrounds/room_10.jpg",
+    "asset/backgrounds/room_11.jpg",
+    "asset/backgrounds/room_12.jpg",
+    "asset/backgrounds/room_13.jpg",
+    "asset/backgrounds/room_14.jpg",
+    "asset/backgrounds/room_15.jpg",
+    "asset/backgrounds/room_16.jpg",
+    "asset/backgrounds/room_17.jpg",
+    "asset/backgrounds/room_18.jpg",
+    "asset/backgrounds/room_19.jpg"
   ],
   paper: [
-    "https://images.unsplash.com/photo-1604076913837-52ab5629fba9?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1531685222403-f928502d2b30?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1587080266227-677cd237c267?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1529400971008-f566de0e6dfc?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1533158326339-7f3cf2404354?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1516550893923-42d28e5677af?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1508898578281-774ac4893c0c?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1595475241949-c2901c69ac81?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1582201942988-13e60e4556ee?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1557672172-298e090bd0f1?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=800&q=80"
+    "asset/backgrounds/paper_0.jpg",
+    "asset/backgrounds/paper_1.jpg",
+    "asset/backgrounds/paper_2.jpg",
+    "asset/backgrounds/paper_3.jpg",
+    "asset/backgrounds/paper_4.jpg",
+    "asset/backgrounds/paper_5.jpg",
+    "asset/backgrounds/paper_6.jpg",
+    "asset/backgrounds/paper_7.jpg",
+    "asset/backgrounds/paper_8.jpg",
+    "asset/backgrounds/paper_9.jpg",
+    "asset/backgrounds/paper_10.jpg",
+    "asset/backgrounds/paper_11.jpg",
+    "asset/backgrounds/paper_12.jpg",
+    "asset/backgrounds/paper_13.jpg",
+    "asset/backgrounds/paper_14.jpg",
+    "asset/backgrounds/paper_15.jpg",
+    "asset/backgrounds/paper_16.jpg",
+    "asset/backgrounds/paper_17.jpg",
+    "asset/backgrounds/paper_18.jpg",
+    "asset/backgrounds/paper_19.jpg"
   ]
 };
 
@@ -1763,26 +1763,19 @@ function setupDynamicFormFields(contest) {
       </div>
 
       <div class="form-group" style="margin-bottom: 16px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <label for="sub-calli-font" style="margin-bottom:0;">✒️ 캘리그라피 서체 선택</label>
-          <label for="sub-custom-font-file" class="btn btn-secondary btn-sm" style="margin-bottom:0; font-size:0.75rem; padding: 4px 8px; cursor:pointer; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:6px; display:inline-flex; align-items:center; gap:4px;">
-            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"></path>
-            </svg>
-            폰트 등록 (.ttf/.otf)
-          </label>
-          <input type="file" id="sub-custom-font-file" accept=".ttf,.otf,.woff,.woff2" style="display:none;">
-        </div>
+        <label for="sub-calli-font">✒️ 캘리그라피 서체 선택</label>
         <select id="sub-calli-font" style="width:100%; padding:10px; background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border-color); border-radius:8px; font-weight:bold;">
           <option value="'East Sea Dokdo', sans-serif">✒️ 독도체 (개성 있는 붓글씨)</option>
           <option value="'Nanum Brush Script', cursive">✒️ 나눔붓체 (정갈한 손글씨)</option>
           <option value="'Nanum Pen Script', cursive">✒️ 나눔펜체 (귀엽고 깔끔한 필체)</option>
           <option value="'Gamja Flower', cursive">✒️ 감자꽃체 (동화적이고 따뜻한 서체)</option>
           <option value="'Yeon Sung', cursive">✒️ 연성체 (고전적인 멋을 내는 서체)</option>
+          <option value="'CustomFont1', sans-serif">⭐ 사용자 에셋 서체 1 (asset/fonts/custom1.ttf / .otf)</option>
+          <option value="'CustomFont2', sans-serif">⭐ 사용자 에셋 서체 2 (asset/fonts/custom2.ttf / .otf)</option>
         </select>
-        <div id="custom-font-status" style="margin-top:6px; font-size:0.75rem; color:var(--success-color); display:none; align-items:center; gap:4px;">
-          <span>✓ 개인 폰트가 성공적으로 등록 및 자동 선택되었습니다!</span>
-        </div>
+        <p style="margin-top:6px; font-size:0.75rem; color:var(--text-secondary); line-height:1.4;">
+          ※ 개인 폰트는 프로젝트 폴더 내 <code>asset/fonts/custom1.ttf</code> (또는 <code>custom1.otf</code>) 경로로 파일을 업로드해두면 자동 적용됩니다.
+        </p>
       </div>
 
       <button type="button" id="btn-generate-calli" class="btn btn-secondary btn-block" style="background: var(--accent-gradient, linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)); color: white; font-weight: bold; padding: 12px; margin-bottom: 16px; border:none; transition:transform 0.2s;">🎨 AI 캘리그라피 엽서 생성</button>
@@ -1800,48 +1793,7 @@ function setupDynamicFormFields(contest) {
 
     document.getElementById("btn-generate-calli").addEventListener("click", generateAICalligraphyCard);
 
-    // Register font file upload listener
-    const fontFileInput = document.getElementById("sub-custom-font-file");
-    const fontSelect = document.getElementById("sub-calli-font");
-    const fontStatus = document.getElementById("custom-font-status");
-
-    if (fontFileInput) {
-      fontFileInput.addEventListener("change", (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = async (event) => {
-          try {
-            const fontData = event.target.result;
-            const customFontName = `CustomCalliFont_${Date.now()}`;
-            const fontFace = new FontFace(customFontName, fontData);
-            
-            showToast("업로드된 폰트 파일 등록 중...", "info");
-            const loadedFace = await fontFace.load();
-            document.fonts.add(loadedFace);
-
-            // Add new custom option to dropdown and select it
-            const option = document.createElement("option");
-            option.value = `'${customFontName}'`;
-            option.textContent = `⭐ 등록한 폰트 (${file.name})`;
-            fontSelect.appendChild(option);
-            fontSelect.value = `'${customFontName}'`;
-
-            if (fontStatus) {
-              fontStatus.style.display = "flex";
-              fontStatus.querySelector("span").textContent = `✓ 개인 폰트 '${file.name}'이 등록 및 선택되었습니다!`;
-            }
-            showToast(`폰트 '${file.name}'이(가) 성공적으로 등록되었습니다! ✨`, "success");
-          } catch (err) {
-            console.error(err);
-            showToast("폰트 파일 로드에 실패했습니다. 올바른 폰트 형식(.ttf/.otf)인지 확인해주세요.", "error");
-          }
-        };
-        reader.readAsArrayBuffer(file);
-      });
     }
-  }
 
   else if (contest.submissionType === "text_fields") {
     let html = "";
