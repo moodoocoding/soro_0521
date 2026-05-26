@@ -4,7 +4,7 @@
 // [가이드] 구글 스프레드시트 연동 완료 후, 아래 공란에 구글 Apps Script 웹앱 배포 URL을 입력해 주세요.
 // 예시: "https://script.google.com/macros/s/AKfycbz.../exec"
 // 이 주소가 비어있는 동안에는 브라우저의 localStorage 로컬 DB 모드로 즉시 원활히 시뮬레이션 작동합니다.
-const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyGKQlom8k8okl8Gbd-WeADknfztVlZZ1md6RE1A37VoAIuPg4G0YC4FQLrJAvHyRo1Mg/exec";
+const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbx8jo76mJkxSj5ub-ysxSUFhOGI_U3y2Dn-w4XkrHIx9SNimetkEtXcvhfcgqStYsPz/exec";
 
 // ====================================================
 // CONTEST DATA AND INLINE ILLUSTRATIONS (SVG)
@@ -416,21 +416,23 @@ const GALLERY_2025_DATA = RAW_2025_KEYRING_DATA.trim().split("\n").map(line => {
 // STATE MANAGEMENT & USER SESSION CONFIGURATION
 // ====================================================
 let currentVirtualMonth = 9;
-const FORCE_ACTIVE_CONTESTS = ["keyring", "library"];
+const FORCE_ACTIVE_CONTESTS = ["keyring", "library", "pixelart"];
 
 function getContestStatus(contestOrMonth) {
   // If contestOrMonth is an object, extract month and id
   const contestMonth = typeof contestOrMonth === "object" ? contestOrMonth.month : (typeof contestOrMonth === "number" ? contestOrMonth : null);
   const contestId = typeof contestOrMonth === "object" ? contestOrMonth.id : (typeof contestOrMonth === "string" ? contestOrMonth : null);
 
-  // 6월 키링, 9월 도서관(AI 캘리그라피), 12월 사운드 앨범 상시 강제 활성화
-  if (contestId && ["keyring", "library", "sound_album"].includes(contestId)) {
+  // 키링 공모전, 온라인 도서관, 픽셀아트 상시 강제 활성화
+  if (contestId && FORCE_ACTIVE_CONTESTS.includes(contestId)) {
     return "active";
   }
-  if (contestOrMonth && ["keyring", "library", "sound_album"].includes(contestOrMonth)) {
+  if (contestOrMonth && FORCE_ACTIVE_CONTESTS.includes(contestOrMonth)) {
     return "active";
   }
-  if (contestMonth === 6 || contestMonth === 9 || contestMonth === 12) {
+  // FORCE_ACTIVE_CONTESTS에 해당하는 공모전의 월인 경우 활성화 (6월, 9월, 11월)
+  const forceActiveMonths = [6, 9, 11];
+  if (contestMonth !== null && forceActiveMonths.includes(contestMonth)) {
     return "active";
   }
 
@@ -956,6 +958,644 @@ function renderGallery2025(gradeFilter = "all") {
   });
 }
 
+// ONLINE LIBRARY SUBMISSIONS GALLERY (2026 SUBMISSIONS)
+// ====================================================
+async function getLibrarySubmissions(gradeFilter = "all", sortBy = "newest", searchKeyword = "") {
+  const contestId = (activeContest && activeContest.id) ? activeContest.id : "library";
+  let submissions = [];
+
+  // 1. Fetch from Google Sheets Apps Script API URL
+  if (GOOGLE_SHEET_API_URL) {
+    const payload = {
+      action: "getAllSubmissions",
+      contestId: contestId
+    };
+    try {
+      const response = await fetch(GOOGLE_SHEET_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json();
+      if (result.status === "success" && Array.isArray(result.data)) {
+        submissions = result.data;
+      }
+    } catch (e) {
+      console.warn(`Failed to fetch ${contestId} submissions remotely, using local backup:`, e);
+    }
+  }
+
+  // 2. Fetch local storage entries to merge (or fallback)
+  const localSubmissions = JSON.parse(localStorage.getItem("soro_submissions") || "[]")
+                             .filter(entry => entry.contestId === contestId);
+
+  if (submissions.length === 0) {
+    submissions = localSubmissions;
+  } else {
+    // Merge local entries that are not yet in the remote submissions (avoid duplicates by id)
+    const remoteIds = new Set(submissions.map(s => s.id));
+    localSubmissions.forEach(localEntry => {
+      if (!remoteIds.has(localEntry.id)) {
+        submissions.push(localEntry);
+      }
+    });
+  }
+
+  // Normalize entry.data (Ensure it is parsed into an Object if it is a JSON string from Google Sheets API)
+  submissions.forEach(entry => {
+    if (entry && entry.data && typeof entry.data === "string") {
+      try {
+        entry.data = JSON.parse(entry.data);
+      } catch (err) {
+        console.warn("Failed to parse entry.data JSON string:", err);
+        entry.data = {};
+      }
+    } else if (entry && !entry.data) {
+      entry.data = {};
+    }
+  });
+
+  // [Premium 1인 1작품 제한 필터] 학생당 가장 마지막(최신)으로 제출한 1개의 작품만 노출 및 중복 제거
+  const latestSubmissionsMap = new Map();
+  submissions.forEach(entry => {
+    const studentKey = entry.studentUsername ? entry.studentUsername.toLowerCase() : (entry.studentName ? entry.studentName.toLowerCase() : "");
+    if (studentKey) {
+      const existing = latestSubmissionsMap.get(studentKey);
+      if (!existing || new Date(entry.timestamp) > new Date(existing.timestamp)) {
+        latestSubmissionsMap.set(studentKey, entry);
+      }
+    } else {
+      latestSubmissionsMap.set(entry.id, entry);
+    }
+  });
+  submissions = Array.from(latestSubmissionsMap.values());
+
+  // Filter by grade
+  if (gradeFilter !== "all") {
+    const gradeNum = parseInt(gradeFilter, 10);
+    submissions = submissions.filter(entry => parseInt(entry.studentGrade, 10) === gradeNum);
+  }
+
+  // Filter by search keyword
+  if (searchKeyword.trim() !== "") {
+    const kw = searchKeyword.trim().toLowerCase();
+    submissions = submissions.filter(entry => {
+      const bookTitle = (entry.data && entry.data["book-title"]) ? entry.data["book-title"].toLowerCase() : "";
+      const title = (entry.data && entry.data["title"]) ? entry.data["title"].toLowerCase() : "";
+      const bookAuthor = (entry.data && entry.data["book-author"]) ? entry.data["book-author"].toLowerCase() : "";
+      const author = (entry.data && entry.data["author"]) ? entry.data["author"].toLowerCase() : "";
+      const studentName = entry.studentName ? entry.studentName.toLowerCase() : "";
+      return bookTitle.includes(kw) || title.includes(kw) || bookAuthor.includes(kw) || author.includes(kw) || studentName.includes(kw);
+    });
+  }
+
+  // Sort
+  if (sortBy === "likes") {
+    const likes = JSON.parse(localStorage.getItem(`soro_${contestId}_likes`) || "{}");
+    submissions.sort((a, b) => {
+      const likesA = likes[a.id] || 0;
+      const likesB = likes[b.id] || 0;
+      if (likesA !== likesB) {
+        return likesB - likesA;
+      }
+      return new Date(b.timestamp) - new Date(a.timestamp);
+    });
+  } else {
+    // Newest first
+    submissions.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  }
+
+  return submissions;
+}
+
+async function renderLibraryGallery(gradeFilter = "all") {
+  const gridContainer = document.getElementById("gallery-grid-list");
+  if (!gridContainer) return;
+
+  const contestId = (activeContest && activeContest.id) ? activeContest.id : "library";
+
+  gridContainer.innerHTML = `
+    <div style="grid-column: span 2; display: flex; flex-direction: column; align-items: center; padding: 40px; color: var(--text-secondary);">
+      <div class="spinner"></div>
+      <p style="margin-top: 12px; font-weight: bold;">모두가 제출한 작품을 불러오고 있습니다...</p>
+    </div>
+  `;
+
+  const submissions = await getLibrarySubmissions(gradeFilter, "newest", "");
+
+  gridContainer.innerHTML = "";
+
+  if (submissions.length === 0) {
+    gridContainer.innerHTML = `<div class="helper-text" style="text-align: center; grid-column: span 2; padding: 40px; color: var(--text-secondary);">아직 등록된 작품이 없습니다. 🥺<br>가장 먼저 멋진 작품을 제출해 보세요!</div>`;
+    return;
+  }
+
+  const likes = JSON.parse(localStorage.getItem(`soro_${contestId}_likes`) || "{}");
+  const likedByMe = JSON.parse(localStorage.getItem(`soro_${contestId}_liked_by_me`) || "[]");
+
+  submissions.forEach(entry => {
+    const likesCount = likes[entry.id] || 0;
+    const isLiked = likedByMe.includes(entry.id);
+    
+    // Dynamic image URL resolution
+    let imageUrl = "";
+    if (entry.data) {
+      if (entry.data.image) {
+        imageUrl = entry.data.image;
+      } else if (entry.data.images && entry.data.images.length > 0) {
+        imageUrl = entry.data.images[0];
+      }
+    }
+
+    // Convert Google Drive viewer link to direct image link if applicable
+    if (imageUrl && imageUrl.includes("drive.google.com")) {
+      imageUrl = getGoogleDriveDirectLink(imageUrl);
+    }
+
+    // [Premium UI 방어막] 이미지가 깨졌거나 비어있는 무효한 테스트 데이터는 렌더링 배제
+    if (!imageUrl || imageUrl.trim() === "" || imageUrl.includes("No Image") || imageUrl.includes("placehold.co")) {
+      return;
+    }
+
+    const card = document.createElement("div");
+    card.className = "gallery-card";
+    
+    // Mask name for privacy protection (e.g. 홍길동 -> 홍*동)
+    let maskedName = entry.studentName || "학생";
+    if (maskedName.length > 2) {
+      maskedName = maskedName[0] + "*".repeat(maskedName.length - 2) + maskedName[maskedName.length - 1];
+    } else if (maskedName.length === 2) {
+      maskedName = maskedName[0] + "*";
+    }
+
+    // Dynamic title resolution
+    let displayTitle = "";
+    if (contestId === "library") {
+      displayTitle = entry.data["book-title"] || "독서 엽서";
+    } else if (contestId === "cuttoon") {
+      displayTitle = entry.data["title"] || "안전사고 예방 컷툰";
+    } else {
+      displayTitle = entry.contestTitle || "제출작";
+    }
+
+    card.innerHTML = `
+      <div class="gallery-card-img-wrapper postcard-ratio loading" style="position: relative; cursor: pointer; overflow: hidden; border-radius: 8px;">
+        <img class="gallery-card-img" src="${imageUrl}" alt="${displayTitle}" loading="lazy" style="width: 100%; transition: transform 0.3s;" onload="this.parentElement.classList.remove('loading')" onerror="this.src='https://placehold.co/800x600/0c0c0e/ffffff?text=No+Image'; this.parentElement.classList.remove('loading')" onclick="openImageModal('${imageUrl}')">
+      </div>
+      <div class="gallery-card-info" style="display:flex; justify-content:space-between; align-items:center; padding: 10px 6px;">
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <span style="font-weight:700; font-size:0.75rem; color:var(--text-secondary);">${entry.studentGrade}학년 ${entry.studentClass}반</span>
+          <span style="font-weight:700; font-size:0.9rem; color:var(--text-primary);">${maskedName}</span>
+        </div>
+        <button class="gallery-card-like-btn${isLiked ? ' liked' : ''}" onclick="toggleLikePostcard('${entry.id}', this, false)" style="background:none; border:none; color:${isLiked ? '#ef4444' : 'var(--text-secondary)'}; cursor:pointer; display:flex; align-items:center; gap:4px; font-size:0.85rem; padding: 4px; font-weight:700; transition: color 0.2s;">
+          <span class="heart-icon">${isLiked ? '❤️' : '🤍'}</span>
+          <span class="like-count">${likesCount}</span>
+        </button>
+      </div>
+    `;
+    gridContainer.appendChild(card);
+  });
+}
+
+function toggleLikePostcard(id, btn, fromDID = false) {
+  const contestId = (activeContest && activeContest.id) ? activeContest.id : "library";
+  const likesKey = `soro_${contestId}_likes`;
+  const likedByMeKey = `soro_${contestId}_liked_by_me`;
+
+  const likes = JSON.parse(localStorage.getItem(likesKey) || "{}");
+  const likedByMe = JSON.parse(localStorage.getItem(likedByMeKey) || "[]");
+  
+  const countEl = btn.querySelector(".like-count");
+  const heartEl = btn.querySelector(".heart-icon");
+  if (!countEl || !heartEl) return;
+  
+  let currentCount = parseInt(countEl.textContent, 10) || 0;
+  const isCurrentlyLiked = likedByMe.includes(id);
+  
+  if (isCurrentlyLiked) {
+    // Unlike
+    likedByMe.splice(likedByMe.indexOf(id), 1);
+    currentCount = Math.max(0, currentCount - 1);
+    likes[id] = currentCount;
+    btn.classList.remove("liked");
+    btn.style.color = fromDID ? "" : "var(--text-secondary)";
+    heartEl.textContent = "🤍";
+  } else {
+    // Like
+    likedByMe.push(id);
+    currentCount += 1;
+    likes[id] = currentCount;
+    btn.classList.add("liked");
+    btn.style.color = "#ef4444";
+    heartEl.textContent = "❤️";
+    
+    // Trigger floating heart animations (premium UX!)
+    createFloatingHeart(btn);
+  }
+  
+  localStorage.setItem(likesKey, JSON.stringify(likes));
+  localStorage.setItem(likedByMeKey, JSON.stringify(likedByMe));
+  countEl.textContent = currentCount;
+
+  // Sync both views
+  if (fromDID) {
+    // Sync to drawer
+    const activeBadge = document.querySelector(".gallery-filter-badge.active");
+    const gradeFilter = activeBadge ? activeBadge.getAttribute("data-grade") : "all";
+    renderLibraryGallery(gradeFilter);
+    // If autoplay is not active, we might also want to update the grid view items inside DID
+    if (!isDidAutoplayActive) {
+      const didGrid = document.getElementById("did-grid-view");
+      if (didGrid) {
+        const cards = didGrid.querySelectorAll(".did-card");
+        cards.forEach(card => {
+          const img = card.querySelector(".did-card-img");
+          if (img && img.getAttribute("onclick").includes(id)) {
+            const likeBtn = card.querySelector(".did-card-like-btn");
+            if (likeBtn) {
+              likeBtn.querySelector(".like-count").textContent = currentCount;
+              if (isCurrentlyLiked) {
+                likeBtn.classList.remove("liked");
+                likeBtn.querySelector(".heart-icon").textContent = "🤍";
+              } else {
+                likeBtn.classList.add("liked");
+                likeBtn.querySelector(".heart-icon").textContent = "❤️";
+              }
+            }
+          }
+        });
+      }
+    }
+  } else {
+    // Sync to DID
+    const didModal = document.getElementById("did-exhibition-modal");
+    if (didModal && didModal.style.display !== "none") {
+      updateDIDExhibitionContent();
+    }
+  }
+}
+
+function createFloatingHeart(btn) {
+  const rect = btn.getBoundingClientRect();
+  const heart = document.createElement("div");
+  heart.innerHTML = "❤️";
+  heart.style.position = "fixed";
+  heart.style.left = `${rect.left + rect.width / 2}px`;
+  heart.style.top = `${rect.top}px`;
+  heart.style.fontSize = "1rem";
+  heart.style.pointerEvents = "none";
+  heart.style.zIndex = "100000";
+  heart.style.transition = "all 1s ease-out";
+  
+  document.body.appendChild(heart);
+  
+  // Trigger animation after append
+  requestAnimationFrame(() => {
+    const angle = (Math.random() - 0.5) * 60; // Random angle -30 to 30 deg
+    const destX = (Math.random() - 0.5) * 100;
+    const destY = -150 - Math.random() * 50;
+    
+    heart.style.transform = `translate(${destX}px, ${destY}px) scale(2.5) rotate(${angle}deg)`;
+    heart.style.opacity = "0";
+  });
+  
+  setTimeout(() => {
+    heart.remove();
+  }, 1000);
+}
+
+// DIGITAL DID EXHIBITION GLOBAL VARIABLES & CONTROLS
+let didAutoplayInterval = null;
+let didSubmissions = [];
+let didCurrentSlideIndex = 0;
+let isDidAutoplayActive = false;
+let didCurrentGradeFilter = "all";
+let didCurrentSortBy = "newest";
+let didCurrentSearchKeyword = "";
+
+function initDIDExhibition() {
+  const modal = document.getElementById("did-exhibition-modal");
+  if (!modal) return;
+
+  document.getElementById("did-close").addEventListener("click", closeDIDExhibition);
+  document.getElementById("did-exhibition-overlay").addEventListener("click", closeDIDExhibition);
+
+  // Grade filter badges click
+  document.querySelectorAll("#did-filter-bar .did-filter-badge").forEach(badge => {
+    badge.addEventListener("click", async (e) => {
+      document.querySelectorAll("#did-filter-bar .did-filter-badge").forEach(b => b.classList.remove("active"));
+      e.currentTarget.classList.add("active");
+      didCurrentGradeFilter = e.currentTarget.getAttribute("data-grade");
+      
+      resetDIDAutoplay();
+      didCurrentSlideIndex = 0;
+      await updateDIDExhibitionContent();
+    });
+  });
+
+  // Search input change
+  const searchInput = document.getElementById("did-search-input");
+  searchInput.addEventListener("input", debounce(async (e) => {
+    didCurrentSearchKeyword = e.target.value;
+    
+    resetDIDAutoplay();
+    didCurrentSlideIndex = 0;
+    await updateDIDExhibitionContent();
+  }, 300));
+
+  // Sort selector change
+  const sortSelect = document.getElementById("did-sort-select");
+  sortSelect.addEventListener("change", async (e) => {
+    didCurrentSortBy = e.target.value;
+    
+    resetDIDAutoplay();
+    didCurrentSlideIndex = 0;
+    await updateDIDExhibitionContent();
+  });
+
+  // Autoplay toggle button click
+  const autoplayBtn = document.getElementById("did-autoplay-btn");
+  autoplayBtn.addEventListener("click", () => {
+    toggleDIDAutoplay();
+  });
+
+  // Slide navigation arrows click
+  document.getElementById("did-prev-slide").addEventListener("click", () => {
+    navigateDIDSlide(-1);
+  });
+  document.getElementById("did-next-slide").addEventListener("click", () => {
+    navigateDIDSlide(1);
+  });
+}
+
+function debounce(func, delay) {
+  let timer;
+  return function(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+async function openDIDExhibition() {
+  const modal = document.getElementById("did-exhibition-modal");
+  if (!modal) return;
+
+  modal.style.display = "flex";
+  modal.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+
+  didCurrentGradeFilter = "all";
+  didCurrentSortBy = "newest";
+  didCurrentSearchKeyword = "";
+  didCurrentSlideIndex = 0;
+
+  document.querySelectorAll("#did-filter-bar .did-filter-badge").forEach(b => {
+    if (b.getAttribute("data-grade") === "all") b.classList.add("active");
+    else b.classList.remove("active");
+  });
+  document.getElementById("did-search-input").value = "";
+  document.getElementById("did-sort-select").value = "newest";
+
+  resetDIDAutoplay();
+  await updateDIDExhibitionContent();
+}
+
+function closeDIDExhibition() {
+  const modal = document.getElementById("did-exhibition-modal");
+  if (!modal) return;
+
+  modal.style.display = "none";
+  modal.setAttribute("aria-hidden", "true");
+  
+  const contestDrawer = document.getElementById("contest-drawer");
+  const isContestDrawerOpen = contestDrawer && contestDrawer.getAttribute("aria-hidden") === "false";
+  if (!isContestDrawerOpen) {
+    document.body.style.overflow = "";
+  }
+
+  resetDIDAutoplay();
+}
+
+async function updateDIDExhibitionContent() {
+  didSubmissions = await getLibrarySubmissions(didCurrentGradeFilter, didCurrentSortBy, didCurrentSearchKeyword);
+
+  const gridView = document.getElementById("did-grid-view");
+  const slideshowView = document.getElementById("did-slideshow-view");
+
+  if (isDidAutoplayActive) {
+    gridView.style.display = "none";
+    slideshowView.style.display = "flex";
+    renderDIDSlideshow();
+  } else {
+    gridView.style.display = "grid";
+    slideshowView.style.display = "none";
+    renderDIDGrid();
+  }
+}
+
+function renderDIDGrid() {
+  const gridView = document.getElementById("did-grid-view");
+  if (!gridView) return;
+
+  gridView.innerHTML = "";
+
+  if (didSubmissions.length === 0) {
+    gridView.innerHTML = `
+      <div style="grid-column: 1 / -1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 100px; color:rgba(255,255,255,0.4); width:100%;">
+        <span style="font-size:3rem; margin-bottom:16px;">🔍</span>
+        <p style="font-size:1.1rem; font-weight:bold;">검색 결과 또는 제출된 독서 엽서가 없습니다.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const contestId = (activeContest && activeContest.id) ? activeContest.id : "library";
+  const likedByMe = JSON.parse(localStorage.getItem(`soro_${contestId}_liked_by_me`) || "[]");
+  const likes = JSON.parse(localStorage.getItem(`soro_${contestId}_likes`) || "{}");
+
+  didSubmissions.forEach(entry => {
+    const likesCount = likes[entry.id] || 0;
+    const isLiked = likedByMe.includes(entry.id);
+    let imageUrl = entry.data && entry.data.image ? entry.data.image : "";
+
+    // Convert Google Drive viewer link to direct image link if applicable
+    if (imageUrl && imageUrl.includes("drive.google.com")) {
+      imageUrl = getGoogleDriveDirectLink(imageUrl);
+    }
+
+    // [Premium UI 방어막] 이미지가 깨졌거나 비어있는 무효한 테스트 데이터는 렌더링 배제
+    if (!imageUrl || imageUrl.trim() === "" || imageUrl.includes("No Image") || imageUrl.includes("placehold.co")) {
+      return;
+    }
+
+    let maskedName = entry.studentName || "학생";
+    if (maskedName.length > 2) {
+      maskedName = maskedName[0] + "*".repeat(maskedName.length - 2) + maskedName[maskedName.length - 1];
+    } else if (maskedName.length === 2) {
+      maskedName = maskedName[0] + "*";
+    }
+
+    const card = document.createElement("div");
+    card.className = "did-card";
+    card.innerHTML = `
+      <div class="did-card-img-wrapper loading">
+        <img class="did-card-img" src="${imageUrl}" alt="${entry.data["book-title"] || "독서 엽서"}" loading="lazy" onload="this.parentElement.classList.remove('loading')" onerror="this.src='https://placehold.co/800x600/0c0c0e/ffffff?text=No+Image'; this.parentElement.classList.remove('loading')" onclick="openImageModal('${imageUrl}')">
+      </div>
+      <div class="did-card-info" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 8px 4px 8px;">
+        <div class="did-card-meta" style="display: flex; flex-direction: column; gap: 2px;">
+          <span class="did-card-class" style="font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.5);">${entry.studentGrade}학년 ${entry.studentClass}반</span>
+          <span class="did-card-student" style="font-size: 0.9rem; font-weight: 700; color: #ffffff;">${maskedName}</span>
+        </div>
+        <div class="did-card-footer" style="margin-top: 0;">
+          <button class="did-card-like-btn${isLiked ? ' liked' : ''}" onclick="toggleLikePostcard('${entry.id}', this, true)" style="background:none; border:none; color:${isLiked ? '#ef4444' : 'rgba(255,255,255,0.4)'}; cursor:pointer; display:inline-flex; align-items:center; gap:6px; font-size:1.1rem; font-weight:700; transition: all 0.2s;">
+            <span class="heart-icon">${isLiked ? '❤️' : '🤍'}</span>
+            <span class="like-count">${likesCount}</span>
+          </button>
+        </div>
+      </div>
+    `;
+    gridView.appendChild(card);
+  });
+}
+
+function renderDIDSlideshow() {
+  const slideshowView = document.getElementById("did-slideshow-view");
+  if (!slideshowView) return;
+
+  slideshowView.innerHTML = "";
+
+  if (didSubmissions.length === 0) {
+    slideshowView.innerHTML = `
+      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:rgba(255,255,255,0.4); width:100%;">
+        <span style="font-size:3rem; margin-bottom:16px;">🔍</span>
+        <p style="font-size:1.1rem; font-weight:bold;">슬라이드쇼로 감상할 독서 엽서가 없습니다.</p>
+      </div>
+    `;
+    return;
+  }
+
+  // Ensure index is within range
+  if (didCurrentSlideIndex >= didSubmissions.length) {
+    didCurrentSlideIndex = 0;
+  } else if (didCurrentSlideIndex < 0) {
+    didCurrentSlideIndex = didSubmissions.length - 1;
+  }
+
+  const entry = didSubmissions[didCurrentSlideIndex];
+  const likedByMe = JSON.parse(localStorage.getItem("soro_postcard_liked_by_me") || "[]");
+  const likes = JSON.parse(localStorage.getItem("soro_postcard_likes") || "{}");
+  const likesCount = likes[entry.id] || 0;
+  const isLiked = likedByMe.includes(entry.id);
+  const imageUrl = entry.data && entry.data.image ? entry.data.image : "https://placehold.co/800x600/0c0c0e/ffffff?text=No+Image";
+
+  let maskedName = entry.studentName || "학생";
+  if (maskedName.length > 2) {
+    maskedName = maskedName[0] + "*".repeat(maskedName.length - 2) + maskedName[maskedName.length - 1];
+  } else if (maskedName.length === 2) {
+    maskedName = maskedName[0] + "*";
+  }
+
+  const slide = document.createElement("div");
+  slide.className = "did-slide active";
+  slide.innerHTML = `
+    <div class="did-slide-image-wrapper">
+      <img class="did-slide-image" src="${imageUrl}" alt="${entry.data["book-title"] || "독서 엽서"}" onclick="openImageModal('${imageUrl}')">
+    </div>
+    <div class="did-slide-info">
+      <div class="did-slide-meta">
+        <span class="did-slide-class">${entry.studentGrade}학년 ${entry.studentClass}반</span>
+        <span class="did-slide-student">${maskedName}</span>
+      </div>
+      <div class="did-slide-book">
+        <h2 class="did-slide-book-title">${entry.data["book-title"] || "도서명"}</h2>
+        <span class="did-slide-book-author">저자: ${entry.data["book-author"] || "저자"}</span>
+      </div>
+      <div class="did-slide-comment">“${entry.data["comment"] || "인상 깊은 구절"}”</div>
+      <div class="did-slide-footer">
+        <button class="did-slide-like-btn${isLiked ? ' liked' : ''}" onclick="toggleLikePostcard('${entry.id}', this, true)" style="background:none; border:none; color:${isLiked ? '#ef4444' : 'rgba(255,255,255,0.4)'}; cursor:pointer; display:inline-flex; align-items:center; gap:8px; font-size:1.3rem; font-weight:700; transition: all 0.2s;">
+          <span class="heart-icon">${isLiked ? '❤️' : '🤍'}</span>
+          <span class="like-count">${likesCount}</span>
+        </button>
+      </div>
+    </div>
+  `;
+  slideshowView.appendChild(slide);
+
+  // Setup autoplay if active
+  if (isDidAutoplayActive && !didAutoplayInterval) {
+    startDIDAutoplayInterval();
+  }
+}
+
+function navigateDIDSlide(direction) {
+  if (didSubmissions.length === 0) return;
+  
+  // Reset autoplay timer to prevent immediate jumping
+  resetDIDAutoplay();
+  
+  didCurrentSlideIndex += direction;
+  if (didCurrentSlideIndex >= didSubmissions.length) {
+    didCurrentSlideIndex = 0;
+  } else if (didCurrentSlideIndex < 0) {
+    didCurrentSlideIndex = didSubmissions.length - 1;
+  }
+  
+  renderDIDSlideshow();
+}
+
+function startDIDAutoplayInterval() {
+  if (didAutoplayInterval) clearInterval(didAutoplayInterval);
+  
+  didAutoplayInterval = setInterval(() => {
+    didCurrentSlideIndex++;
+    if (didCurrentSlideIndex >= didSubmissions.length) {
+      didCurrentSlideIndex = 0;
+    }
+    renderDIDSlideshow();
+  }, 4000); // 4 seconds transition
+}
+
+function toggleDIDAutoplay() {
+  const btn = document.getElementById("did-autoplay-btn");
+  if (!btn) return;
+
+  isDidAutoplayActive = !isDidAutoplayActive;
+
+  const iconEl = btn.querySelector(".autoplay-icon") || btn.querySelector(".btn-icon");
+  const textEl = btn.querySelector(".btn-text");
+
+  if (isDidAutoplayActive) {
+    btn.classList.add("active");
+    if (iconEl) iconEl.textContent = "⏸";
+    if (textEl) textEl.textContent = "자동 재생 중";
+    else btn.innerHTML = "⏸ 자동 재생 중";
+    
+    startDIDAutoplayInterval();
+    updateDIDExhibitionContent();
+  } else {
+    btn.classList.remove("active");
+    if (iconEl) iconEl.textContent = "▶";
+    if (textEl) textEl.textContent = "자동 슬라이드";
+    else btn.innerHTML = "▶ 자동 슬라이드";
+    
+    if (didAutoplayInterval) {
+      clearInterval(didAutoplayInterval);
+      didAutoplayInterval = null;
+    }
+    updateDIDExhibitionContent();
+  }
+}
+
+function resetDIDAutoplay() {
+  if (didAutoplayInterval) {
+    clearInterval(didAutoplayInterval);
+    didAutoplayInterval = null;
+  }
+  if (isDidAutoplayActive) {
+    startDIDAutoplayInterval();
+  }
+}
+
 function switchDrawerTab(tabName) {
   const tabGuide = document.getElementById("drawer-tab-guide");
   const tabCriteria = document.getElementById("drawer-tab-criteria");
@@ -1012,8 +1652,6 @@ function switchDrawerTab(tabName) {
     formContainer.style.display = "none";
     noticeContainer.style.display = "none";
     
-    renderGallery2025("all");
-    
     document.querySelectorAll(".gallery-filter-badge").forEach(badge => {
       if (badge.getAttribute("data-grade") === "all") {
         badge.classList.add("active");
@@ -1021,6 +1659,36 @@ function switchDrawerTab(tabName) {
         badge.classList.remove("active");
       }
     });
+
+    if (activeContest && activeContest.id !== "keyring") {
+      galleryContainer.querySelector(".gallery-title").textContent = `${activeContest.title} 제출작 갤러리 🏆`;
+      galleryContainer.querySelector(".gallery-desc").textContent = `친구들이 작성한 감성 가득한 ${activeContest.title} 리스트입니다. 좋아요(❤️)를 눌러 응원해 주세요!`;
+      
+      let didBtn = document.getElementById("drawer-did-open-btn");
+      if (activeContest.id === "library") {
+        if (!didBtn) {
+          didBtn = document.createElement("button");
+          didBtn.type = "button";
+          didBtn.id = "drawer-did-open-btn";
+          didBtn.className = "btn-did-open";
+          didBtn.innerHTML = "🖥️ 전체 화면 전자 화랑(DID) 입장";
+          didBtn.onclick = () => openDIDExhibition();
+          galleryContainer.insertBefore(didBtn, galleryContainer.querySelector(".gallery-filter-bar"));
+        } else {
+          didBtn.style.display = "inline-flex";
+        }
+      } else {
+        if (didBtn) didBtn.style.display = "none";
+      }
+      renderLibraryGallery("all");
+    } else {
+      galleryContainer.querySelector(".gallery-title").textContent = "2025년도 출품작 갤러리";
+      galleryContainer.querySelector(".gallery-desc").textContent = "작년에 선배들이 실제로 그린 소중한 키링 공모작들입니다. 아래 학년 필터를 통해 자유롭게 감상해 보세요.";
+      
+      const didBtn = document.getElementById("drawer-did-open-btn");
+      if (didBtn) didBtn.style.display = "none";
+      renderGallery2025("all");
+    }
   } else if (tabName === "examples") {
     if (tabExamples) tabExamples.classList.add("active");
     
@@ -1114,15 +1782,14 @@ function openContestDetails(contestId) {
     noticeText.innerHTML = `🔒 <strong>이 대회의 접수가 종료되었습니다.</strong><br>${contest.period || `2026년 ${contest.month}월 한 달 간`} 진행되었던 작품 접수가 완료되었습니다.`;
   }
 
-
-
-  // Show 3rd tab only for keyring contest
+  // Show 3rd tab for all contests
   const tabGallery = document.getElementById("drawer-tab-gallery");
   if (tabGallery) {
+    tabGallery.style.display = "flex";
     if (contest.id === "keyring") {
-      tabGallery.style.display = "flex";
+      tabGallery.textContent = "2025 출품작 🏆";
     } else {
-      tabGallery.style.display = "none";
+      tabGallery.textContent = "제출작 갤러리 🏆";
     }
   }
 
@@ -2095,15 +2762,10 @@ async function generateAICalligraphyCard() {
   const title = titleInput.value.trim();
   const author = authorInput.value.trim();
 
-  // Local background image paths to completely avoid cross-origin CORS blocks
-  const localImageMap = {
-    sky: "asset/backgrounds/sky.jpg",
-    forest: "asset/backgrounds/forest.jpg",
-    ocean: "asset/backgrounds/ocean.jpg",
-    room: "asset/backgrounds/room.jpg",
-    paper: "asset/backgrounds/paper.jpg"
-  };
-  const selectedImageUrl = localImageMap[selectedThemeKey] || localImageMap.sky;
+  // Select a beautiful random image from the pre-bundled 100 background assets!
+  const themeImages = CALLIGRAPHY_THEMES_IMAGES[selectedThemeKey] || CALLIGRAPHY_THEMES_IMAGES.sky;
+  const randomIndex = Math.floor(Math.random() * themeImages.length);
+  const selectedImageUrl = themeImages[randomIndex];
 
   const img = new Image();
   img.crossOrigin = "anonymous"; // Enable canvas to export without security sandbox violations
@@ -2112,7 +2774,21 @@ async function generateAICalligraphyCard() {
     try {
       // Ensure the selected font is fully loaded in the browser before drawing to Canvas
       try {
+        console.log(`Loading webfont: ${selectedFont}...`);
         await document.fonts.load(`44px ${selectedFont}`);
+        await document.fonts.ready;
+        
+        // Polling check: wait up to 1000ms until document.fonts.check returns true for this font
+        let attempts = 0;
+        while (!document.fonts.check(`44px ${selectedFont}`) && attempts < 10) {
+          console.log(`Webfont ${selectedFont} is still downloading, waiting 100ms... (attempt ${attempts + 1}/10)`);
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+        
+        // Final fallback micro-delay to let the font engine register it in canvas context
+        await new Promise(resolve => setTimeout(resolve, 150));
+        console.log(`Webfont ${selectedFont} is ready to render!`);
       } catch (fontErr) {
         console.warn("Font loading failed, falling back to system font:", fontErr);
       }
@@ -2190,9 +2866,8 @@ async function generateAICalligraphyCard() {
     drawFallbackCanvas(selectedThemeKey);
   };
 
-  // Add random query param to bypass potential browser cache which strips CORS headers
-  const finalImageUrl = selectedImageUrl + (selectedImageUrl.includes("?") ? "&" : "?") + "cors_bypass=" + Date.now();
-  img.src = finalImageUrl;
+  // Selected images are local assets, so CORS is never an issue and no bypass query param is needed
+  img.src = selectedImageUrl;
 
   // 2차 폴백: 로딩 실패 시 감성 그라디언트 엽서로 대체 작성
   function drawFallbackCanvas(theme) {
@@ -3427,13 +4102,17 @@ function setupEventListeners() {
   document.getElementById("drawer-tab-criteria").addEventListener("click", () => switchDrawerTab("criteria"));
   document.getElementById("drawer-tab-gallery").addEventListener("click", () => switchDrawerTab("gallery"));
 
-  // 2025 Gallery Filter Badges Event Listeners
+  // Gallery Filter Badges Event Listeners (Context-aware for keyring vs generic/other contests)
   document.querySelectorAll(".gallery-filter-badge").forEach(badge => {
     badge.addEventListener("click", (e) => {
       document.querySelectorAll(".gallery-filter-badge").forEach(b => b.classList.remove("active"));
       e.currentTarget.classList.add("active");
       const grade = e.currentTarget.getAttribute("data-grade");
-      renderGallery2025(grade);
+      if (activeContest && activeContest.id !== "keyring") {
+        renderLibraryGallery(grade);
+      } else {
+        renderGallery2025(grade);
+      }
     });
   });
 
@@ -3500,6 +4179,8 @@ function setupEventListeners() {
       executeSubmit();
     }
   });
+
+  initDIDExhibition();
 }
 
 // ====================================================
@@ -3740,6 +4421,12 @@ async function executeSubmit() {
       }
 
       showToast(`${activeContest.title} 대회의 작품 접수가 성공적으로 클라우드에 기록되었습니다! 🎨`, "success");
+      // Save locally as well for offline/instant caching
+      const allSubmissions = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
+      if (!allSubmissions.some(s => s.id === newEntry.id)) {
+        allSubmissions.push(newEntry);
+        localStorage.setItem("soro_submissions", JSON.stringify(allSubmissions));
+      }
       closeContestDrawer();
       updateLiveCounters();
       return;
@@ -4290,6 +4977,37 @@ function doPost(e) {
       } else {
         response = { status: "error", message: "삭제 대상을 찾을 수 없음" };
       }
+    }
+    
+    // 6. 전체 작품 조회 액션 (Submissions 시트 - 갤러리 로딩용)
+    else if (requestData.action === "getAllSubmissions") {
+      var sheet = ss.getSheetByName("Submissions");
+      var results = [];
+      var filterContestId = requestData.contestId;
+      
+      if (sheet) {
+        var data = sheet.getDataRange().getValues();
+        for (var i = 1; i < data.length; i++) {
+          if (data[i][1] === filterContestId) {
+            results.push({
+              id: data[i][0],
+              contestId: data[i][1],
+              contestTitle: data[i][2],
+              studentUsername: data[i][3],
+              studentName: data[i][4],
+              studentGrade: data[i][5],
+              studentClass: data[i][6],
+              studentNumber: data[i][7],
+              timestamp: data[i][8],
+              data: (function() {
+                try { return JSON.parse(data[i][9]); }
+                catch(e) { return { image: data[i][9] }; }
+              })()
+            });
+          }
+        }
+      }
+      response = { status: "success", data: results };
     }
     
   } catch (error) {
