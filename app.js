@@ -979,6 +979,14 @@ async function getLibrarySubmissions(gradeFilter = "all", sortBy = "newest", sea
       const result = await response.json();
       if (result.status === "success" && Array.isArray(result.data)) {
         submissions = result.data;
+        // Clean up localStorage: remove any local submissions for this contestId that are NOT in the remote data
+        const remoteIds = new Set(submissions.map(s => s.id));
+        const allSubmissions = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
+        const cleanedSubmissions = allSubmissions.filter(entry => {
+          if (entry.contestId !== contestId) return true;
+          return remoteIds.has(entry.id);
+        });
+        localStorage.setItem("soro_submissions", JSON.stringify(cleanedSubmissions));
       }
     } catch (e) {
       console.warn(`Failed to fetch ${contestId} submissions remotely, using local backup:`, e);
@@ -4472,6 +4480,15 @@ async function executeLoggedInLookup() {
       const result = await response.json();
       if (result.status === "success") {
         mySubmissions = result.data;
+        // Clean up localStorage for this student: if a non-draft submission is not in the remote list, remove it
+        const remoteIds = new Set(mySubmissions.map(s => s.id));
+        const allSubmissions = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
+        const cleanedSubmissions = allSubmissions.filter(entry => {
+          if (entry.studentUsername.toLowerCase() !== currentUser.userKey.toLowerCase()) return true;
+          if (entry.contestId === "pixelart_draft") return true;
+          return remoteIds.has(entry.id);
+        });
+        localStorage.setItem("soro_submissions", JSON.stringify(cleanedSubmissions));
       }
     } catch (e) {
       console.error(e);
