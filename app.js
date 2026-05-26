@@ -87,24 +87,21 @@ const CONTESTS_DATA = [
     monthText: "9월",
     activeMonths: [8, 9],
     period: "2026. 8. 10.(목) ~ 2026. 9. 30.(수)",
-    summary: "독서의 달을 맞이하여 내 인생의 책을 소개하고 감동을 나누어 주세요.",
-    description: "9월 독서의 달을 기념하여 다른 친구들에게 꼭 추천하고 싶은 책이나 나의 인생에 깊은 영감을 준 도서를 한 편 골라 멋진 한 줄 평과 독서 리뷰를 남기는 비대면 도서 박람회 대회입니다.",
+    summary: "도서관 책 속 깊은 울림을 준 글귀를 타이핑하여 나만의 AI 캘리그라피 엽서로 만들어보세요.",
+    description: "독서의 달 9월을 맞이하여, 자신이 감명 깊게 읽은 책 속의 한 줄이나 추천 글귀를 붓글씨 캘리그라피와 인공지능이 생성한 감성 배경을 결합한 엽서 카드 형태로 창작해 제출하는 디지털 문학 공모전입니다.",
     rules: [
-      "참가 대상: 3~6학년 학생 누구나",
-      "제출 내용: 추천 책 제목, 저자, 그리고 150자 이내의 마음을 울리는 한 줄 평 및 추천 사유",
-      "혜택: 선정된 추천평은 도서관 전시 공간 및 웹 사이트 메인에 배너 형태로 게재됩니다.",
-      "특별 혜택: 학급 인원의 2/3 이상이 참여하였을 경우 학급 전체에 소정의 기념품을 지급합니다."
+      "참가 대상: 본교 3~6학년 학생 누구나",
+      "공모 주제: 책에서 얻은 감동, 위로를 주는 도서 문장, 친구에게 추천하고 싶은 멋진 책 구절",
+      "제출 규격: 생성기에서 실시간으로 생성한 AI 캘리그라피 엽서 이미지",
+      "제출 방법: 도서명/저자/글귀 입력 후 'AI 엽서 생성'을 실행하여 완성된 이미지로 제출",
+      "혜택: 멋진 작품들은 학교 복도 로비 전자 화랑(DID) 및 도서관 입구 대형 스크린에 가을 테마 엽서로 기획 전시됩니다."
     ],
-    submissionType: "text_fields",
-    textFields: [
-      { id: "book-title", label: "추천 도서 제목", placeholder: "예) 어린 왕자", type: "text" },
-      { id: "book-author", label: "도서 저자 (작가)", placeholder: "예) 생텍쥐페리", type: "text" },
-      { id: "book-review", label: "한 줄 평 & 추천 사유 (150자 이내)", placeholder: "이 책이 나에게 어떤 감동을 주었는지 적어주세요...", type: "textarea" }
-    ],
+    submissionType: "calligraphy",
     icon: `<svg class="card-visual-svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M4 12V52c0 2 2 4 4 4h48V8H8c-2 0-4 2-4 4z" />
       <path d="M8 8v44c0 2 2 4 4 4" />
-      <path d="M18 20h28M18 30h28M18 40h18" />
+      <path d="M38 18h12M38 28h12M18 18h12M18 28h12M18 38h32" />
+      <path d="M42 46l12-12-4-4-12 12v4h4z" fill="currentColor" fill-opacity="0.15" />
     </svg>`
   },
   {
@@ -158,30 +155,143 @@ const CONTESTS_DATA = [
     </svg>`
   },
   {
-    id: "friendship",
-    title: "우정사진",
+    id: "sound_album",
+    title: "소로 사운드 앨범",
     month: 12,
     monthText: "12월",
-    summary: "한 해를 마무리하며, 가장 소중한 친구들과의 잊지 못할 추억을 카메라에 담아보세요.",
-    description: "친구들과 함께한 소소한 일상, 신나는 특별한 모험, 따뜻한 연말 감성이 가득한 우정 사진을 제출합니다. 사진 속에 담긴 따뜻하고 장난기 어린 소중한 스토리도 함께 나누어 주세요.",
+    summary: "디지털 음악 도구로 우리들의 소중한 학교생활 추억과 감정을 노래에 담아 공유해 보세요.",
+    description: "디지털 음악 제작 도구(Chrome Music Lab, GarageBand, BandLab, 멜로디 카드 등)를 활용하여 2026년 학교생활, 친구와의 추억, 다채움 활용 수업, 한글날 활동 등 한 해 동안의 배움과 기억을 음악으로 자유롭게 표현해 제출합니다.",
     rules: [
-      "참가 대상: 3~6학년 동급생 혹은 선후배 등 2인 이상이 함께 촬영한 사진",
-      "제출물: 인화 가능한 수준의 선명한 단체/우정 사진 파일 및 사진 소개글",
-      "혜택: 선정작들은 12월 말 학교 복도 갤러리에 폴라로이드 감성 스타일로 대대적으로 인화/전시됩니다.",
-      "특별 혜택: 학급 인원의 2/3 이상이 참여하였을 경우 학급 전체에 소정의 기념품을 지급합니다."
+      "참가 대상: 본교 3~6학년 재학생 누구나 (개인 참여)",
+      "공모 주제: 2026년 학교생활, 친구와의 추억, 다채움 활용 수업, 한글날 활동 등 한 해를 돌아볼 수 있는 주제",
+      "제출 규격: 디지털 음악 도구로 제작한 음악 파일 (MP3, WAV, M4A 형식, 최대 10MB)",
+      "제출 내용: 음악 파일 및 곡 소개글 (장면, 분위기, 감정, 가사 등 200자 이내)",
+      "활용 계획: 제출 작품은 온라인 사운드 앨범 형태로 공유하여 음악 감상 및 학교생활 회고에 활용되며, 우수작은 연말 성과 공유 자료 및 영상 배경음악 등으로 사용됩니다."
     ],
-    submissionType: "image",
-    inputLabel: "친구들과 함께 찍은 소중한 사진 파일",
-    placeholder: "JPEG, PNG 원본 사진 파일 (최대 8MB)",
+    submissionType: "audio",
+    inputLabel: "디지털 기기로 직접 제작한 음악 파일 업로드",
+    placeholder: "MP3, WAV, M4A 형식의 음악 파일 (최대 10MB)",
     icon: `<svg class="card-visual-svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="10" y="8" width="44" height="48" rx="4" />
-      <rect x="14" y="12" width="36" height="32" />
-      <circle cx="32" cy="26" r="5" fill="currentColor" fill-opacity="0.15" />
-      <path d="M14 40l10-10 8 8 6-6 12 12" />
-      <circle cx="32" cy="50" r="2" fill="currentColor" />
+      <path d="M18 48V14l30-6v34" />
+      <circle cx="12" cy="48" r="6" fill="currentColor" fill-opacity="0.15" />
+      <circle cx="42" cy="42" r="6" fill="currentColor" fill-opacity="0.15" />
+      <path d="M18 26l30-6" />
     </svg>`
   }
 ];
+
+const CALLIGRAPHY_THEMES_IMAGES = {
+  sky: [
+    "https://images.unsplash.com/photo-1506318137071-a8e063b4bec0?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1502134249126-9f3755a50d78?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1537498424275-c27702672948?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1436891620584-376571ef2f40?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1475274047050-1d0c0975c63e?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1532974297617-c0f05fe4c415?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1543722530-d2c3201371e7?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1504333631150-c8ab2fe93b05?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1528722828814-77b9b83aafb2?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1464802686167-b939a6910659?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1505506819548-f9b5c35b801a?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1484503786284-5f50af9ccddf?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1435224668246-86a2d53efd31?auto=format&fit=crop&w=800&q=80"
+  ],
+  forest: [
+    "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1463740839922-2d3b7e426a56?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1425913397330-cf8af2ff40a1?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1500627869374-13cd993b1115?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1470115636472-72479574400c?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1418065460487-3e41a6c84dc5?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1505245208761-ba872912fac0?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1472214222541-d510753a8707?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1501183007986-d0d080b147f9?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1500485035595-cbe6f645feb1?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80"
+  ],
+  ocean: [
+    "https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1473116763269-255ea7b2b5f1?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1545490387-c379b7c154ee?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1439066615861-d1af74d74000?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1501426026826-31c667bdf23d?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1520116468816-90b61400c357?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1515260268569-9271009adfdb?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1496034563008-7207c424de41?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1538964173425-93884d739596?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1468413253725-0d5181026218?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1506953823976-52e1fdc0149a?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1510414842594-fc614bad157c?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1509043759401-164b1d1791b3?auto=format&fit=crop&w=800&q=80"
+  ],
+  room: [
+    "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1544207240-8b1025eb7a6c?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1565538810844-1e119ba18520?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1541123437800-1bb1317badc2?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1505693395321-883724634266?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1532372320978-9b4d8a32cb24?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=800&q=80"
+  ],
+  paper: [
+    "https://images.unsplash.com/photo-1604076913837-52ab5629fba9?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1531685222403-f928502d2b30?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1587080266227-677cd237c267?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1529400971008-f566de0e6dfc?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1533158326339-7f3cf2404354?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1516550893923-42d28e5677af?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1508898578281-774ac4893c0c?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1595475241949-c2901c69ac81?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1582201942988-13e60e4556ee?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1557672172-298e090bd0f1?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=800&q=80"
+  ]
+};
 
 // ====================================================
 // STATIC GALLERY DATA (2025 KEYRING SUBMISSIONS)
@@ -305,14 +415,22 @@ const GALLERY_2025_DATA = RAW_2025_KEYRING_DATA.trim().split("\n").map(line => {
 // ====================================================
 // STATE MANAGEMENT & USER SESSION CONFIGURATION
 // ====================================================
-let currentVirtualMonth = 6;
-const FORCE_ACTIVE_CONTESTS = [];
+let currentVirtualMonth = 9;
+const FORCE_ACTIVE_CONTESTS = ["keyring", "library"];
 
 function getContestStatus(contestOrMonth) {
-  const contestMonth = typeof contestOrMonth === "object" ? contestOrMonth.month : contestOrMonth;
-  const contestId = typeof contestOrMonth === "object" ? contestOrMonth.id : null;
+  // If contestOrMonth is an object, extract month and id
+  const contestMonth = typeof contestOrMonth === "object" ? contestOrMonth.month : (typeof contestOrMonth === "number" ? contestOrMonth : null);
+  const contestId = typeof contestOrMonth === "object" ? contestOrMonth.id : (typeof contestOrMonth === "string" ? contestOrMonth : null);
 
-  if (contestId && FORCE_ACTIVE_CONTESTS.includes(contestId)) {
+  // 6월 키링, 9월 도서관(AI 캘리그라피), 12월 사운드 앨범 상시 강제 활성화
+  if (contestId && ["keyring", "library", "sound_album"].includes(contestId)) {
+    return "active";
+  }
+  if (contestOrMonth && ["keyring", "library", "sound_album"].includes(contestOrMonth)) {
+    return "active";
+  }
+  if (contestMonth === 6 || contestMonth === 9 || contestMonth === 12) {
     return "active";
   }
 
@@ -475,8 +593,8 @@ function updateThemeIcon(theme) {
 // PRODUCTION TIME CONFIGURATION (JUNE ONLY)
 // ====================================================
 function initVirtualTime() {
-  // 실제 프로덕션 환경의 진행 월을 6월로 고정합니다.
-  currentVirtualMonth = 6;
+  // 실제 프로덕션 환경의 진행 월을 9월로 고정합니다.
+  currentVirtualMonth = 9;
   sessionStorage.removeItem("soro_virtual_month"); // 가상 오버라이드 제거
 
   const statMonthEl = document.getElementById("stat-current-month");
@@ -1221,6 +1339,29 @@ async function checkAndRenderSubmissionArea(contest) {
           </div>
         </div>
       `;
+    } else if (entryData.audio) {
+      contentHtml += `
+        <div class="submitted-media-preview-container audio-submission-preview" style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <div class="submitted-media-preview" style="border: 1px solid var(--border-color); padding: 12px; background: var(--bg-tertiary); display: flex; flex-direction: column; align-items: center; gap: 10px;">
+            <div style="font-size: 1.5rem;">🎵</div>
+            <audio src="${entryData.audio}" controls style="width: 100%; max-width: 320px;"></audio>
+            ${entryData.description ? `
+              <div style="margin-top: 8px; font-size: 0.85rem; color: var(--text-secondary); width: 100%; text-align: left; background: var(--bg-primary); padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+                <strong>곡 소개 및 제작 의도:</strong>
+                <p style="margin: 4px 0 0 0; white-space: pre-wrap; color: var(--text-primary); line-height: 1.4;">${entryData.description}</p>
+              </div>
+            ` : ''}
+          </div>
+          <div style="text-align: center;">
+            <a href="${entryData.audio}" download="소로사운드앨범_${currentUser ? currentUser.name : '학생'}.mp3" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.75rem; font-weight: 700; padding: 6px 14px; border-radius: 8px; background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); text-decoration: none; cursor: pointer; transition: all var(--transition-fast);">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
+              </svg>
+              곡 파일 다운로드
+            </a>
+          </div>
+        </div>
+      `;
     } else if (entryData["book-title"]) {
       contentHtml += `
         <div class="submitted-text-preview">
@@ -1315,6 +1456,7 @@ function getGradientForContest(id) {
     library: "linear-gradient(135deg, #10b981 0%, #3b82f6 100%)",
     transcription: "linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)",
     pixelart: "linear-gradient(135deg, #ec4899 0%, #f43f5e 100%)",
+    sound_album: "linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)",
     friendship: "linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)"
   };
   return gradients[id] || "linear-gradient(135deg, #374151 0%, #111827 100%)";
@@ -1564,6 +1706,89 @@ function setupDynamicFormFields(contest) {
     setupFileUploader();
   }
 
+  else if (contest.submissionType === "audio") {
+    container.innerHTML = `
+      <label>${contest.inputLabel}</label>
+      <div id="file-dropzone" class="file-dropzone">
+        <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 18V5l12-2v13"></path>
+          <circle cx="6" cy="18" r="3"></circle>
+          <circle cx="18" cy="16" r="3"></circle>
+        </svg>
+        <div class="dropzone-text">
+          음악 파일을 이곳에 끌어다 놓거나 <span>기기에서 탐색</span>
+        </div>
+        <div class="helper-text">${contest.placeholder}</div>
+        <input type="file" id="submission-file" accept="audio/*, .mp3, .wav, .m4a" style="display: none;" required>
+      </div>
+      <div id="upload-preview-wrapper" style="display: none;"></div>
+      <span class="error-message">응모할 음악 파일을 꼭 업로드해 주세요.</span>
+
+      <div class="form-group" style="margin-top: 16px;">
+        <label for="sub-audio-description">🎵 곡 소개 및 제작 의도 (가사 등)</label>
+        <textarea id="sub-audio-description" required placeholder="이 곡에 담긴 학교생활의 추억, 감정, 가사 또는 사용한 음악 도구 등을 자유롭게 적어주세요. (최대 200자)" maxlength="200" style="width: 100%; min-height: 80px;"></textarea>
+        <span class="error-message">곡 소개를 입력해 주세요.</span>
+      </div>
+    `;
+    setupAudioUploader();
+  }
+
+  else if (contest.submissionType === "calligraphy") {
+    container.innerHTML = `
+      <div class="form-group" style="margin-bottom: 12px;">
+        <label for="sub-calli-title">📖 도서 제목</label>
+        <input type="text" id="sub-calli-title" required placeholder="예) 어린 왕자">
+        <span class="error-message">도서 제목을 정확히 입력해 주세요.</span>
+      </div>
+      <div class="form-group" style="margin-bottom: 12px;">
+        <label for="sub-calli-author">✍️ 도서 저자 (작가)</label>
+        <input type="text" id="sub-calli-author" required placeholder="예) 생텍쥐페리">
+        <span class="error-message">저자명을 정확히 입력해 주세요.</span>
+      </div>
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label for="sub-calli-text">📝 감명 깊은 한 줄 글귀 (최대 60자)</label>
+        <textarea id="sub-calli-text" required placeholder="가장 마음을 울렸던 문장을 적어주세요. 엽서에 캘리그라피로 들어갑니다..." maxlength="60" style="width: 100%; min-height: 60px;"></textarea>
+        <span class="error-message">글귀를 입력해 주세요.</span>
+      </div>
+      
+      <div class="form-group" style="margin-bottom: 12px;">
+        <label for="sub-calli-theme">🌌 배경화면 AI 이미지 테마 선택</label>
+        <select id="sub-calli-theme" style="width:100%; padding:10px; background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border-color); border-radius:8px; font-weight:bold;">
+          <option value="sky">🌌 깊고 푸른 밤하늘 & 우주 은하수 (20종 랜덤)</option>
+          <option value="forest">🌿 평화로운 초록 숲속 & 나뭇잎 사이 햇살 (20종 랜덤)</option>
+          <option value="ocean">🌅 노을빛 바다 & 부드러운 황금 파도 (20종 랜덤)</option>
+          <option value="room">🕯️ 따뜻하고 아늑한 방 안 & 은은한 촛불 (20종 랜덤)</option>
+          <option value="paper">📜 빈티지 양장 종이 질감 & 클래식 스크롤 (20종 랜덤)</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label for="sub-calli-font">✒️ 캘리그라피 서체 선택</label>
+        <select id="sub-calli-font" style="width:100%; padding:10px; background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border-color); border-radius:8px; font-weight:bold;">
+          <option value="'East Sea Dokdo', sans-serif">✒️ 독도체 (개성 있는 붓글씨)</option>
+          <option value="'Nanum Brush Script', cursive">✒️ 나눔붓체 (정갈한 손글씨)</option>
+          <option value="'Nanum Pen Script', cursive">✒️ 나눔펜체 (귀엽고 깔끔한 필체)</option>
+          <option value="'Gamja Flower', cursive">✒️ 감자꽃체 (동화적이고 따뜻한 서체)</option>
+          <option value="'Yeon Sung', cursive">✒️ 연성체 (고전적인 멋을 내는 서체)</option>
+        </select>
+      </div>
+
+      <button type="button" id="btn-generate-calli" class="btn btn-secondary btn-block" style="background: var(--accent-gradient, linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)); color: white; font-weight: bold; padding: 12px; margin-bottom: 16px; border:none; transition:transform 0.2s;">🎨 AI 캘리그라피 엽서 생성</button>
+      
+      <!-- Preview and loading area -->
+      <div id="calli-preview-wrapper" style="display: none; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; background: var(--bg-tertiary); text-align: center; margin-bottom: 16px;">
+        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom: 8px;">🖼️ 완성된 AI 캘리그라피 엽서</p>
+        <div id="calli-image-container" style="display:flex; justify-content:center; overflow:hidden; border-radius:8px; border:1px solid var(--border-color); position:relative; min-height: 200px; background: var(--bg-primary);">
+          <!-- Generated postcard image will go here -->
+        </div>
+      </div>
+      
+      <span class="error-message" id="calli-validation-error" style="display:none; text-align:center; margin-top:8px; color: var(--error-color);">엽서 생성을 위해 먼저 'AI 캘리그라피 엽서 생성' 버튼을 실행해 주세요.</span>
+    `;
+
+    document.getElementById("btn-generate-calli").addEventListener("click", generateAICalligraphyCard);
+  }
+
   else if (contest.submissionType === "text_fields") {
     let html = "";
     contest.textFields.forEach(field => {
@@ -1727,6 +1952,324 @@ function setupFileUploader() {
         dropzone.style.display = "flex";
       });
     };
+  }
+}
+
+function setupAudioUploader() {
+  const dropzone = document.getElementById("file-dropzone");
+  const fileInput = document.getElementById("submission-file");
+  const previewWrapper = document.getElementById("upload-preview-wrapper");
+
+  if (!dropzone || !fileInput) return;
+
+  dropzone.addEventListener("click", () => fileInput.click());
+
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropzone.addEventListener(eventName, preventDefaults, false);
+  });
+
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropzone.addEventListener(eventName, () => dropzone.classList.add('dragover'), false);
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropzone.addEventListener(eventName, () => dropzone.classList.remove('dragover'), false);
+  });
+
+  dropzone.addEventListener('drop', (e) => {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    if (files.length) {
+      fileInput.files = files;
+      handleFileSelected(files[0]);
+    }
+  });
+
+  fileInput.addEventListener('change', (e) => {
+    if (fileInput.files.length) {
+      handleFileSelected(fileInput.files[0]);
+    }
+  });
+
+  function handleFileSelected(file) {
+    const isAudio = file.type.startsWith('audio/') || 
+                    file.name.endsWith('.mp3') || 
+                    file.name.endsWith('.wav') || 
+                    file.name.endsWith('.m4a');
+    if (!isAudio) {
+      showToast("오디오 형식의 파일(.mp3, .wav, .m4a 등)만 업로드할 수 있습니다.", "error");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      showToast("음악 파일 크기는 최대 10MB를 초과할 수 없습니다.", "error");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      uploadBase64Data = reader.result;
+
+      previewWrapper.innerHTML = `
+        <div class="preview-container audio-preview-container" style="border: 1px solid var(--border-color); padding: 12px; background: var(--bg-tertiary); display: flex; flex-direction: column; align-items: center; gap: 10px; position: relative;">
+          <div style="font-weight: bold; font-size: 0.85rem; color: var(--text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width: 85%; text-align: center;">
+            🎵 ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)
+          </div>
+          <audio src="${uploadBase64Data}" controls style="width: 100%; max-width: 320px;"></audio>
+          <button type="button" class="remove-preview-btn" aria-label="삭제" style="position: absolute; right: 10px; top: 10px; background: none; border: none; font-size: 20px; color: var(--text-secondary); cursor: pointer;">&times;</button>
+        </div>
+      `;
+      previewWrapper.style.display = "block";
+      dropzone.style.display = "none";
+
+      previewWrapper.querySelector(".remove-preview-btn").addEventListener("click", () => {
+        uploadBase64Data = null;
+        fileInput.value = "";
+        previewWrapper.innerHTML = "";
+        previewWrapper.style.display = "none";
+        dropzone.style.display = "flex";
+      });
+    };
+  }
+}
+
+async function generateAICalligraphyCard() {
+  const titleInput = document.getElementById("sub-calli-title");
+  const authorInput = document.getElementById("sub-calli-author");
+  const textInput = document.getElementById("sub-calli-text");
+  const themeSelect = document.getElementById("sub-calli-theme");
+  const fontSelect = document.getElementById("sub-calli-font");
+  const previewWrapper = document.getElementById("calli-preview-wrapper");
+  const imageContainer = document.getElementById("calli-image-container");
+  const validationError = document.getElementById("calli-validation-error");
+
+  if (!titleInput || !authorInput || !textInput || !themeSelect || !fontSelect) return;
+
+  // Reset errors
+  document.querySelectorAll("#submission-form .form-group").forEach(g => g.classList.remove("has-error"));
+  if (validationError) validationError.style.display = "none";
+
+  let hasError = false;
+  if (!titleInput.value.trim()) {
+    titleInput.parentElement.classList.add("has-error");
+    hasError = true;
+  }
+  if (!authorInput.value.trim()) {
+    authorInput.parentElement.classList.add("has-error");
+    hasError = true;
+  }
+  if (!textInput.value.trim()) {
+    textInput.parentElement.classList.add("has-error");
+    hasError = true;
+  }
+
+  if (hasError) {
+    showToast("필수 입력 항목을 작성해 주세요.", "error");
+    return;
+  }
+
+  // Show loading indicator
+  previewWrapper.style.display = "block";
+  imageContainer.innerHTML = `
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 40px; color: var(--text-secondary); width:100%;">
+      <div class="spinner"></div>
+      <p style="margin-top: 12px; font-weight:bold; color:var(--text-primary);">선택한 테마의 프리미엄 AI 이미지를 로딩하고 있습니다...</p>
+    </div>
+  `;
+
+  const userText = textInput.value.trim();
+  const selectedThemeKey = themeSelect.value; // "sky", "forest", "ocean", "room", "paper"
+  const selectedFont = fontSelect.value;
+  const title = titleInput.value.trim();
+  const author = authorInput.value.trim();
+
+  // Get a random pre-generated AI background image from our 100-image dataset (20 images per theme)
+  const themeImages = CALLIGRAPHY_THEMES_IMAGES[selectedThemeKey];
+  const randomIndex = Math.floor(Math.random() * themeImages.length);
+  const selectedImageUrl = themeImages[randomIndex];
+
+  const img = new Image();
+  img.crossOrigin = "anonymous"; // Enable canvas to export without security sandbox violations
+  
+  img.onload = () => {
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = 800;
+      canvas.height = 600;
+      const ctx = canvas.getContext("2d");
+
+      // Draw background
+      ctx.drawImage(img, 0, 0, 800, 600);
+
+      // Dark Overlay for typography readability
+      ctx.fillStyle = "rgba(0, 0, 0, 0.42)";
+      ctx.fillRect(0, 0, 800, 600);
+
+      // Draw paper border effect
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(20, 20, 760, 560);
+
+      // Draw Book Info Header
+      ctx.font = "italic 20px 'Noto Sans KR', sans-serif";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+      ctx.textAlign = "center";
+      ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+      ctx.shadowBlur = 4;
+      ctx.fillText(`📖 ${title} (${author})`, 400, 70);
+
+      // Divider Line
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+      ctx.lineWidth = 1.5;
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.moveTo(300, 95);
+      ctx.lineTo(500, 95);
+      ctx.stroke();
+
+      // Draw Calligraphy main text with glowing shadow
+      ctx.font = `44px ${selectedFont}`;
+      ctx.fillStyle = "#ffffff";
+      ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
+      ctx.shadowBlur = 12;
+      ctx.shadowOffsetX = 3;
+      ctx.shadowOffsetY = 3;
+
+      wrapText(ctx, userText, 400, 300, 680, 65);
+
+      // Reset shadow for footer
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+
+      // Draw Footer
+      ctx.font = "14px 'Noto Sans KR', sans-serif";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+      ctx.fillText("🎨 SORO ART GALLERY | 캘리그라피 엽서", 400, 545);
+
+      // Export base64
+      const resultData = canvas.toDataURL("image/png");
+      uploadBase64Data = resultData;
+
+      imageContainer.innerHTML = `
+        <img src="${resultData}" style="max-width:100%; border: 1px solid var(--border-color); box-shadow: 0 4px 20px rgba(0,0,0,0.5); display:block;" alt="완성된 캘리그라피 엽서">
+      `;
+      showToast("캘리그라피 엽서가 성공적으로 완성되었습니다! ✨", "success");
+    } catch (e) {
+      console.error(e);
+      drawFallbackCanvas();
+    }
+  };
+
+  img.onerror = () => {
+    drawFallbackCanvas();
+  };
+
+  img.src = selectedImageUrl;
+
+  // 2차 폴백: 로딩 실패 시 감성 그라디언트 엽서로 대체 작성
+  function drawFallbackCanvas() {
+    showToast("이미지 로딩이 원활하지 않아 감성 배경 엽서로 대체 작성합니다.", "warning");
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = 800;
+      canvas.height = 600;
+      const ctx = canvas.getContext("2d");
+
+      // Draw beautiful gradient
+      const grad = ctx.createLinearGradient(0, 0, 800, 600);
+      grad.addColorStop(0, "#1e1b4b"); // Deep purple-navy
+      grad.addColorStop(1, "#311042"); // Deep wine red
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 800, 600);
+
+      // Subtle noise/vignette effect on canvas
+      ctx.fillStyle = "rgba(255, 255, 255, 0.03)";
+      for (let i = 0; i < 20000; i++) {
+        const x = Math.random() * 800;
+        const y = Math.random() * 600;
+        ctx.fillRect(x, y, 1.5, 1.5);
+      }
+
+      // Draw inner border line
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(20, 20, 760, 560);
+
+      // Draw Book Info Header
+      ctx.font = "italic 20px 'Noto Sans KR', sans-serif";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+      ctx.textAlign = "center";
+      ctx.fillText(`📖 ${title} (${author})`, 400, 70);
+
+      // Divider Line
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(300, 95);
+      ctx.lineTo(500, 95);
+      ctx.stroke();
+
+      // Draw Calligraphy
+      ctx.font = `44px ${selectedFont}`;
+      ctx.fillStyle = "#ffffff";
+      ctx.shadowColor = "rgba(0, 0, 0, 0.6)";
+      ctx.shadowBlur = 8;
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 2;
+      wrapText(ctx, userText, 400, 300, 680, 65);
+
+      // Reset shadow
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+
+      // Draw Footer
+      ctx.font = "14px 'Noto Sans KR', sans-serif";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+      ctx.fillText("🎨 SORO ART GALLERY | 캘리그라피 엽서", 400, 545);
+
+      const resultData = canvas.toDataURL("image/png");
+      uploadBase64Data = resultData;
+
+      imageContainer.innerHTML = `
+        <img src="${resultData}" style="max-width:100%; border: 1px solid var(--border-color);" alt="완성된 캘리그라피 엽서">
+      `;
+    } catch (err) {
+      console.error(err);
+      showToast("엽서 제작에 실패했습니다. 입력값을 확인해 주세요.", "error");
+    }
+  }
+
+  // Word Wrapping Helper function
+  function wrapText(context, text, x, y, maxWidth, lineHeight) {
+    const words = text.split(" ");
+    let line = "";
+    let lines = [];
+
+    for (let n = 0; n < words.length; n++) {
+      let testLine = line + words[n] + " ";
+      let metrics = context.measureText(testLine);
+      let testWidth = metrics.width;
+      if (testWidth > maxWidth && n > 0) {
+        lines.push(line);
+        line = words[n] + " ";
+      } else {
+        line = testLine;
+      }
+    }
+    lines.push(line);
+
+    let startY = y - ((lines.length - 1) * lineHeight) / 2;
+    for (let i = 0; i < lines.length; i++) {
+      context.fillText(lines[i].trim(), x, startY + (i * lineHeight));
+    }
   }
 }
 
@@ -3010,6 +3553,27 @@ function validateSubmissionForm() {
     }
   }
 
+  else if (activeContest.submissionType === "audio") {
+    if (!uploadBase64Data) {
+      const dropzone = document.getElementById("file-dropzone");
+      if (dropzone) dropzone.parentElement.classList.add("has-error");
+      isValid = false;
+    }
+    const desc = document.getElementById("sub-audio-description");
+    if (desc && !desc.value.trim()) {
+      desc.parentElement.classList.add("has-error");
+      isValid = false;
+    }
+  }
+
+  else if (activeContest.submissionType === "calligraphy") {
+    if (!uploadBase64Data) {
+      const errEl = document.getElementById("calli-validation-error");
+      if (errEl) errEl.style.display = "block";
+      isValid = false;
+    }
+  }
+
   else if (activeContest.submissionType === "text_fields") {
     activeContest.textFields.forEach(field => {
       const element = document.getElementById(`sub-${field.id}`);
@@ -3073,6 +3637,19 @@ async function executeSubmit() {
     }
   } else if (activeContest.submissionType === "image") {
     newEntry.data.image = uploadBase64Data;
+  }
+
+  else if (activeContest.submissionType === "audio") {
+    newEntry.data.audio = uploadBase64Data;
+    newEntry.data.description = document.getElementById("sub-audio-description").value.trim();
+  }
+
+  else if (activeContest.submissionType === "calligraphy") {
+    newEntry.data.image = uploadBase64Data;
+    newEntry.data.type = "calligraphy";
+    newEntry.data["book-title"] = document.getElementById("sub-calli-title").value.trim();
+    newEntry.data["book-author"] = document.getElementById("sub-calli-author").value.trim();
+    newEntry.data["book-text"] = document.getElementById("sub-calli-text").value.trim();
   }
 
   else if (activeContest.submissionType === "text_fields") {
@@ -3309,6 +3886,30 @@ async function executeLoggedInLookup() {
       `;
     }
 
+    else if (entryData && entryData.audio) {
+      contentHtml += `
+        <div class="submitted-media-preview-container audio-submission-preview" style="margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="border: 1px solid var(--border-color); padding: 10px; background: var(--bg-tertiary); display: flex; flex-direction: column; align-items: center; gap: 8px; border-radius: 6px;">
+            <div style="font-size: 1.2rem;">🎵</div>
+            <audio src="${entryData.audio}" controls style="width: 100%; max-width: 280px;"></audio>
+            ${entryData.description ? `
+              <div style="margin-top: 6px; font-size: 0.8rem; color: var(--text-secondary); width: 100%; text-align: left; background: var(--bg-primary); padding: 8px; border: 1px solid var(--border-color); border-radius: 4px;">
+                <strong>곡 소개 및 제작 의도:</strong>
+                <p style="margin: 2px 0 0 0; white-space: pre-wrap; color: var(--text-primary); line-height: 1.3;">${entryData.description}</p>
+              </div>
+            ` : ''}
+          </div>
+          <div>
+            <a href="${entryData.audio}" download="소로사운드앨범_${currentUser ? currentUser.name : '학생'}.mp3" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 6px; background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); text-decoration: none; cursor: pointer; transition: all var(--transition-fast);">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
+              </svg>
+              곡 파일 다운로드
+            </a>
+          </div>
+        </div>
+      `;
+    }
     else if (entryData && entryData["book-title"]) {
       contentHtml += `
         <div><strong>추천 도서:</strong> ${entryData["book-title"]} (${entryData["book-author"] || "저자 미상"})</div>

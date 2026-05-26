@@ -932,6 +932,31 @@ textarea {
   border: 1px solid var(--border-color);
   object-fit: contain;
 }
+
+/* Audio Preview and Submitted Player Custom Styling */
+.audio-preview-container {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  border-radius: 8px;
+  position: relative;
+}
+
+.audio-preview-container audio {
+  width: 100%;
+  outline: none;
+}
+
+.audio-submission-preview {
+  margin-top: 12px;
+  width: 100%;
+}
+
 .remove-preview-btn {
   position: absolute;
   top: -6px;
