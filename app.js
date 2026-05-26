@@ -2143,10 +2143,15 @@ async function generateAICalligraphyCard() {
   const title = titleInput.value.trim();
   const author = authorInput.value.trim();
 
-  // Get a random pre-generated AI background image from our 100-image dataset (20 images per theme)
-  const themeImages = CALLIGRAPHY_THEMES_IMAGES[selectedThemeKey];
-  const randomIndex = Math.floor(Math.random() * themeImages.length);
-  const selectedImageUrl = themeImages[randomIndex];
+  // Local background image paths to completely avoid cross-origin CORS blocks
+  const localImageMap = {
+    sky: "asset/backgrounds/sky.jpg",
+    forest: "asset/backgrounds/forest.jpg",
+    ocean: "asset/backgrounds/ocean.jpg",
+    room: "asset/backgrounds/room.jpg",
+    paper: "asset/backgrounds/paper.jpg"
+  };
+  const selectedImageUrl = localImageMap[selectedThemeKey] || localImageMap.sky;
 
   const img = new Image();
   img.crossOrigin = "anonymous"; // Enable canvas to export without security sandbox violations
@@ -2224,12 +2229,13 @@ async function generateAICalligraphyCard() {
       showToast("캘리그라피 엽서가 성공적으로 완성되었습니다! ✨", "success");
     } catch (e) {
       console.error(e);
-      drawFallbackCanvas();
+      drawFallbackCanvas(selectedThemeKey);
     }
   };
 
-  img.onerror = () => {
-    drawFallbackCanvas();
+  img.onerror = (err) => {
+    console.error("Image loading failed:", err);
+    drawFallbackCanvas(selectedThemeKey);
   };
 
   // Add random query param to bypass potential browser cache which strips CORS headers
@@ -2237,27 +2243,56 @@ async function generateAICalligraphyCard() {
   img.src = finalImageUrl;
 
   // 2차 폴백: 로딩 실패 시 감성 그라디언트 엽서로 대체 작성
-  function drawFallbackCanvas() {
-    showToast("이미지 로딩이 원활하지 않아 감성 배경 엽서로 대체 작성합니다.", "warning");
+  function drawFallbackCanvas(theme) {
+    showToast("로컬 이미지 로드 실패. 테마별 감성 배경으로 대체 작성합니다.", "warning");
     try {
       const canvas = document.createElement("canvas");
       canvas.width = 800;
       canvas.height = 600;
       const ctx = canvas.getContext("2d");
 
-      // Draw beautiful gradient
-      const grad = ctx.createLinearGradient(0, 0, 800, 600);
-      grad.addColorStop(0, "#1e1b4b"); // Deep purple-navy
-      grad.addColorStop(1, "#311042"); // Deep wine red
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, 800, 600);
+      // Draw beautiful theme-specific gradients
+      if (theme === "sky") {
+        const grad = ctx.createLinearGradient(0, 0, 0, 600);
+        grad.addColorStop(0, "#0b0c10"); // Near black
+        grad.addColorStop(1, "#1f2833"); // Dark steel blue
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 800, 600);
 
-      // Subtle noise/vignette effect on canvas
-      ctx.fillStyle = "rgba(255, 255, 255, 0.03)";
-      for (let i = 0; i < 20000; i++) {
-        const x = Math.random() * 800;
-        const y = Math.random() * 600;
-        ctx.fillRect(x, y, 1.5, 1.5);
+        // Twinkling stars
+        ctx.fillStyle = "#ffffff";
+        for (let i = 0; i < 40; i++) {
+          const x = Math.random() * 800;
+          const y = Math.random() * 450;
+          const r = Math.random() * 1.5;
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      } else if (theme === "forest") {
+        const grad = ctx.createLinearGradient(0, 0, 0, 600);
+        grad.addColorStop(0, "#0a2f1d"); // Forest green
+        grad.addColorStop(1, "#134e5e"); // Teal
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 800, 600);
+      } else if (theme === "ocean") {
+        const grad = ctx.createLinearGradient(0, 0, 0, 600);
+        grad.addColorStop(0, "#f857a6"); // Pink sunset
+        grad.addColorStop(1, "#ff5858"); // Coral
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 800, 600);
+      } else if (theme === "room") {
+        const grad = ctx.createLinearGradient(0, 0, 800, 600);
+        grad.addColorStop(0, "#2c3e50"); // Midnight blue
+        grad.addColorStop(1, "#000000"); // Charcoal black
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 800, 600);
+      } else {
+        const grad = ctx.createLinearGradient(0, 0, 800, 600);
+        grad.addColorStop(0, "#e8d5b5"); // Vintage paper
+        grad.addColorStop(1, "#c0a080"); // Aged parchment
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 800, 600);
       }
 
       // Draw inner border line
