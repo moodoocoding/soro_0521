@@ -1763,7 +1763,16 @@ function setupDynamicFormFields(contest) {
       </div>
 
       <div class="form-group" style="margin-bottom: 16px;">
-        <label for="sub-calli-font">✒️ 캘리그라피 서체 선택</label>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <label for="sub-calli-font" style="margin-bottom:0;">✒️ 캘리그라피 서체 선택</label>
+          <label for="sub-custom-font-file" class="btn btn-secondary btn-sm" style="margin-bottom:0; font-size:0.75rem; padding: 4px 8px; cursor:pointer; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:6px; display:inline-flex; align-items:center; gap:4px;">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"></path>
+            </svg>
+            폰트 등록 (.ttf/.otf)
+          </label>
+          <input type="file" id="sub-custom-font-file" accept=".ttf,.otf,.woff,.woff2" style="display:none;">
+        </div>
         <select id="sub-calli-font" style="width:100%; padding:10px; background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border-color); border-radius:8px; font-weight:bold;">
           <option value="'East Sea Dokdo', sans-serif">✒️ 독도체 (개성 있는 붓글씨)</option>
           <option value="'Nanum Brush Script', cursive">✒️ 나눔붓체 (정갈한 손글씨)</option>
@@ -1771,6 +1780,9 @@ function setupDynamicFormFields(contest) {
           <option value="'Gamja Flower', cursive">✒️ 감자꽃체 (동화적이고 따뜻한 서체)</option>
           <option value="'Yeon Sung', cursive">✒️ 연성체 (고전적인 멋을 내는 서체)</option>
         </select>
+        <div id="custom-font-status" style="margin-top:6px; font-size:0.75rem; color:var(--success-color); display:none; align-items:center; gap:4px;">
+          <span>✓ 개인 폰트가 성공적으로 등록 및 자동 선택되었습니다!</span>
+        </div>
       </div>
 
       <button type="button" id="btn-generate-calli" class="btn btn-secondary btn-block" style="background: var(--accent-gradient, linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)); color: white; font-weight: bold; padding: 12px; margin-bottom: 16px; border:none; transition:transform 0.2s;">🎨 AI 캘리그라피 엽서 생성</button>
@@ -1787,6 +1799,48 @@ function setupDynamicFormFields(contest) {
     `;
 
     document.getElementById("btn-generate-calli").addEventListener("click", generateAICalligraphyCard);
+
+    // Register font file upload listener
+    const fontFileInput = document.getElementById("sub-custom-font-file");
+    const fontSelect = document.getElementById("sub-calli-font");
+    const fontStatus = document.getElementById("custom-font-status");
+
+    if (fontFileInput) {
+      fontFileInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+          try {
+            const fontData = event.target.result;
+            const customFontName = `CustomCalliFont_${Date.now()}`;
+            const fontFace = new FontFace(customFontName, fontData);
+            
+            showToast("업로드된 폰트 파일 등록 중...", "info");
+            const loadedFace = await fontFace.load();
+            document.fonts.add(loadedFace);
+
+            // Add new custom option to dropdown and select it
+            const option = document.createElement("option");
+            option.value = `'${customFontName}'`;
+            option.textContent = `⭐ 등록한 폰트 (${file.name})`;
+            fontSelect.appendChild(option);
+            fontSelect.value = `'${customFontName}'`;
+
+            if (fontStatus) {
+              fontStatus.style.display = "flex";
+              fontStatus.querySelector("span").textContent = `✓ 개인 폰트 '${file.name}'이 등록 및 선택되었습니다!`;
+            }
+            showToast(`폰트 '${file.name}'이(가) 성공적으로 등록되었습니다! ✨`, "success");
+          } catch (err) {
+            console.error(err);
+            showToast("폰트 파일 로드에 실패했습니다. 올바른 폰트 형식(.ttf/.otf)인지 확인해주세요.", "error");
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    }
   }
 
   else if (contest.submissionType === "text_fields") {
@@ -2097,8 +2151,15 @@ async function generateAICalligraphyCard() {
   const img = new Image();
   img.crossOrigin = "anonymous"; // Enable canvas to export without security sandbox violations
   
-  img.onload = () => {
+  img.onload = async () => {
     try {
+      // Ensure the selected font is fully loaded in the browser before drawing to Canvas
+      try {
+        await document.fonts.load(`44px ${selectedFont}`);
+      } catch (fontErr) {
+        console.warn("Font loading failed, falling back to system font:", fontErr);
+      }
+
       const canvas = document.createElement("canvas");
       canvas.width = 800;
       canvas.height = 600;
@@ -2171,7 +2232,9 @@ async function generateAICalligraphyCard() {
     drawFallbackCanvas();
   };
 
-  img.src = selectedImageUrl;
+  // Add random query param to bypass potential browser cache which strips CORS headers
+  const finalImageUrl = selectedImageUrl + (selectedImageUrl.includes("?") ? "&" : "?") + "cors_bypass=" + Date.now();
+  img.src = finalImageUrl;
 
   // 2차 폴백: 로딩 실패 시 감성 그라디언트 엽서로 대체 작성
   function drawFallbackCanvas() {
