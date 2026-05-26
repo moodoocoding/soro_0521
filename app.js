@@ -1490,11 +1490,16 @@ function renderDIDSlideshow() {
   }
 
   const entry = didSubmissions[didCurrentSlideIndex];
-  const likedByMe = JSON.parse(localStorage.getItem("soro_postcard_liked_by_me") || "[]");
-  const likes = JSON.parse(localStorage.getItem("soro_postcard_likes") || "{}");
+  const contestId = (activeContest && activeContest.id) ? activeContest.id : "library";
+  const likedByMe = JSON.parse(localStorage.getItem(`soro_${contestId}_liked_by_me`) || "[]");
+  const likes = JSON.parse(localStorage.getItem(`soro_${contestId}_likes`) || "{}");
   const likesCount = likes[entry.id] || 0;
   const isLiked = likedByMe.includes(entry.id);
-  const imageUrl = entry.data && entry.data.image ? entry.data.image : "https://placehold.co/800x600/0c0c0e/ffffff?text=No+Image";
+  
+  let imageUrl = entry.data && entry.data.image ? entry.data.image : "https://placehold.co/800x600/0c0c0e/ffffff?text=No+Image";
+  if (imageUrl && imageUrl.includes("drive.google.com")) {
+    imageUrl = getGoogleDriveDirectLink(imageUrl);
+  }
 
   let maskedName = entry.studentName || "학생";
   if (maskedName.length > 2) {
