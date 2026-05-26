@@ -2782,21 +2782,24 @@ async function generateAICalligraphyCard() {
     try {
       // Ensure the selected font is fully loaded in the browser before drawing to Canvas
       try {
-        console.log(`Loading webfont: ${selectedFont}...`);
-        await document.fonts.load(`44px ${selectedFont}`);
+        // Extract the pure primary font family name without quotes or fallbacks (e.g., "'East Sea Dokdo', sans-serif" -> "East Sea Dokdo")
+        const primaryFontFamily = selectedFont.split(',')[0].replace(/['"]/g, "").trim();
+        console.log(`Loading webfont: "${primaryFontFamily}" (raw value: ${selectedFont})...`);
+        
+        await document.fonts.load(`44px "${primaryFontFamily}"`);
         await document.fonts.ready;
         
-        // Polling check: wait up to 1000ms until document.fonts.check returns true for this font
+        // Polling check: wait up to 1500ms until document.fonts.check returns true for this specific web font
         let attempts = 0;
-        while (!document.fonts.check(`44px ${selectedFont}`) && attempts < 10) {
-          console.log(`Webfont ${selectedFont} is still downloading, waiting 100ms... (attempt ${attempts + 1}/10)`);
+        while (!document.fonts.check(`44px "${primaryFontFamily}"`) && attempts < 15) {
+          console.log(`Webfont "${primaryFontFamily}" is still downloading, waiting 100ms... (attempt ${attempts + 1}/15)`);
           await new Promise(resolve => setTimeout(resolve, 100));
           attempts++;
         }
         
         // Final fallback micro-delay to let the font engine register it in canvas context
         await new Promise(resolve => setTimeout(resolve, 150));
-        console.log(`Webfont ${selectedFont} is ready to render!`);
+        console.log(`Webfont "${primaryFontFamily}" is ready to render!`);
       } catch (fontErr) {
         console.warn("Font loading failed, falling back to system font:", fontErr);
       }
