@@ -440,68 +440,133 @@
   <!-- Administrator Panel Fullscreen Drawer -->
   <div id="admin-drawer" class="drawer admin-fullscreen" aria-hidden="true">
     <div class="drawer-overlay" id="admin-drawer-overlay"></div>
-    <div class="drawer-content" style="background: var(--bg-primary); display: flex; flex-direction: column;">
+    <div class="drawer-content admin-layout-container">
       
-      <!-- Admin Drawer Header -->
-      <div class="admin-drawer-header" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid var(--border-color); background: var(--bg-secondary);">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <span style="font-size: 1.4rem;">⚙️</span>
+      <!-- 좌측 사이드바 (KPI 대시보드) -->
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-header">
+          <span class="admin-sidebar-logo">⚙️</span>
           <div>
-            <h2 style="margin: 0; font-size: 1.1rem; font-weight: 800; color: var(--text-primary);">공모전 통합 관리자 센터</h2>
-            <p style="margin: 2px 0 0 0; font-size: 0.75rem; color: var(--text-secondary);">데이터 관리, 심사 후보 마킹, Excel 추출</p>
+            <h2 class="admin-sidebar-title">관리자 대시보드</h2>
+            <p class="admin-sidebar-subtitle">SORO CONTEST SYSTEM v2.3.0</p>
           </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <button id="admin-sync-btn" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 700; padding: 6px 12px;">
+        
+        <div class="admin-kpi-section">
+          <div class="admin-kpi-card" id="kpi-total-subs">
+            <span class="kpi-label">총 제출 작품수</span>
+            <div class="kpi-value-container">
+              <span class="kpi-value" id="admin-stat-total">0</span><span class="kpi-unit">건</span>
+            </div>
+          </div>
+          <div class="admin-kpi-card" id="kpi-unique-students">
+            <span class="kpi-label">참가 학생 수</span>
+            <div class="kpi-value-container">
+              <span class="kpi-value" id="admin-stat-students">0</span><span class="kpi-unit">명</span>
+            </div>
+          </div>
+          <div class="admin-kpi-card" id="kpi-starred-candidates">
+            <span class="kpi-label">심사 후보 지정</span>
+            <div class="kpi-value-container">
+              <span class="kpi-value" id="admin-stat-starred" style="color: #fbbf24;">0</span><span class="kpi-unit">건</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-sidebar-divider"></div>
+        
+        <div class="admin-grade-metrics">
+          <h3 class="admin-metrics-title">학년별 참여 현황</h3>
+          <div id="admin-grade-metrics-container" class="admin-grade-metrics-list">
+            <!-- JS로 동적 렌더링 -->
+          </div>
+        </div>
+        
+        <div class="admin-sidebar-footer">
+          <button id="admin-sync-btn" class="admin-btn-sync">
             🔄 원격 동기화
           </button>
-          <button class="drawer-close-btn" id="admin-drawer-close" aria-label="닫기" style="position: static; font-size: 1.5rem; line-height: 1; border: none; background: none; color: var(--text-secondary); cursor: pointer; transition: color 0.2s;">×</button>
         </div>
-      </div>
+      </aside>
 
-      <!-- Admin Main Content (Full Width) -->
-      <div class="admin-main-content" style="flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;">
+      <!-- 우측 메인 콘텐츠 패널 -->
+      <main class="admin-main-panel">
         
-        <!-- 공모전 제어 카드 패널 -->
-        <div id="admin-contest-cards" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px;">
+        <!-- 우측 상단 헤더 & 닫기 -->
+        <div class="admin-main-header">
+          <div>
+            <h1 class="admin-main-title">공모전 데이터 센터</h1>
+            <p class="admin-main-subtitle">공모전 시작/마감 제어 및 심사 자료 통합 관리</p>
+          </div>
+          <button class="admin-drawer-close-btn" id="admin-drawer-close" aria-label="닫기">×</button>
+        </div>
+
+        <!-- 공모전 제어 카드 패널 (3x2 그리드) -->
+        <div id="admin-contest-cards" class="admin-contest-grid">
           <!-- JS에서 동적 렌더링 -->
         </div>
 
-        <!-- 필터 + 액션 바 -->
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
-          <!-- 좌측: 필터 칩 + 학급 필터 -->
-          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-            <div id="admin-star-filters" style="display: flex; gap: 4px;">
-              <button class="admin-filter-chip active" data-filter="all">전체 보기</button>
+        <!-- 통합 필터 및 액션 바 -->
+        <div class="admin-action-bar">
+          <!-- 좌측: 필터 컨트롤러 그룹 -->
+          <div class="admin-filter-group">
+            <!-- 심사 후보 여부 필터 -->
+            <div id="admin-star-filters" class="admin-filter-chips">
+              <button class="admin-filter-chip active" data-filter="all">전체</button>
               <button class="admin-filter-chip" data-filter="starred">★ 심사 후보만</button>
             </div>
-            <div style="width: 1px; height: 20px; background: var(--border-color);"></div>
-            <div id="admin-class-filters" style="display: flex; gap: 4px; flex-wrap: wrap;">
-              <!-- JS에서 학급 필터 뱃지 동적 생성 -->
+            
+            <div class="admin-filter-divider"></div>
+            
+            <!-- 이중 분할 학급 필터 -->
+            <div class="admin-double-filter">
+              <div id="admin-grade-selector" class="admin-capsule-group">
+                <button class="admin-capsule active" data-grade="all">전체 학년</button>
+                <button class="admin-capsule" data-grade="3">3학년</button>
+                <button class="admin-capsule" data-grade="4">4학년</button>
+                <button class="admin-capsule" data-grade="5">5학년</button>
+                <button class="admin-capsule" data-grade="6">6학년</button>
+              </div>
+              <div id="admin-class-selector" class="admin-capsule-group" style="display: none;">
+                <!-- 학년 클릭 시 동적으로 반 칩 등장 -->
+              </div>
             </div>
           </div>
-          <!-- 우측: 검색 + Excel 추출 -->
-          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-            <input type="text" id="admin-search-input" placeholder="학생 이름 또는 내용 검색..." style="padding: 8px 14px; font-size: 0.85rem; border-radius: 0; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); width: 200px;">
-            <button id="admin-export-csv-btn" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 700; padding: 8px 16px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; cursor: pointer;">
-              📥 Excel 추출
+
+          <!-- 우측: 검색 및 Excel 추출 -->
+          <div class="admin-search-export-group">
+            <div class="admin-search-wrapper">
+              <svg class="admin-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="admin-search-input" placeholder="학생 이름 또는 내용 검색...">
+            </div>
+            <button id="admin-export-csv-btn" class="admin-btn-export">
+              <svg class="admin-export-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Excel 추출
             </button>
           </div>
         </div>
 
         <!-- 실시간 데이터 테이블 -->
-        <div class="admin-table-wrapper" style="flex: 1; border: 1px solid var(--border-color); overflow: hidden; background: var(--bg-secondary); display: flex; flex-direction: column;">
-          <div style="overflow-x: auto; flex: 1;">
-            <table id="admin-submissions-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+        <div class="admin-table-container">
+          <div class="admin-table-scroll-wrapper">
+            <table id="admin-submissions-table">
               <thead>
-                <tr style="background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color); color: var(--text-secondary); font-weight: 800; font-family: var(--font-display);">
-                  <th style="padding: 12px 16px; width: 50px; text-align: center;">★</th>
-                  <th style="padding: 12px 16px; width: 100px;">제출일시</th>
-                  <th style="padding: 12px 16px; width: 95px;">공모전</th>
-                  <th style="padding: 12px 16px; width: 95px;">학년반번호</th>
-                  <th style="padding: 12px 16px; width: 80px;">이름</th>
-                  <th style="padding: 12px 16px;">출품 작품</th>
-                  <th style="padding: 12px 16px; text-align: center; width: 90px;">관리</th>
+                <tr>
+                  <th style="width: 6px; padding: 0;"></th> <!-- 수직 인디케이터 바 자리 -->
+                  <th style="width: 50px; text-align: center;">★</th>
+                  <th style="width: 100px;">제출일시</th>
+                  <th style="width: 110px;">공모전</th>
+                  <th style="width: 95px;">학년반번호</th>
+                  <th style="width: 80px;">이름</th>
+                  <th>출품 작품 및 내용</th>
+                  <th style="text-align: center; width: 140px;">관리</th>
                 </tr>
               </thead>
               <tbody id="admin-submissions-list">
@@ -511,7 +576,7 @@
           </div>
         </div>
 
-      </div>
+      </main>
 
     </div>
   </div>
@@ -521,6 +586,6 @@
 
 
   <!-- Main JavaScript -->
-  <script src="app.js?v=2.2.0"></script>
+  <script src="app.js?v=2.3.0"></script>
 </body>
 </html>

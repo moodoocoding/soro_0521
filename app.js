@@ -5019,7 +5019,8 @@ function parseKoreanDate(dateStr) {
 
 let adminAllSubmissions = [];
 let adminCurrentContestFilter = "all";
-let adminCurrentClassFilter = "all";
+let adminCurrentGradeFilter = "all";
+let adminCurrentClassOnlyFilter = "all"; // "all" | "1" | "2" | "3"
 let adminSearchQuery = "";
 let adminStarFilter = "all"; // "all" | "starred"
 
@@ -5057,6 +5058,23 @@ function initAdminPanel() {
       });
     });
   }
+
+  // Two-Tier Grade Selector
+  const gradeSelector = document.getElementById("admin-grade-selector");
+  if (gradeSelector) {
+    gradeSelector.querySelectorAll(".admin-capsule").forEach(capsule => {
+      capsule.addEventListener("click", (e) => {
+        gradeSelector.querySelectorAll(".admin-capsule").forEach(c => c.classList.remove("active"));
+        e.target.classList.add("active");
+        
+        adminCurrentGradeFilter = e.target.dataset.grade;
+        adminCurrentClassOnlyFilter = "all";
+        
+        renderAdminClassSelector();
+        renderAdminSubmissionsTable();
+      });
+    });
+  }
 }
 
 // 2. Open / Close Admin Drawer
@@ -5075,7 +5093,18 @@ function openAdminDrawer() {
   if (drawer) {
     drawer.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
-    renderAdminClassFilters();
+    adminCurrentGradeFilter = "all";
+    adminCurrentClassOnlyFilter = "all";
+    
+    // Reset grade active tabs
+    const gradeSelector = document.getElementById("admin-grade-selector");
+    if (gradeSelector) {
+      gradeSelector.querySelectorAll(".admin-capsule").forEach(c => c.classList.remove("active"));
+      const allBtn = gradeSelector.querySelector('[data-grade="all"]');
+      if (allBtn) allBtn.classList.add("active");
+    }
+    
+    renderAdminClassSelector();
     fetchAndRenderAdminData();
   }
 }
@@ -5088,41 +5117,99 @@ function closeAdminDrawer() {
   }
 }
 
-// 3. Render Class Filtering Pills
-function renderAdminClassFilters() {
-  const container = document.getElementById("admin-class-filters");
+// 3. Render Two-Tier Class Selector (Sub-Tier)
+function renderAdminClassSelector() {
+  const container = document.getElementById("admin-class-selector");
   if (!container) return;
 
-  let html = `<button class="admin-class-badge active" data-class="all">전체</button>`;
-  for (let grade = 3; grade <= 6; grade++) {
-    for (let classNum = 1; classNum <= 3; classNum++) {
-      const classStr = `${grade}-${classNum}`;
-      html += `<button class="admin-class-badge" data-class="${classStr}">${classStr}</button>`;
-    }
+  if (adminCurrentGradeFilter === "all") {
+    container.style.display = "none";
+    container.innerHTML = "";
+    return;
   }
 
+  container.style.display = "flex";
+  let html = `<button class="admin-capsule active" data-class="all">전체 반</button>`;
+  for (let classNum = 1; classNum <= 3; classNum++) {
+    html += `<button class="admin-capsule" data-class="${classNum}">${classNum}반</button>`;
+  }
   container.innerHTML = html;
 
-  container.querySelectorAll(".admin-class-badge").forEach(badge => {
-    badge.addEventListener("click", (e) => {
-      container.querySelectorAll(".admin-class-badge").forEach(b => b.classList.remove("active"));
+  container.querySelectorAll(".admin-capsule").forEach(capsule => {
+    capsule.addEventListener("click", (e) => {
+      container.querySelectorAll(".admin-capsule").forEach(c => c.classList.remove("active"));
       e.target.classList.add("active");
-      adminCurrentClassFilter = e.target.dataset.class;
+      adminCurrentClassOnlyFilter = e.target.dataset.class;
       renderAdminSubmissionsTable();
     });
   });
 }
 
-// 4. Fetch All Submissions in Parallel
+// 4. Calculate and Render Real-time KPI Dashboards
+function renderAdminKPIs() {
+  const totalEl = document.getElementById("admin-stat-total");
+  const studentsEl = document.getElementById("admin-stat-students");
+  const starredEl = document.getElementById("admin-stat-starred");
+  const metricsContainer = document.getElementById("admin-grade-metrics-container");
+  
+  const deduped = deduplicateSubmissions(adminAllSubmissions);
+  const stars = JSON.parse(localStorage.getItem("soro_admin_stars") || "{}");
+  
+  // Update numbers
+  if (totalEl) totalEl.textContent = adminAllSubmissions.length;
+  if (studentsEl) studentsEl.textContent = deduped.length;
+  
+  let starredCount = 0;
+  deduped.forEach(entry => {
+    if (stars[entry.id]) starredCount++;
+  });
+  if (starredEl) starredEl.textContent = starredCount;
+
+  // Grade participation gauges
+  if (metricsContainer) {
+    const grades = [3, 4, 5, 6];
+    let gradeCounts = { 3: 0, 4: 0, 5: 0, 6: 0 };
+    
+    // Count per grade (based on unique students)
+    deduped.forEach(entry => {
+      const g = parseInt(entry.studentGrade, 10);
+      if (grades.includes(g)) {
+        gradeCounts[g]++;
+      }
+    });
+
+    const maxCount = Math.max(...Object.values(gradeCounts), 1);
+    
+    let html = "";
+    grades.forEach(g => {
+      const count = gradeCounts[g];
+      const pct = Math.round((count / maxCount) * 100);
+      html += `
+        <div class="admin-grade-bar-item">
+          <div class="admin-grade-bar-label">
+            <span>${g}학년</span>
+            <span>${count}명 (${pct}%)</span>
+          </div>
+          <div class="admin-grade-bar-track">
+            <div class="admin-grade-bar-fill" style="width: ${pct}%;"></div>
+          </div>
+        </div>
+      `;
+    });
+    metricsContainer.innerHTML = html;
+  }
+}
+
+// 5. Fetch All Submissions in Parallel
 async function fetchAndRenderAdminData() {
   const tbody = document.getElementById("admin-submissions-list");
   if (!tbody) return;
 
   tbody.innerHTML = `
     <tr>
-      <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+      <td colspan="8" style="text-align: center; padding: 50px; color: var(--text-secondary);">
         <div class="spinner" style="margin: 0 auto 12px auto;"></div>
-        <p style="font-weight: 800; color: var(--text-primary);">6대 공모전 데이터를 수집하는 중...</p>
+        <p style="font-weight: 800; color: var(--text-primary);">원격 공모전 데이터를 실시간 수집하는 중...</p>
       </td>
     </tr>
   `;
@@ -5130,7 +5217,7 @@ async function fetchAndRenderAdminData() {
   if (!GOOGLE_SHEET_API_URL) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7" style="text-align: center; padding: 30px; color: var(--error-color); font-weight: 800;">
+        <td colspan="8" style="text-align: center; padding: 30px; color: var(--error-color); font-weight: 800;">
           ⚠️ 원격 API 주소가 설정되지 않았습니다.
         </td>
       </tr>
@@ -5177,10 +5264,11 @@ async function fetchAndRenderAdminData() {
     });
 
     if (fallbackUsed) {
-      showToast("원격 서버 연결 지연 → 로컬 백업 데이터로 전환했습니다.", "warning");
+      showToast("원격 서버 연결 지연 → 로컬 백업으로 데이터를 긴급 전환했습니다.", "warning");
     } else {
-      showToast("원격 동기화가 완료되었습니다!", "success");
+      showToast("원격 동기화가 성공적으로 완료되었습니다!", "success");
     }
+    renderAdminKPIs();
     renderAdminContestCards();
     renderAdminSubmissionsTable();
   } catch (globalErr) {
@@ -5192,13 +5280,14 @@ async function fetchAndRenderAdminData() {
         try { entry.data = JSON.parse(entry.data); } catch (e) { entry.data = {}; }
       } else if (entry && !entry.data) { entry.data = {}; }
     });
-    showToast("서버 연결 장애 → 로컬 백업으로 전환했습니다.", "warning");
+    showToast("네트워크 연결 불안정 → 로컬 백업으로 화면을 구성했습니다.", "warning");
+    renderAdminKPIs();
     renderAdminContestCards();
     renderAdminSubmissionsTable();
   }
 }
 
-// 5. Deduplicate helper: returns latest 1 per student per contest
+// 6. Deduplicate helper: returns latest 1 per student per contest
 function deduplicateSubmissions(submissions) {
   const map = new Map();
   submissions.forEach(entry => {
@@ -5216,7 +5305,7 @@ function deduplicateSubmissions(submissions) {
   return Array.from(map.values());
 }
 
-// 6. Render Contest Control Cards
+// 7. Render Contest Control Cards (3x2 Grid layout)
 function renderAdminContestCards() {
   const container = document.getElementById("admin-contest-cards");
   if (!container) return;
@@ -5224,23 +5313,30 @@ function renderAdminContestCards() {
   const locks = JSON.parse(localStorage.getItem("soro_contest_locks") || "{}");
   const deduped = deduplicateSubmissions(adminAllSubmissions);
   const contestEmojis = { keyring: "🔑", cuttoon: "📰", library: "📚", transcription: "✍️", pixelart: "🎮", sound_album: "🎵" };
+  
+  // Custom colors and glows
+  const brandGlows = {
+    keyring: { color: "rgba(59, 130, 246, 0.4)", rgb: "59, 130, 246" },
+    cuttoon: { color: "rgba(16, 185, 129, 0.4)", rgb: "16, 185, 129" },
+    library: { color: "rgba(139, 92, 246, 0.4)", rgb: "139, 92, 246" },
+    transcription: { color: "rgba(245, 158, 11, 0.4)", rgb: "245, 158, 11" },
+    pixelart: { color: "rgba(236, 72, 153, 0.4)", rgb: "236, 72, 153" },
+    sound_album: { color: "rgba(168, 85, 247, 0.4)", rgb: "168, 85, 247" }
+  };
 
-  let html = `
-    <div class="admin-contest-card ${adminCurrentContestFilter === 'all' ? 'selected' : ''}" data-contest="all">
-      <div class="card-title">전체 보기</div>
-      <div class="card-count">${deduped.length}<span> 건</span></div>
-    </div>
-  `;
-
+  let html = "";
   const contestIds = ["keyring", "cuttoon", "library", "transcription", "pixelart", "sound_album"];
   contestIds.forEach(cId => {
     const contest = CONTESTS_DATA.find(c => c.id === cId);
     const count = deduped.filter(s => s.contestId === cId).length;
     const isLocked = !!locks[cId];
     const isSelected = adminCurrentContestFilter === cId;
+    const glow = brandGlows[cId] || { color: "rgba(255,255,255,0.08)", rgb: "255,255,255" };
 
     html += `
-      <div class="admin-contest-card ${isSelected ? 'selected' : ''}" data-contest="${cId}">
+      <div class="admin-contest-card ${isSelected ? 'selected' : ''} ${isLocked ? 'locked' : ''}" 
+           data-contest="${cId}" 
+           style="--glow-color: ${glow.color}; --glow-rgb: ${glow.rgb};">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div class="card-title">${contestEmojis[cId] || ''} ${contest ? contest.title : cId}</div>
           <label class="admin-toggle" onclick="event.stopPropagation();">
@@ -5248,25 +5344,32 @@ function renderAdminContestCards() {
             <span class="slider"></span>
           </label>
         </div>
-        <div class="card-count">${count}<span> 건</span></div>
-        <div style="font-size: 0.65rem; font-weight: 700; color: ${isLocked ? '#ef4444' : '#22c55e'};">${isLocked ? '🔒 마감' : '🔓 접수중'}</div>
+        <div class="card-count">${count}<span>건</span></div>
+        <div style="font-size: 0.7rem; font-weight: 800; display:flex; align-items:center; gap:4px; color: ${isLocked ? '#f43f5e' : '#22c55e'};">
+          <span>${isLocked ? '🔒 마감' : '🟢 접수중'}</span>
+        </div>
       </div>
     `;
   });
 
   container.innerHTML = html;
 
-  // Card click -> filter
+  // Add click to card -> filter toggle
   container.querySelectorAll(".admin-contest-card").forEach(card => {
     card.addEventListener("click", () => {
-      adminCurrentContestFilter = card.dataset.contest;
+      const targetContest = card.dataset.contest;
+      if (adminCurrentContestFilter === targetContest) {
+        adminCurrentContestFilter = "all"; // toggle off
+      } else {
+        adminCurrentContestFilter = targetContest;
+      }
       renderAdminContestCards();
       renderAdminSubmissionsTable();
     });
   });
 }
 
-// 7. Toggle Contest Lock
+// 8. Toggle Contest Lock
 window.toggleContestLock = function(cId) {
   const locks = JSON.parse(localStorage.getItem("soro_contest_locks") || "{}");
   locks[cId] = !locks[cId];
@@ -5275,7 +5378,7 @@ window.toggleContestLock = function(cId) {
   showToast(`공모전 접수 상태가 변경되었습니다.`, "success");
 };
 
-// 8. Toggle Star Marking
+// 9. Toggle Star Marking
 window.toggleAdminStar = function(submissionId) {
   const stars = JSON.parse(localStorage.getItem("soro_admin_stars") || "{}");
   if (stars[submissionId]) {
@@ -5284,10 +5387,11 @@ window.toggleAdminStar = function(submissionId) {
     stars[submissionId] = true;
   }
   localStorage.setItem("soro_admin_stars", JSON.stringify(stars));
+  renderAdminKPIs(); // Refresh sidebar count
   renderAdminSubmissionsTable();
 };
 
-// 9. Render Data Table
+// 10. Render Data Table
 function renderAdminSubmissionsTable() {
   const tbody = document.getElementById("admin-submissions-list");
   if (!tbody) return;
@@ -5302,13 +5406,12 @@ function renderAdminSubmissionsTable() {
     filtered = filtered.filter(entry => entry.contestId === adminCurrentContestFilter);
   }
 
-  // Class filter
-  if (adminCurrentClassFilter !== "all") {
-    const [grade, classNum] = adminCurrentClassFilter.split('-');
-    filtered = filtered.filter(entry => 
-      parseInt(entry.studentGrade, 10) === parseInt(grade, 10) && 
-      parseInt(entry.studentClass, 10) === parseInt(classNum, 10)
-    );
+  // Two-Tier Class/Grade filter
+  if (adminCurrentGradeFilter !== "all") {
+    filtered = filtered.filter(entry => parseInt(entry.studentGrade, 10) === parseInt(adminCurrentGradeFilter, 10));
+    if (adminCurrentClassOnlyFilter !== "all") {
+      filtered = filtered.filter(entry => parseInt(entry.studentClass, 10) === parseInt(adminCurrentClassOnlyFilter, 10));
+    }
   }
 
   // Search filter
@@ -5333,13 +5436,22 @@ function renderAdminSubmissionsTable() {
   if (filtered.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+        <td colspan="8" style="text-align: center; padding: 50px; color: var(--text-secondary);">
           🔍 조건에 일치하는 출품작이 없습니다.
         </td>
       </tr>
     `;
     return;
   }
+
+  const contestColors = {
+    keyring: "#3b82f6",
+    cuttoon: "#10b981",
+    library: "#8b5cf6",
+    transcription: "#f59e0b",
+    pixelart: "#ec4899",
+    sound_album: "#a855f7"
+  };
 
   let html = "";
   filtered.forEach(entry => {
@@ -5351,6 +5463,7 @@ function renderAdminSubmissionsTable() {
     const studentInfo = `${entry.studentGrade}-${entry.studentClass}-${entry.studentNumber}`;
     const studentName = entry.studentName || "-";
     const isStarred = !!stars[entry.id];
+    const cColor = contestColors[entry.contestId] || "#ffffff";
 
     let imageUrl = entry.data && entry.data.image ? entry.data.image : "";
     if (imageUrl && imageUrl.includes("drive.google.com")) {
@@ -5360,43 +5473,58 @@ function renderAdminSubmissionsTable() {
     let contentHtml = "";
     if (entry.contestId === "library") {
       contentHtml = `
-        <div style="display:flex; align-items: flex-start; gap:10px;">
+        <div style="display:flex; align-items: center; gap:12px;">
           ${imageUrl ? `<div class="admin-table-thumb-wrapper" onclick="openImageModal('${imageUrl}')"><img src="${imageUrl}" class="admin-table-thumb" onerror="this.src='https://placehold.co/100/0c0c0e/ffffff?text=Err'"></div>` : ""}
-          <div style="display:flex; flex-direction:column; gap:2px;">
-            <span style="font-weight:700; color:var(--text-primary); font-size:0.8rem;">📖 ${entry.data["book-title"] || "도서명"}</span>
-            <span style="font-size:0.7rem; color:var(--text-secondary); max-width:280px; word-break:break-all;">"${entry.data["comment"] || ""}"</span>
+          <div style="display:flex; flex-direction:column; gap:3px;">
+            <span style="font-weight:800; color:var(--text-primary); font-size:0.82rem;">📖 ${entry.data["book-title"] || "도서명"}</span>
+            <span style="font-size:0.72rem; color:var(--text-secondary); max-width:400px; word-break:break-all; line-height: 1.4;">"${entry.data["comment"] || ""}"</span>
           </div>
+        </div>
+      `;
+    } else if (entry.contestId === "sound_album") {
+      const audioUrl = entry.data && entry.data.audio ? entry.data.audio : "";
+      const isBase64 = audioUrl && audioUrl.startsWith("data:");
+      contentHtml = `
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.2rem;">🎵</span>
+            ${audioUrl && !isBase64 ? `<audio src="${audioUrl}" controls style="height: 28px; width: 240px;"></audio>` : `<span style="font-size:0.72rem; color:var(--text-secondary);">(로컬 백업 오디오 재생 불가 - 다운로드 저장 권장)</span>`}
+          </div>
+          ${entry.data && entry.data.description ? `<span style="font-size:0.72rem; color:var(--text-secondary); line-height: 1.3;">"${entry.data.description}"</span>` : ""}
         </div>
       `;
     } else if (imageUrl) {
       contentHtml = `
-        <div style="display:flex; align-items: flex-start; gap:10px;">
+        <div style="display:flex; align-items: center; gap:12px;">
           <div class="admin-table-thumb-wrapper" onclick="openImageModal('${imageUrl}')"><img src="${imageUrl}" class="admin-table-thumb" onerror="this.src='https://placehold.co/100/0c0c0e/ffffff?text=Err'"></div>
-          ${entry.data && entry.data.text ? `<span style="font-size:0.75rem; word-break:break-all;">${entry.data.text.substring(0, 80)}</span>` : ""}
+          ${entry.data && entry.data.text ? `<span style="font-size:0.75rem; color:var(--text-secondary); max-width:400px; word-break:break-all; line-height:1.4;">${entry.data.text.substring(0, 100)}</span>` : ""}
         </div>
       `;
     } else if (entry.data && entry.data.text) {
-      contentHtml = `<span style="font-size:0.8rem; word-break:break-all;">${entry.data.text.substring(0, 120)}</span>`;
+      contentHtml = `<span style="font-size:0.78rem; color:var(--text-primary); line-height:1.4; word-break:break-all;">${entry.data.text.substring(0, 150)}</span>`;
     } else {
       contentHtml = `<span style="color:var(--text-secondary); font-size:0.75rem;">(내용 없음)</span>`;
     }
 
+    // Indicator inline styling inject
     html += `
-      <tr style="border-bottom: 1px solid var(--border-color);">
-        <td style="text-align:center; padding: 10px 8px;">
+      <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);" onmouseenter="this.querySelector('.row-indicator').style.backgroundColor='${cColor}'" onmouseleave="this.querySelector('.row-indicator').style.backgroundColor='transparent'">
+        <td class="row-indicator-cell"><div class="row-indicator"></div></td>
+        <td style="text-align:center; padding: 12px 6px;">
           <button class="admin-star-btn ${isStarred ? 'starred' : ''}" onclick="toggleAdminStar('${entry.id}')">
             ${isStarred ? '★' : '☆'}
           </button>
         </td>
-        <td style="padding:10px 12px; color:var(--text-secondary); font-size:0.75rem; font-family:var(--font-display);">${dateStr}</td>
-        <td style="padding:10px 12px;"><span class="admin-badge-contest ${entry.contestId}">${contestTitle}</span></td>
-        <td style="padding:10px 12px; font-weight:700; font-size:0.8rem; font-family:var(--font-display); color:var(--text-secondary);">${studentInfo}</td>
-        <td style="padding:10px 12px; font-weight:800; font-size:0.85rem; color:var(--text-primary);">${studentName}</td>
-        <td style="padding:10px 12px;">${contentHtml}</td>
-        <td style="text-align:center; padding:10px 8px;">
-          <div style="display:flex; flex-direction:column; gap:4px; align-items:center;">
-            ${imageUrl ? `<button class="btn btn-secondary btn-sm" onclick="downloadAdminPostcard('${imageUrl}', '${entry.studentGrade}-${entry.studentClass}_${entry.studentName}')" style="font-size:0.65rem; font-weight:800; padding:3px 6px;">📥 저장</button>` : ""}
-            <button class="btn btn-secondary btn-sm" onclick="deleteSubmissionByAdmin('${entry.id}', '${entry.contestId}')" style="background:#ef4444; border:none; color:white; font-size:0.65rem; font-weight:800; padding:3px 6px;">🗑️ 삭제</button>
+        <td style="padding:12px 10px; color:var(--text-secondary); font-size:0.72rem; font-family:var(--font-display);">${dateStr}</td>
+        <td style="padding:12px 10px;"><span class="admin-badge-contest ${entry.contestId}">${contestTitle}</span></td>
+        <td style="padding:12px 10px; font-weight:800; font-size:0.78rem; font-family:var(--font-display); color:var(--text-secondary);">${studentInfo}</td>
+        <td style="padding:12px 10px; font-weight:900; font-size:0.82rem; color:var(--text-primary);">${studentName}</td>
+        <td style="padding:12px 10px;">${contentHtml}</td>
+        <td style="text-align:center; padding:12px 10px;">
+          <div style="display:flex; gap:6px; align-items:center; justify-content:center;">
+            ${(imageUrl && !imageUrl.startsWith("data:")) ? `<button class="admin-btn-save" onclick="downloadAdminPostcard('${imageUrl}', '${entry.studentGrade}-${entry.studentClass}_${entry.studentName}')">저장</button>` : ""}
+            ${(entry.contestId === "sound_album" && entry.data.audio && !entry.data.audio.startsWith("data:")) ? `<button class="admin-btn-save" onclick="downloadAdminPostcard('${entry.data.audio}', '음악_${entry.studentGrade}-${entry.studentClass}_${entry.studentName}')">저장</button>` : ""}
+            <button class="admin-btn-delete" onclick="deleteSubmissionByAdmin('${entry.id}', '${entry.contestId}')">삭제</button>
           </div>
         </td>
       </tr>
@@ -5406,41 +5534,70 @@ function renderAdminSubmissionsTable() {
   tbody.innerHTML = html;
 }
 
-// 10. Export to CSV (current filtered view)
+// 11. Export to CSV (Deduplicated, correct URLs, Base64 filter protection, 7 Columns)
 function exportSubmissionsToCSV() {
   const stars = JSON.parse(localStorage.getItem("soro_admin_stars") || "{}");
   
   let filtered = deduplicateSubmissions(adminAllSubmissions);
 
+  // Contest filter
   if (adminCurrentContestFilter !== "all") {
     filtered = filtered.filter(entry => entry.contestId === adminCurrentContestFilter);
   }
 
-  if (adminCurrentClassFilter !== "all") {
-    const [grade, classNum] = adminCurrentClassFilter.split('-');
-    filtered = filtered.filter(entry => 
-      parseInt(entry.studentGrade, 10) === parseInt(grade, 10) && 
-      parseInt(entry.studentClass, 10) === parseInt(classNum, 10)
-    );
+  // Two-Tier Grade filter
+  if (adminCurrentGradeFilter !== "all") {
+    filtered = filtered.filter(entry => parseInt(entry.studentGrade, 10) === parseInt(adminCurrentGradeFilter, 10));
+    if (adminCurrentClassOnlyFilter !== "all") {
+      filtered = filtered.filter(entry => parseInt(entry.studentClass, 10) === parseInt(adminCurrentClassOnlyFilter, 10));
+    }
   }
 
+  // Star filter
   if (adminStarFilter === "starred") {
     filtered = filtered.filter(entry => !!stars[entry.id]);
   }
 
   if (filtered.length === 0) {
-    showToast("추출할 데이터가 없습니다.", "error");
+    showToast("조건에 맞는 심사 데이터가 없습니다.", "error");
     return;
   }
 
   let csvContent = "";
-  const headers = ["학년", "반", "번호", "이름", "공모전명", "작품URL"];
+  const headers = ["학년", "반", "번호", "이름", "공모전명", "작품URL", "상세내용/감상글"];
   csvContent += headers.map(h => `"${h}"`).join(",") + "\n";
 
   filtered.forEach(entry => {
     const contest = CONTESTS_DATA.find(c => c.id === entry.contestId);
     const contestTitle = contest ? contest.title : entry.contestId;
-    const imgUrl = entry.data && entry.data.image ? entry.data.image : "";
+    
+    // Choose correct submission media URL based on contest type
+    let workUrl = "";
+    let descriptionText = "";
+
+    if (entry.contestId === "sound_album") {
+      workUrl = entry.data && entry.data.audio ? entry.data.audio : "";
+      descriptionText = entry.data && entry.data.description ? entry.data.description : "";
+    } else {
+      workUrl = entry.data && entry.data.image ? entry.data.image : "";
+      
+      // Map texts
+      if (entry.contestId === "library") {
+        descriptionText = entry.data ? `[도서명: ${entry.data["book-title"] || ""}] ${entry.data["comment"] || ""}` : "";
+      } else if (entry.data && entry.data.text) {
+        descriptionText = entry.data.text;
+      }
+    }
+
+    // Google drive direct link convert
+    if (workUrl && workUrl.includes("drive.google.com")) {
+      workUrl = getGoogleDriveDirectLink(workUrl);
+    }
+
+    // Base64 explosion filter protection
+    if (workUrl && workUrl.startsWith("data:")) {
+      workUrl = "(로컬 백업 - 파일 URL 없음)";
+    }
 
     const row = [
       entry.studentGrade || "",
@@ -5448,16 +5605,17 @@ function exportSubmissionsToCSV() {
       entry.studentNumber || "",
       entry.studentName || "",
       contestTitle,
-      imgUrl
+      workUrl,
+      descriptionText
     ];
 
-    csvContent += row.map(cell => `"${(cell || "").toString().replace(/"/g, '""')}"`).join(",") + "\n";
+    csvContent += row.map(cell => `"${(cell || "").toString().replace(/"/g, '""').replace(/\r?\n/g, " ")}"`).join(",") + "\n";
   });
 
   const bom = "\ufeff";
   const blob = new Blob([bom + csvContent], { type: "text/csv;charset=utf-8;" });
   const link = document.createElement("a");
-  const filename = `소로초_심사자료_${adminCurrentContestFilter}_${new Date().toLocaleDateString("ko-KR").replace(/\s/g, "")}.csv`;
+  const filename = `소로초_공모전_심사자료_${adminCurrentContestFilter}_${new Date().toLocaleDateString("ko-KR").replace(/\s/g, "")}.csv`;
   
   link.href = URL.createObjectURL(blob);
   link.download = filename;
@@ -5466,10 +5624,10 @@ function exportSubmissionsToCSV() {
   link.click();
   document.body.removeChild(link);
 
-  showToast(`${filtered.length}건의 심사 자료가 Excel로 추출되었습니다!`, "success");
+  showToast(`${filtered.length}건의 고품격 심사 데이터가 내보내기 되었습니다!`, "success");
 }
 
-// 11. Download original file
+// 12. Download original file
 window.downloadAdminPostcard = async function(url, filename) {
   if (!url) return;
   showToast("파일 다운로드를 시작합니다...", "info");
@@ -5488,15 +5646,15 @@ window.downloadAdminPostcard = async function(url, filename) {
     showToast("파일이 성공적으로 다운로드되었습니다!", "success");
   } catch (err) {
     window.open(url, "_blank");
-    showToast("브라우저 보안(CORS)으로 인해 새 창에서 열었습니다. 우클릭 → '다른 이름으로 저장'해 주세요.", "warning");
+    showToast("브라우저 보안으로 인해 새 창에서 열었습니다. 마우스 우클릭으로 저장해 주세요.", "warning");
   }
 };
 
-// 12. Delete submission
+// 13. Delete submission
 window.deleteSubmissionByAdmin = async function(id, contestId) {
-  if (!confirm("⚠️ 이 출품 작품을 영구 삭제하시겠습니까?")) return;
+  if (!confirm("⚠️ 이 출품 작품을 정말로 영구 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.")) return;
 
-  showToast("출품작 삭제 처리 중...", "info");
+  showToast("출품작 영구 삭제 처리 중...", "info");
 
   if (GOOGLE_SHEET_API_URL) {
     try {
@@ -5510,7 +5668,7 @@ window.deleteSubmissionByAdmin = async function(id, contestId) {
     }
   }
 
-  // Remove from local
+  // Remove from local array
   adminAllSubmissions = adminAllSubmissions.filter(s => s.id !== id);
   const localSubs = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
   localStorage.setItem("soro_submissions", JSON.stringify(localSubs.filter(s => s.id !== id)));
@@ -5520,9 +5678,10 @@ window.deleteSubmissionByAdmin = async function(id, contestId) {
   delete stars[id];
   localStorage.setItem("soro_admin_stars", JSON.stringify(stars));
 
+  renderAdminKPIs(); // Refresh stats
   renderAdminContestCards();
   renderAdminSubmissionsTable();
-  showToast("출품작이 삭제되었습니다.", "success");
+  showToast("출품작이 영구 삭제되었습니다.", "success");
 };
 
 
