@@ -2,7 +2,7 @@
 // GOOGLE SPREADSHEET DATABASE CONFIGURATION (Secure Masked Setup)
 // ====================================================
 // 난독화된 구글 스프레드시트 백엔드 API 주소 (Base64)
-const SECURE_API_ENCODED = "aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J4OGpvNzZtS2t4U2o1dWIteXN4U1VGaE9HSV9VM3kyRG4tdzRYa3JISXg5U05pbWV0a0V0WGN2aGZjZ3FTdFlzUHovZXhlYw==";
+const SECURE_API_ENCODED = "aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J4RTFrQWVaOWluTGJraFFpUS1TQTNETFdmOHVXNTlHTEwwMjQyMS1JLV9nSkxnQ25Ecld4WGloa09mU2xtcGl0YjJWZy9leGVj";
 const GOOGLE_SHEET_API_URL = atob(SECURE_API_ENCODED);
 
 // ====================================================
