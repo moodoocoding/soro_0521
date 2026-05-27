@@ -422,7 +422,36 @@ function getContestStatus(contestOrMonth) {
   const contestMonth = typeof contestOrMonth === "object" ? contestOrMonth.month : (typeof contestOrMonth === "number" ? contestOrMonth : null);
   const contestId = typeof contestOrMonth === "object" ? contestOrMonth.id : (typeof contestOrMonth === "string" ? contestOrMonth : null);
 
-  // 키링 공모전, 온라인 도서관, 픽셀아트 상시 강제 활성화
+  // 1. 관리자 수동 강제 마감 검사 (Locks가 true인 경우 무조건 closed)
+  if (contestId) {
+    const locks = JSON.parse(localStorage.getItem("soro_contest_locks") || "{}");
+    if (locks[contestId] === true) {
+      return "closed";
+    }
+
+    // 2. 시작일/마감일 날짜 검사
+    const dates = JSON.parse(localStorage.getItem("soro_contest_dates") || "{}");
+    if (dates[contestId] && dates[contestId].start && dates[contestId].end) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // 시간 절사 (날짜만 비교)
+
+      const startDate = new Date(dates[contestId].start);
+      startDate.setHours(0, 0, 0, 0);
+
+      const endDate = new Date(dates[contestId].end);
+      endDate.setHours(23, 59, 59, 999);
+
+      if (today < startDate) {
+        return "pending"; // 시작 전 대기 상태
+      } else if (today > endDate) {
+        return "closed"; // 마감 상태
+      } else {
+        return "active"; // 접수 기간 내 활성화 상태
+      }
+    }
+  }
+
+  // 3. 관리자 설정이 없을 때 기본 폴백 (기존 월별 자동 활성화 정책)
   if (contestId && FORCE_ACTIVE_CONTESTS.includes(contestId)) {
     return "active";
   }
@@ -5305,12 +5334,13 @@ function deduplicateSubmissions(submissions) {
   return Array.from(map.values());
 }
 
-// 7. Render Contest Control Cards (3x2 Grid layout)
+// 7. Render Contest Control Cards (1x6 Grid Layout & Hybrid Date configuration)
 function renderAdminContestCards() {
   const container = document.getElementById("admin-contest-cards");
   if (!container) return;
 
   const locks = JSON.parse(localStorage.getItem("soro_contest_locks") || "{}");
+  const dates = JSON.parse(localStorage.getItem("soro_contest_dates") || "{}");
   const deduped = deduplicateSubmissions(adminAllSubmissions);
   const contestEmojis = { keyring: "🔑", cuttoon: "📰", library: "📚", transcription: "✍️", pixelart: "🎮", sound_album: "🎵" };
   
@@ -5329,24 +5359,46 @@ function renderAdminContestCards() {
   contestIds.forEach(cId => {
     const contest = CONTESTS_DATA.find(c => c.id === cId);
     const count = deduped.filter(s => s.contestId === cId).length;
-    const isLocked = !!locks[cId];
+    
+    // Check locked state (hybrid check: manual lock or closed by date)
+    const isLockedManually = !!locks[cId];
+    const isClosedByDate = getContestStatus(cId) === "closed";
+    const isLocked = isLockedManually || isClosedByDate;
+
     const isSelected = adminCurrentContestFilter === cId;
     const glow = brandGlows[cId] || { color: "rgba(255,255,255,0.08)", rgb: "255,255,255" };
+    
+    // Period range text parsing
+    const cDates = dates[cId];
+    let periodText = "기간 미지정";
+    if (cDates && cDates.start && cDates.end) {
+      const startShort = cDates.start.substring(5).replace("-", ".");
+      const endShort = cDates.end.substring(5).replace("-", ".");
+      periodText = `${startShort} ~ ${endShort}`;
+    }
 
     html += `
       <div class="admin-contest-card ${isSelected ? 'selected' : ''} ${isLocked ? 'locked' : ''}" 
            data-contest="${cId}" 
            style="--glow-color: ${glow.color}; --glow-rgb: ${glow.rgb};">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div class="card-title">${contestEmojis[cId] || ''} ${contest ? contest.title : cId}</div>
-          <label class="admin-toggle" onclick="event.stopPropagation();">
-            <input type="checkbox" ${!isLocked ? 'checked' : ''} onchange="toggleContestLock('${cId}')">
-            <span class="slider"></span>
-          </label>
+          <div class="card-title">${contestEmojis[cId] || ''} ${contest ? contest.title.substring(0, 6) : cId}</div>
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <button class="admin-btn-date-trigger" onclick="event.stopPropagation(); toggleDatePopover(event, '${cId}')" title="기간 일정 설정">
+              📅
+            </button>
+            <label class="admin-toggle" onclick="event.stopPropagation();" title="수동 강제 마감">
+              <input type="checkbox" ${!isLockedManually ? 'checked' : ''} onchange="toggleContestLock('${cId}')">
+              <span class="slider"></span>
+            </label>
+          </div>
         </div>
         <div class="card-count">${count}<span>건</span></div>
-        <div style="font-size: 0.7rem; font-weight: 800; display:flex; align-items:center; gap:4px; color: ${isLocked ? '#f43f5e' : '#22c55e'};">
-          <span>${isLocked ? '🔒 마감' : '🟢 접수중'}</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
+          <span style="font-size: 0.68rem; font-weight: 800; color: ${isLocked ? '#f43f5e' : '#22c55e'};">
+            ${isLocked ? '🔒 마감' : '🟢 접수중'}
+          </span>
+          <span class="admin-card-period" title="공모전 일정: ${periodText}">${periodText}</span>
         </div>
       </div>
     `;
@@ -5369,13 +5421,105 @@ function renderAdminContestCards() {
   });
 }
 
-// 8. Toggle Contest Lock
+// 8. Toggle Contest Lock (Manual Locking)
 window.toggleContestLock = function(cId) {
   const locks = JSON.parse(localStorage.getItem("soro_contest_locks") || "{}");
   locks[cId] = !locks[cId];
   localStorage.setItem("soro_contest_locks", JSON.stringify(locks));
+  
+  // Refresh Admin Grid
   renderAdminContestCards();
-  showToast(`공모전 접수 상태가 변경되었습니다.`, "success");
+  renderAdminSubmissionsTable();
+  
+  // Real-time synchronization to student main page
+  if (typeof renderContestGrid === "function") {
+    renderContestGrid();
+  }
+  
+  showToast(`공모전 접수 제어 상태가 실시간 연계 변경되었습니다.`, "success");
+};
+
+// 8-1. Toggle Popover for date configuration
+window.toggleDatePopover = function(event, cId) {
+  event.stopPropagation();
+  
+  const oldPopover = document.getElementById("admin-date-popover");
+  if (oldPopover) {
+    oldPopover.remove();
+    if (oldPopover.dataset.contest === cId) return; // toggle off same popover
+  }
+
+  const dates = JSON.parse(localStorage.getItem("soro_contest_dates") || "{}");
+  const currentDates = dates[cId] || { start: "", end: "" };
+
+  const popover = document.createElement("div");
+  popover.id = "admin-date-popover";
+  popover.className = "admin-date-popover";
+  popover.dataset.contest = cId;
+  
+  const contestColors = {
+    keyring: "59, 130, 246",
+    cuttoon: "16, 185, 129",
+    library: "139, 92, 246",
+    transcription: "245, 158, 11",
+    pixelart: "236, 72, 153",
+    sound_album: "168, 85, 247"
+  };
+  const rgb = contestColors[cId] || "255, 255, 255";
+  popover.style.setProperty("--glow-rgb", rgb);
+
+  popover.innerHTML = `
+    <div class="admin-date-popover-header">📅 일정 기간 설정</div>
+    <div class="admin-date-popover-row">
+      <label>시작일</label>
+      <input type="date" id="popover-start-date" value="${currentDates.start || ''}" onclick="event.stopPropagation();">
+    </div>
+    <div class="admin-date-popover-row">
+      <label>마감일</label>
+      <input type="date" id="popover-end-date" value="${currentDates.end || ''}" onclick="event.stopPropagation();">
+    </div>
+    <div class="admin-popover-footer">
+      <button class="admin-btn-popover-cancel" onclick="event.stopPropagation(); document.getElementById('admin-date-popover').remove();">취소</button>
+      <button class="admin-btn-popover-save" onclick="event.stopPropagation(); savePopoverDates('${cId}');">적용</button>
+    </div>
+  `;
+
+  const card = event.currentTarget.closest(".admin-contest-card");
+  card.appendChild(popover);
+};
+
+// 8-2. Save date settings from popover
+window.savePopoverDates = function(cId) {
+  const startVal = document.getElementById("popover-start-date").value;
+  const endVal = document.getElementById("popover-end-date").value;
+
+  if (startVal && endVal && new Date(startVal) > new Date(endVal)) {
+    showToast("마감일은 시작일보다 빠를 수 없습니다.", "error");
+    return;
+  }
+
+  const dates = JSON.parse(localStorage.getItem("soro_contest_dates") || "{}");
+  if (!startVal && !endVal) {
+    delete dates[cId]; // Reset
+  } else {
+    dates[cId] = { start: startVal, end: endVal };
+  }
+  
+  localStorage.setItem("soro_contest_dates", JSON.stringify(dates));
+  
+  const popover = document.getElementById("admin-date-popover");
+  if (popover) popover.remove();
+
+  showToast("공모전 접수 기간 설정이 실시간 반영되었습니다.", "success");
+  
+  // Reload layouts
+  renderAdminContestCards();
+  renderAdminSubmissionsTable();
+  
+  // Real-time synchronization to student main page
+  if (typeof renderContestGrid === "function") {
+    renderContestGrid();
+  }
 };
 
 // 9. Toggle Star Marking
