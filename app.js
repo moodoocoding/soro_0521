@@ -5019,7 +5019,7 @@ async function fetchAndRenderAdminData() {
     return;
   }
 
-  const activeContestIds = ["keyring", "cuttoon", "library", "transcription", "pixelart"];
+  const activeContestIds = ["keyring", "cuttoon", "library", "transcription", "pixelart", "sound_album"];
   
   try {
     const fetchPromises = activeContestIds.map(async (cId) => {
