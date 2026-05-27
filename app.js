@@ -2,7 +2,7 @@
 // GOOGLE SPREADSHEET DATABASE CONFIGURATION (Secure Masked Setup)
 // ====================================================
 // 난독화된 구글 스프레드시트 백엔드 API 주소 (Base64)
-const SECURE_API_ENCODED = "aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J4OGpvNzZtSmt4U2o1dWIteXN4U1VGaE9HSV9VM3kyRG4tdzRYa3JISXg5U05pbWV0a0V0WGN2aGZjZ3N0WXNQei9leGVj";
+const SECURE_API_ENCODED = "aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J4OGpvNzZtS2t4U2o1dWIteXN4U1VGaE9HSV9VM3kyRG4tdzRYa3JISXg5U05pbWV0a0V0WGN2aGZjZ3FTdFlzUHovZXhlYw==";
 const GOOGLE_SHEET_API_URL = atob(SECURE_API_ENCODED);
 
 // ====================================================
@@ -5228,6 +5228,14 @@ async function fetchAndRenderAdminData() {
     const results = await Promise.all(fetchPromises);
     adminAllSubmissions = results.flat();
     
+    let fallbackUsed = false;
+    if (adminAllSubmissions.length === 0) {
+      console.warn("Remote fetched submissions are empty. Swapping to local backup...");
+      const localBackups = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
+      adminAllSubmissions = localBackups.filter(s => activeContestIds.includes(s.contestId));
+      fallbackUsed = true;
+    }
+    
     adminAllSubmissions.forEach(entry => {
       if (entry && entry.data && typeof entry.data === "string") {
         try {
@@ -5240,18 +5248,35 @@ async function fetchAndRenderAdminData() {
       }
     });
 
-    showToast("실시간 원격 동기화가 성공적으로 완료되었습니다!", "success");
+    if (fallbackUsed) {
+      showToast("🟢 원격 서버 연결 지연으로 인해 로컬 저장소 백업 데이터로 즉각 선회하여 관리자 대시보드를 복구 완료했습니다!", "warning");
+    } else {
+      showToast("실시간 원격 동기화가 성공적으로 완료되었습니다!", "success");
+    }
     renderAdminStats();
     renderAdminSubmissionsTable();
   } catch (globalErr) {
     console.error("Global admin fetch error:", globalErr);
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="6" style="text-align: center; padding: 30px; color: var(--error-color); font-weight: 800;">
-          ⚠️ 데이터를 원격으로 수집하는 중 네트워크 연결 오류가 발생했습니다.
-        </td>
-      </tr>
-    `;
+    
+    // Global fetch error fallback
+    const localBackups = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
+    adminAllSubmissions = localBackups.filter(s => activeContestIds.includes(s.contestId));
+    
+    adminAllSubmissions.forEach(entry => {
+      if (entry && entry.data && typeof entry.data === "string") {
+        try {
+          entry.data = JSON.parse(entry.data);
+        } catch (e) {
+          entry.data = {};
+        }
+      } else if (entry && !entry.data) {
+        entry.data = {};
+      }
+    });
+
+    showToast("🟢 원격 서버 연결 장애로 인해 로컬 저장소 백업 데이터로 즉각 선회하여 관리자 대시보드를 복구 완료했습니다!", "warning");
+    renderAdminStats();
+    renderAdminSubmissionsTable();
   }
 }
 
