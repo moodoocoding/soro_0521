@@ -2185,8 +2185,7 @@ function getGradientForContest(id) {
     library: "linear-gradient(135deg, #10b981 0%, #3b82f6 100%)",
     transcription: "linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)",
     pixelart: "linear-gradient(135deg, #ec4899 0%, #f43f5e 100%)",
-    sound_album: "linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)",
-    friendship: "linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)"
+    sound_album: "linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)"
   };
   return gradients[id] || "linear-gradient(135deg, #374151 0%, #111827 100%)";
 }
@@ -5020,7 +5019,7 @@ async function fetchAndRenderAdminData() {
     return;
   }
 
-  const activeContestIds = ["keyring", "cuttoon", "library", "transcription", "pixelart", "friendship"];
+  const activeContestIds = ["keyring", "cuttoon", "library", "transcription", "pixelart"];
   
   try {
     const fetchPromises = activeContestIds.map(async (cId) => {
@@ -5076,6 +5075,37 @@ async function fetchAndRenderAdminData() {
   }
 }
 
+// Safe Korean local format date parser
+function parseKoreanDate(dateStr) {
+  if (!dateStr) return new Date();
+  
+  // Try standard parse first
+  const stdParsed = Date.parse(dateStr);
+  if (!isNaN(stdParsed)) return new Date(stdParsed);
+  
+  try {
+    const cleanStr = dateStr.replace(/\s+/g, " ");
+    const parts = cleanStr.match(/(\d+)\.\s*(\d+)\.\s*(\d+)\.?\s*(오전|오후)?\s*(\d+):(\d+):?(\d+)?/);
+    if (parts) {
+      const year = parseInt(parts[1], 10);
+      const month = parseInt(parts[2], 10) - 1;
+      const day = parseInt(parts[3], 10);
+      const ampm = parts[4];
+      let hour = parseInt(parts[5], 10);
+      const minute = parseInt(parts[6], 10);
+      const second = parts[7] ? parseInt(parts[7], 10) : 0;
+      
+      if (ampm === "오후" && hour < 12) hour += 12;
+      if (ampm === "오전" && hour === 12) hour = 0;
+      
+      return new Date(year, month, day, hour, minute, second);
+    }
+  } catch (e) {
+    console.error("parseKoreanDate error for: " + dateStr, e);
+  }
+  return new Date(dateStr);
+}
+
 // 5. Render Core Statistics KPIs
 function renderAdminStats() {
   const totalSubmissionsEl = document.getElementById("admin-kpi-total-submissions");
@@ -5091,7 +5121,7 @@ function renderAdminStats() {
     const key = `${studentKey}_${entry.contestId}`;
     if (studentKey) {
       const existing = dedupedMap.get(key);
-      if (!existing || new Date(entry.timestamp) > new Date(existing.timestamp)) {
+      if (!existing || parseKoreanDate(entry.timestamp) > parseKoreanDate(existing.timestamp)) {
         dedupedMap.set(key, entry);
       }
     } else {
@@ -5192,16 +5222,31 @@ window.setSubmissionAward = function(id, awardType) {
   showToast(`수상작 마크가 변경되었습니다. 🏆`, "success");
 };
 
-// 9. Download original file directly from admin panel
-window.downloadAdminPostcard = function(url, filename) {
+// 9. Download original file directly from admin panel with CORS Safe Hybrid Downloader
+window.downloadAdminPostcard = async function(url, filename) {
   if (!url) return;
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `소로_${filename}.png`;
-  link.target = "_blank";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  showToast("파일 다운로드를 시작합니다...", "info");
+  
+  try {
+    const response = await fetch(url, { mode: 'cors' });
+    if (!response.ok) throw new Error("CORS fetch failed");
+    const blob = await response.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.download = `소로_${filename}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(blobUrl);
+    showToast("파일이 성공적으로 다운로드되었습니다!", "success");
+  } catch (err) {
+    console.warn("CORS secure download blocked, launching fallback secure bypass tab...", err);
+    // Fallback: Open in new tab and show detailed guide toast
+    window.open(url, "_blank");
+    showToast("🔒 브라우저 보안 규정(CORS)으로 인해 우회 저장을 진행합니다. 새 창의 이미지를 우클릭하여 '다른 이름으로 저장'해 주세요!", "warning");
+  }
 };
 
 // 10. Force Delete submission by Admin (Sync DB and localStorage)
@@ -5268,7 +5313,7 @@ function exportSubmissionsToCSV() {
     const key = `${studentKey}_${entry.contestId}`;
     if (studentKey) {
       const existing = dedupedMap.get(key);
-      if (!existing || new Date(entry.timestamp) > new Date(existing.timestamp)) {
+      if (!existing || parseKoreanDate(entry.timestamp) > parseKoreanDate(existing.timestamp)) {
         dedupedMap.set(key, entry);
       }
     } else {
@@ -5306,7 +5351,7 @@ function exportSubmissionsToCSV() {
   csvContent += headers.map(h => `"${h.replace(/"/g, '""')}"`).join(",") + "\n";
 
   filtered.forEach(entry => {
-    const dateStr = new Date(entry.timestamp).toLocaleString("ko-KR");
+    const dateStr = parseKoreanDate(entry.timestamp).toLocaleString("ko-KR");
     const contest = CONTESTS_DATA.find(c => c.id === entry.contestId);
     const contestTitle = contest ? contest.title : entry.contestId;
     const grade = entry.studentGrade || "";
@@ -5406,7 +5451,7 @@ function renderAdminSubmissionsTable() {
     const key = `${studentKey}_${entry.contestId}`;
     if (studentKey) {
       const existing = dedupedMap.get(key);
-      if (!existing || new Date(entry.timestamp) > new Date(existing.timestamp)) {
+      if (!existing || parseKoreanDate(entry.timestamp) > parseKoreanDate(existing.timestamp)) {
         dedupedMap.set(key, entry);
       }
     } else {
@@ -5445,12 +5490,12 @@ function renderAdminSubmissionsTable() {
     });
   }
 
-  filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  filtered.sort((a, b) => parseKoreanDate(b.timestamp) - parseKoreanDate(a.timestamp));
 
   if (filtered.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+        <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-secondary);">
           🔍 조건에 일치하는 공모 출품작이 존재하지 않습니다.
         </td>
       </tr>
@@ -5460,46 +5505,59 @@ function renderAdminSubmissionsTable() {
 
   let html = "";
   filtered.forEach(entry => {
-    const dateStr = new Date(entry.timestamp).toLocaleString("ko-KR", {
-      month: "numeric",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    });
+    const parsedDate = parseKoreanDate(entry.timestamp);
+    const dateStr = `${parsedDate.getMonth() + 1}. ${parsedDate.getDate()}. ${String(parsedDate.getHours()).padStart(2, '0')}:${String(parsedDate.getMinutes()).padStart(2, '0')}`;
 
     const contest = CONTESTS_DATA.find(c => c.id === entry.contestId);
     const contestTitle = contest ? contest.title : entry.contestId;
     const studentInfo = `${entry.studentGrade}-${entry.studentClass} ${entry.studentNumber}번`;
     const studentName = entry.studentName || "-";
 
-    let contentHtml = "";
-    if (entry.contestId === "library") {
-      contentHtml = `
-        <div style="display:flex; flex-direction:column; gap:4px;">
-          <span style="font-weight:700; color:var(--text-primary);">📖 ${entry.data["book-title"] || "도서명"} (${entry.data["book-author"] || "저자"})</span>
-          <span style="font-style:italic; font-size:0.75rem; color:var(--text-secondary); max-width: 320px; word-break: break-all;">"${entry.data["comment"] || "구절"}"</span>
-        </div>
-      `;
-    } else if (entry.data && entry.data.text) {
-      contentHtml = `<span style="font-size:0.8rem; word-break:break-all;">${entry.data.text}</span>`;
-    } else {
-      contentHtml = `<span style="color:var(--text-secondary); font-size:0.75rem;">(파일/이미지 전용 접수건)</span>`;
-    }
-
     let imageUrl = entry.data && entry.data.image ? entry.data.image : "";
     if (imageUrl && imageUrl.includes("drive.google.com")) {
       imageUrl = getGoogleDriveDirectLink(imageUrl);
     }
 
-    let imgPreviewHtml = "";
-    if (imageUrl) {
-      imgPreviewHtml = `
-        <div class="gallery-card-img-wrapper" style="width: 60px; height: 45px; border-radius: 4px; overflow:hidden; border:1px solid var(--border-color); margin: 0 auto; cursor:pointer;" onclick="openImageModal('${imageUrl}')">
-          <img src="${imageUrl}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://placehold.co/60/0c0c0e/ffffff?text=Err'">
+    let contentHtml = "";
+    
+    // 이미지형 공모전(keyring, cuttoon, pixelart)이거나 이미지가 존재하는 경우
+    const isImageContest = ["keyring", "cuttoon", "pixelart"].includes(entry.contestId);
+    
+    if (entry.contestId === "library") {
+      contentHtml = `
+        <div style="display:flex; align-items: flex-start; gap:12px;">
+          ${imageUrl ? `
+            <div class="admin-table-thumb-wrapper" onclick="openImageModal('${imageUrl}')">
+              <img src="${imageUrl}" class="admin-table-thumb" onerror="this.src='https://placehold.co/100/0c0c0e/ffffff?text=Err'">
+            </div>
+          ` : ""}
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <span style="font-weight:700; color:var(--text-primary);">📖 ${entry.data["book-title"] || "도서명"} (${entry.data["book-author"] || "저자"})</span>
+            <span style="font-style:italic; font-size:0.75rem; color:var(--text-secondary); max-width: 320px; word-break: break-all;">"${entry.data["comment"] || "구절"}"</span>
+          </div>
         </div>
       `;
+    } else if (isImageContest || imageUrl) {
+      contentHtml = `
+        <div style="display:flex; align-items: flex-start; gap:12px;">
+          ${imageUrl ? `
+            <div class="admin-table-thumb-wrapper" onclick="openImageModal('${imageUrl}')">
+              <img src="${imageUrl}" class="admin-table-thumb" onerror="this.src='https://placehold.co/100/0c0c0e/ffffff?text=Err'">
+            </div>
+          ` : `
+            <div class="admin-table-thumb-wrapper" style="display:flex; align-items:center; justify-content:center; background: var(--bg-tertiary);">
+              <span style="font-size:0.7rem; color:var(--text-muted);">이미지 없음</span>
+            </div>
+          `}
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            ${entry.data && entry.data.text ? `<span style="font-size:0.8rem; word-break:break-all;">${entry.data.text}</span>` : `<span style="color:var(--text-muted); font-size:0.75rem;">(파일 전용 출품작)</span>`}
+          </div>
+        </div>
+      `;
+    } else if (entry.data && entry.data.text) {
+      contentHtml = `<span style="font-size:0.8rem; word-break:break-all;">${entry.data.text}</span>`;
     } else {
-      imgPreviewHtml = `<span style="font-size:0.75rem; color:var(--text-secondary);">없음</span>`;
+      contentHtml = `<span style="color:var(--text-secondary); font-size:0.75rem;">(출품 상세 내용 없음)</span>`;
     }
 
     const evalData = evaluations[entry.id] || { rating: 0, note: "" };
@@ -5511,22 +5569,23 @@ function renderAdminSubmissionsTable() {
 
     const currentAward = awards[entry.id] || "";
     const awardBadge = currentAward === "grand" 
-      ? `<span style="background:#eab308; color:#000; font-size:0.65rem; font-weight:800; padding:2px 4px; border-radius:4px; border:1px solid #000; margin-top:2px; display:inline-block;">🏆 최우수</span>`
-      : (currentAward === "gold" ? `<span style="background:#cbd5e1; color:#000; font-size:0.65rem; font-weight:800; padding:2px 4px; border-radius:4px; border:1px solid #000; margin-top:2px; display:inline-block;">🥈 우수</span>` : "");
+      ? `<span class="admin-award-badge grand">🏆 최우수</span>`
+      : (currentAward === "gold" ? `<span class="admin-award-badge gold">🥈 우수</span>` : "");
 
     html += `
       <tr style="border-bottom: 1px solid var(--border-color);">
-        <td style="color:var(--text-secondary); font-size:0.75rem;">${dateStr}</td>
+        <td style="color:var(--text-secondary); font-size:0.75rem; font-family:var(--font-display);">${dateStr}</td>
         <td><span class="admin-badge-contest ${entry.contestId}">${contestTitle}</span></td>
-        <td style="font-weight:700;">${studentInfo}</td>
-        <td style="font-weight:800; font-size:0.9rem;">
+        <td>
           <div style="display:flex; flex-direction:column; gap:4px;">
-            <span>${studentName}</span>
-            <div style="display:flex; gap:2px; flex-wrap:wrap;">${awardBadge}</div>
+            <span style="font-weight:700; color:var(--text-secondary); font-size:0.75rem; font-family:var(--font-display);">${studentInfo}</span>
+            <span style="font-weight:800; font-size:0.9rem; color:var(--text-primary); display:flex; align-items:center; gap:6px;">
+              ${studentName}
+              ${awardBadge}
+            </span>
           </div>
         </td>
         <td>${contentHtml}</td>
-        <td style="text-align:center;">${imgPreviewHtml}</td>
         <td>
           <div style="display:flex; flex-direction:column; gap:6px;">
             ${starsHtml}
