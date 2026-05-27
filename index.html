@@ -32,8 +32,11 @@
         <div id="user-profile-badge" class="user-badge" style="display: none;">
           <span class="user-avatar">👤</span>
           <span id="user-info-text" class="user-info">3-2 15번 홍길동 학생</span>
-          <button id="admin-panel-trigger-btn" class="btn btn-admin" style="display: none; margin-left: 8px; padding: 4px 10px; font-size: 0.75rem; background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: all 0.2s; align-items: center; justify-content: center; gap: 4px; border: 1px solid rgba(255,255,255,0.15);">⚙️ 관리자</button>
         </div>
+        
+        <button id="admin-panel-trigger-btn" class="btn btn-secondary" style="display: none; align-items: center; justify-content: center; gap: 4px;">
+          ⚙️ 관리자
+        </button>
         
         <button id="lookup-toggle-btn" class="btn btn-secondary" aria-label="내 접수 확인하기" style="display: none;">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -505,6 +508,35 @@
         <!-- Right Side: Content Area (Dashboard & Data Tables) -->
         <div class="admin-main-content" style="flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;">
           
+          <!-- 공모전 운영 상태 보드 (Nielsen's 1st UX Principle) -->
+          <div class="admin-ops-board" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 6px;">
+            <div class="admin-ops-card" data-ops="active" style="cursor:pointer;">
+              <span class="admin-ops-label">현재 접수 중</span>
+              <div id="admin-ops-count-active" class="admin-ops-count">-</div>
+              <div class="admin-ops-bar" style="background: #3b82f6;"></div>
+            </div>
+            <div class="admin-ops-card" data-ops="upcoming" style="cursor:pointer;">
+              <span class="admin-ops-label">접수 예정</span>
+              <div id="admin-ops-count-upcoming" class="admin-ops-count">-</div>
+              <div class="admin-ops-bar" style="background: #10b981;"></div>
+            </div>
+            <div class="admin-ops-card" data-ops="evaluating" style="cursor:pointer;">
+              <span class="admin-ops-label">심사 진행 중</span>
+              <div id="admin-ops-count-evaluating" class="admin-ops-count">-</div>
+              <div class="admin-ops-bar" style="background: #f59e0b;"></div>
+            </div>
+            <div class="admin-ops-card" data-ops="awards" style="cursor:pointer;">
+              <span class="admin-ops-label">수상자 확정</span>
+              <div id="admin-ops-count-awards" class="admin-ops-count">-</div>
+              <div class="admin-ops-bar" style="background: #eab308;"></div>
+            </div>
+            <div class="admin-ops-card" data-ops="closed" style="cursor:pointer;">
+              <span class="admin-ops-label">종료 및 보관</span>
+              <div id="admin-ops-count-closed" class="admin-ops-count">-</div>
+              <div class="admin-ops-bar" style="background: #6b7280;"></div>
+            </div>
+          </div>
+
           <!-- 탭바 및 상단 컨트롤 그룹 -->
           <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
             <!-- 공모전 선택 탭 -->
@@ -566,7 +598,72 @@
   <!-- Notification Toast Container -->
   <div id="toast-container" class="toast-container"></div>
 
+  <!-- 🎨 집중 독자 심사관 포털 (Pop-up Evaluation Portal) -->
+  <div id="admin-eval-modal" class="drawer admin-eval-modal-drawer" aria-hidden="true" style="display: none; z-index: 1300;">
+    <div class="drawer-overlay" id="admin-eval-modal-overlay"></div>
+    <div class="drawer-content admin-eval-modal-content" style="background: var(--bg-primary); display: flex; flex-direction: column;">
+      <div class="admin-eval-modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid var(--border-color); background: var(--bg-secondary);">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.2rem;">🎨</span>
+          <h3 id="admin-eval-modal-title" style="margin: 0; font-size: 1rem; font-weight: 800; color: var(--text-primary);">제출 작품 집중 심사관</h3>
+        </div>
+        <button class="drawer-close-btn" id="admin-eval-modal-close" aria-label="닫기" style="position: static; font-size: 1.5rem; line-height: 1; border: none; background: none; color: var(--text-secondary); cursor: pointer; transition: color 0.2s;">×</button>
+      </div>
+      
+      <div class="admin-eval-modal-body" style="flex: 1; display: flex; overflow: hidden; background: var(--bg-primary);">
+        <!-- 좌측: 고해상도 작품 감상 공간 -->
+        <div class="admin-eval-img-panel" style="flex: 1.2; display: flex; align-items: center; justify-content: center; padding: 24px; background: #000000; border-right: 1px solid var(--border-color); overflow: hidden; position: relative;">
+          <div id="admin-eval-no-image" class="admin-eval-no-image" style="display: none; font-size: 0.9rem; color: var(--text-muted); font-weight: 700;">작품 이미지 없음</div>
+          <img id="admin-eval-modal-image" src="" alt="공모전 출품작" style="max-width: 100%; max-height: 100%; object-fit: contain; border: 1px solid #1a1a1e;" onerror="this.src='https://placehold.co/400x300/0c0c0e/ffffff?text=Err'">
+        </div>
+        
+        <!-- 우측: 채점 및 수상 지정 공간 -->
+        <div class="admin-eval-form-panel" style="width: 380px; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; background: var(--bg-secondary);">
+          <div class="admin-eval-student-card" style="background: var(--bg-tertiary); padding: 16px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 4px;">
+            <div id="admin-eval-student-info" style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 800; font-family: var(--font-display);">-</div>
+            <div id="admin-eval-student-name" style="font-size: 1.2rem; font-weight: 900; color: var(--text-primary); margin-top: 2px;">-</div>
+            <div style="margin-top: 4px;"><span id="admin-eval-contest-badge" class="admin-badge-contest">-</span></div>
+          </div>
+          
+          <div class="admin-eval-section" style="display: flex; flex-direction: column; gap: 8px;">
+            <label class="admin-eval-label" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); font-weight: 800;">⭐ 5성 별점 심사</label>
+            <div id="admin-eval-stars" class="admin-rating-stars" style="font-size: 1.4rem;">
+              <!-- 동적 별점 -->
+            </div>
+          </div>
+          
+          <div class="admin-eval-section" style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+            <label class="admin-eval-label" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); font-weight: 800;">📝 스태프 정밀 심사평</label>
+            <textarea id="admin-eval-note-textarea" class="admin-eval-note" placeholder="학생에게 격려가 되는 심사평이나 특이사항을 기록해 주세요..." style="flex: 1; min-height: 120px; font-family: inherit; font-size: 0.8rem;"></textarea>
+            <div id="admin-eval-save-indicator" class="admin-eval-save-indicator" style="font-size: 0.65rem; color: #10b981; font-weight: 800; text-align: right; display: none;">실시간 자동 저장 완료 🟢</div>
+          </div>
+          
+          <div class="admin-eval-section" style="display: flex; flex-direction: column; gap: 8px;">
+            <label class="admin-eval-label" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); font-weight: 800;">🏆 공모전 수상 지정</label>
+            <div style="display: flex; gap: 8px;">
+              <button id="admin-eval-nominate-grand" class="btn-admin-nominate" style="flex: 1; justify-content: center; padding: 10px; font-size: 0.75rem;">🏆 최우수</button>
+              <button id="admin-eval-nominate-gold" class="btn-admin-nominate" style="flex: 1; justify-content: center; padding: 10px; font-size: 0.75rem;">🥈 우수</button>
+              <button id="admin-eval-nominate-none" class="btn-admin-nominate" style="padding: 10px; font-size: 0.75rem;">해제</button>
+            </div>
+          </div>
+          
+          <!-- 퀵 내비게이션 및 단축키 안내 -->
+          <div class="admin-eval-footer" style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: auto; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px;">
+              <button id="admin-eval-prev-btn" class="btn btn-secondary btn-sm" style="flex: 1; font-size: 0.7rem; font-weight: 800; border-radius: 0; padding: 8px;">◀ 이전 작품 (←)</button>
+              <button id="admin-eval-next-btn" class="btn btn-secondary btn-sm" style="flex: 1; font-size: 0.7rem; font-weight: 800; border-radius: 0; padding: 8px;">다음 작품 (→) ▶</button>
+            </div>
+            <div style="font-size: 0.65rem; color: var(--text-muted); text-align: center; line-height: 1.4; background: var(--bg-tertiary); padding: 8px; border: 1px solid var(--border-color);">
+              💡 <b>단축키 안내</b><br>
+              이전 작품 [←] | 다음 작품 [→] | 별점 채점 [1~5]
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Main JavaScript -->
-  <script src="app.js?v=2.1.0"></script>
+  <script src="app.js?v=2.1.1"></script>
 </body>
 </html>

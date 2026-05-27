@@ -3350,6 +3350,130 @@ body.light-theme .xp-bar-container {
   }
 }
 
+/* ====================================================
+   ADMINISTRATOR OPERATIONS BOARD & EVALUATION MODAL (UX/UI Upgrades)
+   ==================================================== */
+
+/* Operations Board Cards */
+.admin-ops-card {
+  background: var(--bg-secondary, #0c0c0e);
+  border: 1px solid var(--border-color, #2c2c32);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.admin-ops-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-focus, #ffffff);
+}
+
+.admin-ops-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--text-secondary, #909099);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.admin-ops-count {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--text-primary, #ffffff);
+  font-family: var(--font-display);
+  line-height: 1;
+}
+
+.admin-ops-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+}
+
+/* Submission Stage Badges */
+.admin-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  border-radius: 0 !important;
+}
+
+.admin-status-badge.received {
+  border: 1px solid #10b981;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.admin-status-badge.reviewing {
+  border: 1px solid #f59e0b;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.05);
+}
+
+.admin-status-badge.awarded {
+  border: 1px solid #eab308;
+  color: #eab308;
+  background: rgba(234, 179, 8, 0.1);
+  box-shadow: 0 0 8px rgba(234, 179, 8, 0.15);
+}
+
+/* Evaluation Pop-up Modal (Drawer Extension) */
+.drawer.admin-eval-modal-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.drawer.admin-eval-modal-drawer[aria-hidden="false"] {
+  display: flex !important;
+}
+
+.admin-eval-modal-content {
+  width: 960px !important;
+  max-width: 95vw !important;
+  height: 600px !important;
+  max-height: 85vh !important;
+  border-radius: 0 !important;
+  border: 1px solid var(--border-color, #2c2c32) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6) !important;
+  overflow: hidden;
+  z-index: 1310;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .admin-eval-modal-content {
+    height: 90vh !important;
+  }
+  .admin-eval-modal-body {
+    flex-direction: column !important;
+    overflow-y: auto !important;
+  }
+  .admin-eval-img-panel {
+    flex: none !important;
+    height: 250px !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .admin-eval-form-panel {
+    width: 100% !important;
+  }
+}
+
 
 
 
