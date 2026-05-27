@@ -5262,25 +5262,21 @@ window.setAdminViewMode = function(mode) {
 
 // 5. Fetch All Submissions (Bulk & Fallback Hybrid Acceleration)
 async function fetchAndRenderAdminData() {
-  const tbody = document.getElementById("admin-submissions-list");
-  if (!tbody) return;
+  const galleryList = document.getElementById("admin-gallery-list");
+  if (!galleryList) return;
 
-  tbody.innerHTML = `
-    <tr>
-      <td colspan="8" style="text-align: center; padding: 50px; color: var(--text-secondary);">
-        <div class="spinner" style="margin: 0 auto 12px auto;"></div>
-        <p style="font-weight: 800; color: var(--text-primary);">원격 공모전 데이터를 실시간 수집하는 중...</p>
-      </td>
-    </tr>
+  galleryList.innerHTML = `
+    <div style="grid-column: 1 / -1; text-align: center; padding: 50px; color: var(--text-secondary);">
+      <div class="spinner" style="margin: 0 auto 12px auto;"></div>
+      <p style="font-weight: 800; color: var(--text-primary);">원격 공모전 데이터를 실시간 수집하는 중...</p>
+    </div>
   `;
 
   if (!GOOGLE_SHEET_API_URL) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="8" style="text-align: center; padding: 30px; color: var(--error-color); font-weight: 800;">
-          ⚠️ 원격 API 주소가 설정되지 않았습니다.
-        </td>
-      </tr>
+    galleryList.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 30px; color: var(--error-color); font-weight: 800;">
+        ⚠️ 원격 API 주소가 설정되지 않았습니다.
+      </div>
     `;
     return;
   }
