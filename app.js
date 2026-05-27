@@ -1058,7 +1058,7 @@ function renderGallery2025(gradeFilter = "all") {
 // ONLINE LIBRARY SUBMISSIONS GALLERY (2026 SUBMISSIONS)
 // ====================================================
 async function getLibrarySubmissions(gradeFilter = "all", sortBy = "newest", searchKeyword = "") {
-  const contestId = (activeContest && activeContest.id) ? activeContest.id : "library";
+  const contestId = "library";
   let submissions = [];
 
   // 1. Fetch from Google Sheets Apps Script API URL
@@ -1177,7 +1177,7 @@ async function renderLibraryGallery(gradeFilter = "all") {
   const gridContainer = document.getElementById("gallery-grid-list");
   if (!gridContainer) return;
 
-  const contestId = (activeContest && activeContest.id) ? activeContest.id : "library";
+  const contestId = "library";
 
   gridContainer.innerHTML = `
     <div style="grid-column: span 2; display: flex; flex-direction: column; align-items: center; padding: 40px; color: var(--text-secondary);">
@@ -1271,7 +1271,7 @@ async function renderLibraryGallery(gradeFilter = "all") {
 }
 
 function toggleLikePostcard(id, btn, fromDID = false) {
-  const contestId = (activeContest && activeContest.id) ? activeContest.id : "library";
+  const contestId = "library";
   const likesKey = `soro_${contestId}_likes`;
   const likedByMeKey = `soro_${contestId}_liked_by_me`;
 
@@ -1522,7 +1522,7 @@ function renderDIDGrid() {
     return;
   }
 
-  const contestId = (activeContest && activeContest.id) ? activeContest.id : "library";
+  const contestId = "library";
   const likedByMe = JSON.parse(localStorage.getItem(`soro_${contestId}_liked_by_me`) || "[]");
   const likes = JSON.parse(localStorage.getItem(`soro_${contestId}_likes`) || "{}");
 
@@ -1603,7 +1603,7 @@ function renderDIDSlideshow() {
   }
 
   const entry = didSubmissions[didCurrentSlideIndex];
-  const contestId = (activeContest && activeContest.id) ? activeContest.id : "library";
+  const contestId = "library";
   const likedByMe = JSON.parse(localStorage.getItem(`soro_${contestId}_liked_by_me`) || "[]");
   const likes = JSON.parse(localStorage.getItem(`soro_${contestId}_likes`) || "{}");
   const likesCount = likes[entry.id] || 0;
