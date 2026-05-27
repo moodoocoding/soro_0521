@@ -1,10 +1,7 @@
-// ====================================================
-// GOOGLE SPREADSHEET DATABASE CONFIGURATION (Vercel Cloud Setup)
-// ====================================================
-// [가이드] 구글 스프레드시트 연동 완료 후, 아래 공란에 구글 Apps Script 웹앱 배포 URL을 입력해 주세요.
-// 예시: "https://script.google.com/macros/s/AKfycbz.../exec"
-// 이 주소가 비어있는 동안에는 브라우저의 localStorage 로컬 DB 모드로 즉시 원활히 시뮬레이션 작동합니다.
-const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbx8jo76mJkxSj5ub-ysxSUFhOGI_U3y2Dn-w4XkrHIx9SNimetkEtXcvhfcgqStYsPz/exec";
+// Fallback to local variables if config.js is not loaded (GitHub open-source deployment fallback)
+if (typeof GOOGLE_SHEET_API_URL === "undefined") {
+  var GOOGLE_SHEET_API_URL = "";
+}
 
 // ====================================================
 // CONTEST DATA AND INLINE ILLUSTRATIONS (SVG)
@@ -683,9 +680,20 @@ function executeLogout() {
   showToast("로그아웃 되었습니다.", "info");
 }
 
+// SHA-256 단방향 암호화 해싱 함수 (Web Crypto API 사용)
+async function hashPassword(password) {
+  if (!password) return "";
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await window.crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
 // REST API or Local Sign Up
 async function handleSignUp(grade, classNum, number, name, password) {
   const userKey = `${grade}_${classNum}_${number}_${name}`; // Unique Identifier Key
+  const hashedPassword = await hashPassword(password);
 
   const payload = {
     action: "signUp",
@@ -694,7 +702,7 @@ async function handleSignUp(grade, classNum, number, name, password) {
     classNum: classNum,
     number: number,
     name: name,
-    password: password
+    password: hashedPassword // 암호화된 패스워드 전송
   };
 
   // 1. Remote DB Cloud Mode (Google Sheets Apps Script API URL active)
@@ -741,7 +749,7 @@ async function handleSignUp(grade, classNum, number, name, password) {
     classNum: classNum,
     number: number,
     name: name,
-    password: password
+    password: hashedPassword // 암호화된 패스워드 로컬 저장
   };
 
   users.push(newUser);
@@ -760,32 +768,82 @@ async function handleSignUp(grade, classNum, number, name, password) {
 // REST API or Local Login
 async function handleLogin(grade, classNum, number, name, password) {
   const userKey = `${grade}_${classNum}_${number}_${name}`;
-
-  const payload = {
-    action: "login",
-    userKey: userKey,
-    password: password
-  };
+  const hashedPassword = await hashPassword(password);
 
   // 1. Remote DB Cloud Mode
   if (GOOGLE_SHEET_API_URL) {
     showToast("보안 서버에서 로그인 확인 중...", "info");
+    
+    // 우선 암호 해시 패스워드로 로그인 시도
+    let payload = {
+      action: "login",
+      userKey: userKey,
+      password: hashedPassword
+    };
+
     try {
-      const response = await fetch(GOOGLE_SHEET_API_URL, {
+      let response = await fetch(GOOGLE_SHEET_API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: JSON.stringify(payload)
       });
-      const result = await response.json();
+      let result = await response.json();
 
+      // 로그인 실패 시, 구형 가입자(평문 패스워드 상태)인지 대조하여 하위 호환성 지원
       if (result.status === "error") {
-        showToast(result.message, "error");
-        return false;
+        console.log("Hash login failed, attempting legacy plain text fallback...");
+        
+        payload.password = password; // 평문으로 재조회 시도
+        response = await fetch(GOOGLE_SHEET_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: JSON.stringify(payload)
+        });
+        result = await response.json();
+        
+        if (result.status === "error") {
+          showToast("학년/반/번호/이름 또는 비밀번호가 일치하지 않습니다.", "error");
+          return false;
+        }
+        
+        // 평문 로그인에 성공했다면, 즉시 원격 구글 시트 DB의 구형 암호를 단방향 해시 코드로 자동 마이그레이션(업그레이드)
+        console.log("Legacy plain text login success! Upgrading user credentials to SHA-256 hash...");
+        const upgradePayload = {
+          action: "signUp", // 덮어쓰기 가입을 통해 원격 레코드 암호화 갱신
+          userKey: userKey,
+          grade: grade,
+          classNum: classNum,
+          number: number,
+          name: name,
+          password: hashedPassword
+        };
+        
+        try {
+          await fetch(GOOGLE_SHEET_API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: JSON.stringify(upgradePayload)
+          });
+        } catch (upgradeErr) {
+          console.error("Failed to upgrade remote database password to hash:", upgradeErr);
+        }
       }
 
+      // 로그인 성공 처리
       const loggedUser = { userKey, grade, classNum, number, name };
       currentUser = loggedUser;
       localStorage.setItem("soro_current_user", JSON.stringify(loggedUser));
+      
+      // 기기 로컬스토리지의 백업 사용자 목록 정보도 해시값 비밀번호로 자동 마이그레이션 업데이트
+      const users = JSON.parse(localStorage.getItem("soro_users") || "[]");
+      const idx = users.findIndex(u => u.userKey === userKey);
+      if (idx !== -1) {
+        users[idx].password = hashedPassword;
+      } else {
+        users.push({ userKey, grade, classNum, number, name, password: hashedPassword });
+      }
+      localStorage.setItem("soro_users", JSON.stringify(users));
+
       updateUIForLoggedInState();
       updateLiveCounters();
       if (activeContest) openContestDetails(activeContest.id);
@@ -797,9 +855,28 @@ async function handleLogin(grade, classNum, number, name, password) {
     }
   }
 
-  // 2. Fallback Local Mode
+  // 2. Fallback Local Mode (로컬 스토리지 하위 호환)
   const users = JSON.parse(localStorage.getItem("soro_users") || "[]");
-  const user = users.find(u => u.userKey === userKey && u.password === password);
+  
+  const user = users.find(u => {
+    if (u.userKey !== userKey) return false;
+    
+    // 저장된 패스워드 형식이 64자 Hex 규격(이미 해싱된 상태)인지 체크
+    const isSavedPasswordHashed = u.password && u.password.length === 64 && /^[0-9a-fA-F]+$/.test(u.password);
+    if (isSavedPasswordHashed) {
+      return u.password === hashedPassword; // 해시값끼리 안전 비교
+    } else {
+      // 구형 평문 비교
+      const isMatch = u.password === password;
+      if (isMatch) {
+        // 일치 시 로컬 계정도 바로 해시 암호로 마이그레이션 자동 갱신
+        u.password = hashedPassword;
+        localStorage.setItem("soro_users", JSON.stringify(users));
+        console.log("Local backup user credentials upgraded to SHA-256 hash successfully.");
+      }
+      return isMatch;
+    }
+  });
 
   if (!user) {
     showToast("학년/반/번호/이름 또는 비밀번호가 일치하지 않습니다.", "error");
