@@ -447,8 +447,8 @@
         <div style="display: flex; align-items: center; gap: 12px;">
           <span style="font-size: 1.4rem;">⚙️</span>
           <div>
-            <h2 style="margin: 0; font-size: 1.1rem; font-weight: 800; background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">청주소로초 공모전 통합 관리자 센터</h2>
-            <p style="margin: 2px 0 0 0; font-size: 0.75rem; color: var(--text-secondary);">실시간 출품 데이터 스캔, 심사 배정, 수상작 선정 및 Excel 추출을 통제합니다.</p>
+            <h2 style="margin: 0; font-size: 1.1rem; font-weight: 800; color: var(--text-primary);">공모전 통합 관리자 센터</h2>
+            <p style="margin: 2px 0 0 0; font-size: 0.75rem; color: var(--text-secondary);">데이터 관리, 심사 후보 마킹, Excel 추출</p>
           </div>
         </div>
         <div style="display: flex; align-items: center; gap: 12px;">
@@ -459,139 +459,56 @@
         </div>
       </div>
 
-      <!-- Admin Drawer Main Container -->
-      <div class="admin-drawer-body" style="flex: 1; display: flex; overflow: hidden;">
+      <!-- Admin Main Content (Full Width) -->
+      <div class="admin-main-content" style="flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;">
         
-        <!-- Left Sidebar: KPIs & Statistics -->
-        <div class="admin-sidebar" style="width: 280px; border-right: 1px solid var(--border-color); background: var(--bg-secondary); padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;">
-          
-          <!-- KPI 카드 그룹 -->
-          <div class="admin-sidebar-section">
-            <h3 style="margin: 0 0 12px 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); font-weight: 800;">📊 공모전 핵심 지표</h3>
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-              <!-- KPI 카드 1 -->
-              <div class="admin-kpi-card" style="background: var(--bg-tertiary); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
-                <div style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 700;">총 출품작 수</div>
-                <div id="admin-kpi-total-submissions" style="font-size: 1.5rem; font-weight: 900; color: #3b82f6; margin-top: 4px;">-</div>
-              </div>
-              <!-- KPI 카드 2 -->
-              <div class="admin-kpi-card" style="background: var(--bg-tertiary); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
-                <div style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 700;">고유 참가 학생 수</div>
-                <div id="admin-kpi-total-students" style="font-size: 1.5rem; font-weight: 900; color: #10b981; margin-top: 4px;">-</div>
-              </div>
-              <!-- KPI 카드 3 -->
-              <div class="admin-kpi-card" style="background: var(--bg-tertiary); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
-                <div style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 700;">최고 참여 학년</div>
-                <div id="admin-kpi-best-grade" style="font-size: 1.3rem; font-weight: 900; color: #f59e0b; margin-top: 4px;">-</div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- 학년별 비율 분포 -->
-          <div class="admin-sidebar-section">
-            <h3 style="margin: 0 0 12px 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); font-weight: 800;">🏫 학년별 참여 분포</h3>
-            <div id="admin-grade-progress-container" style="display: flex; flex-direction: column; gap: 10px;">
-              <!-- JS에서 동적 게이지바 렌더링 -->
-            </div>
-          </div>
-
-          <!-- 공모전 설정 수동 토글 스위치 -->
-          <div class="admin-sidebar-section" style="margin-top: auto;">
-            <h3 style="margin: 0 0 12px 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); font-weight: 800;">🔒 공모전 접수 제어</h3>
-            <div id="admin-contest-locks-container" style="display: flex; flex-direction: column; gap: 10px;">
-              <!-- JS에서 각 공모전 접수 락/스위치 동적 생성 -->
-            </div>
-          </div>
-
+        <!-- 공모전 제어 카드 패널 -->
+        <div id="admin-contest-cards" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px;">
+          <!-- JS에서 동적 렌더링 -->
         </div>
 
-        <!-- Right Side: Content Area (Dashboard & Data Tables) -->
-        <div class="admin-main-content" style="flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;">
-          
-          <!-- 공모전 운영 상태 보드 (Nielsen's 1st UX Principle) -->
-          <div class="admin-ops-board" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 6px;">
-            <div class="admin-ops-card" data-ops="active" style="cursor:pointer;">
-              <span class="admin-ops-label">현재 접수 중</span>
-              <div id="admin-ops-count-active" class="admin-ops-count">-</div>
-              <div class="admin-ops-bar" style="background: #3b82f6;"></div>
+        <!-- 필터 + 액션 바 -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+          <!-- 좌측: 필터 칩 + 학급 필터 -->
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <div id="admin-star-filters" style="display: flex; gap: 4px;">
+              <button class="admin-filter-chip active" data-filter="all">전체 보기</button>
+              <button class="admin-filter-chip" data-filter="starred">★ 심사 후보만</button>
             </div>
-            <div class="admin-ops-card" data-ops="upcoming" style="cursor:pointer;">
-              <span class="admin-ops-label">접수 예정</span>
-              <div id="admin-ops-count-upcoming" class="admin-ops-count">-</div>
-              <div class="admin-ops-bar" style="background: #10b981;"></div>
-            </div>
-            <div class="admin-ops-card" data-ops="evaluating" style="cursor:pointer;">
-              <span class="admin-ops-label">심사 진행 중</span>
-              <div id="admin-ops-count-evaluating" class="admin-ops-count">-</div>
-              <div class="admin-ops-bar" style="background: #f59e0b;"></div>
-            </div>
-            <div class="admin-ops-card" data-ops="awards" style="cursor:pointer;">
-              <span class="admin-ops-label">수상자 확정</span>
-              <div id="admin-ops-count-awards" class="admin-ops-count">-</div>
-              <div class="admin-ops-bar" style="background: #eab308;"></div>
-            </div>
-            <div class="admin-ops-card" data-ops="closed" style="cursor:pointer;">
-              <span class="admin-ops-label">종료 및 보관</span>
-              <div id="admin-ops-count-closed" class="admin-ops-count">-</div>
-              <div class="admin-ops-bar" style="background: #6b7280;"></div>
+            <div style="width: 1px; height: 20px; background: var(--border-color);"></div>
+            <div id="admin-class-filters" style="display: flex; gap: 4px; flex-wrap: wrap;">
+              <!-- JS에서 학급 필터 뱃지 동적 생성 -->
             </div>
           </div>
-
-          <!-- 탭바 및 상단 컨트롤 그룹 -->
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
-            <!-- 공모전 선택 탭 -->
-            <div class="admin-tabs" id="admin-contest-tabs" style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <button class="admin-tab-btn active" data-contest="all">전체보기</button>
-              <button class="admin-tab-btn" data-contest="keyring">키링 공모전</button>
-              <button class="admin-tab-btn" data-contest="cuttoon">안전 컷툰</button>
-              <button class="admin-tab-btn" data-contest="library">온라인 도서관</button>
-              <button class="admin-tab-btn" data-contest="transcription">디지털 필사</button>
-              <button class="admin-tab-btn" data-contest="pixelart">픽셀아트</button>
-              <button class="admin-tab-btn" data-contest="sound_album">사운드 앨범</button>
-            </div>
-            
-            <!-- 우측 액션: 검색어 입력 및 엑셀 다운로드 -->
-            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-              <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); cursor: pointer; user-select: none; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 8px; background: var(--bg-secondary);">
-                <input type="checkbox" id="admin-dedup-checkbox" style="width: 14px; height: 14px; accent-color: var(--text-primary);">
-                <span>1인 1작품 최신작 필터링</span>
-              </label>
-              <input type="text" id="admin-search-input" placeholder="학생 실명 또는 내용 검색..." style="padding: 8px 14px; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); width: 220px;">
-              <button id="admin-export-csv-btn" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 700; padding: 8px 16px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 8px; cursor: pointer;">
-                📥 Excel 추출 (CSV)
-              </button>
-            </div>
+          <!-- 우측: 검색 + Excel 추출 -->
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <input type="text" id="admin-search-input" placeholder="학생 이름 또는 내용 검색..." style="padding: 8px 14px; font-size: 0.85rem; border-radius: 0; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); width: 200px;">
+            <button id="admin-export-csv-btn" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 700; padding: 8px 16px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; cursor: pointer;">
+              📥 Excel 추출
+            </button>
           </div>
+        </div>
 
-          <!-- 학급 필터 배지 배너 -->
-          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-            <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 700;">학급 필터:</span>
-            <div id="admin-class-filters" style="display: flex; gap: 6px; flex-wrap: wrap;">
-              <!-- 3, 4, 5, 6학년 각 반 필터 버튼 동적 렌더링 -->
-            </div>
+        <!-- 실시간 데이터 테이블 -->
+        <div class="admin-table-wrapper" style="flex: 1; border: 1px solid var(--border-color); overflow: hidden; background: var(--bg-secondary); display: flex; flex-direction: column;">
+          <div style="overflow-x: auto; flex: 1;">
+            <table id="admin-submissions-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+              <thead>
+                <tr style="background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color); color: var(--text-secondary); font-weight: 800; font-family: var(--font-display);">
+                  <th style="padding: 12px 16px; width: 50px; text-align: center;">★</th>
+                  <th style="padding: 12px 16px; width: 100px;">제출일시</th>
+                  <th style="padding: 12px 16px; width: 95px;">공모전</th>
+                  <th style="padding: 12px 16px; width: 95px;">학년반번호</th>
+                  <th style="padding: 12px 16px; width: 80px;">이름</th>
+                  <th style="padding: 12px 16px;">출품 작품</th>
+                  <th style="padding: 12px 16px; text-align: center; width: 90px;">관리</th>
+                </tr>
+              </thead>
+              <tbody id="admin-submissions-list">
+                <!-- JS에서 동적으로 데이터 테이블 채움 -->
+              </tbody>
+            </table>
           </div>
-
-          <!-- 실시간 테이블 데이터 그리드 -->
-          <div class="admin-table-wrapper" style="flex: 1; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; background: var(--bg-secondary); display: flex; flex-direction: column;">
-            <div style="overflow-x: auto; flex: 1;">
-              <table id="admin-submissions-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
-                <thead>
-                  <tr style="background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color); color: var(--text-secondary); font-weight: 800; font-family: var(--font-display);">
-                    <th style="padding: 14px 16px; width: 110px;">제출일시</th>
-                    <th style="padding: 14px 16px; width: 100px;">공모전구분</th>
-                    <th style="padding: 14px 16px; width: 145px;">참가 학생</th>
-                    <th style="padding: 14px 16px;">출품 작품 내용</th>
-                    <th style="padding: 14px 16px; width: 200px;">심사 평가 & 수상 지정</th>
-                    <th style="padding: 14px 16px; text-align: center; width: 100px;">관리</th>
-                  </tr>
-                </thead>
-                <tbody id="admin-submissions-list">
-                  <!-- JS에서 동적으로 데이터 테이블 채움 -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-
         </div>
 
       </div>
@@ -602,72 +519,8 @@
   <!-- Notification Toast Container -->
   <div id="toast-container" class="toast-container"></div>
 
-  <!-- 🎨 집중 독자 심사관 포털 (Pop-up Evaluation Portal) -->
-  <div id="admin-eval-modal" class="drawer admin-eval-modal-drawer" aria-hidden="true" style="display: none; z-index: 1300;">
-    <div class="drawer-overlay" id="admin-eval-modal-overlay"></div>
-    <div class="drawer-content admin-eval-modal-content" style="background: var(--bg-primary); display: flex; flex-direction: column;">
-      <div class="admin-eval-modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid var(--border-color); background: var(--bg-secondary);">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 1.2rem;">🎨</span>
-          <h3 id="admin-eval-modal-title" style="margin: 0; font-size: 1rem; font-weight: 800; color: var(--text-primary);">제출 작품 집중 심사관</h3>
-        </div>
-        <button class="drawer-close-btn" id="admin-eval-modal-close" aria-label="닫기" style="position: static; font-size: 1.5rem; line-height: 1; border: none; background: none; color: var(--text-secondary); cursor: pointer; transition: color 0.2s;">×</button>
-      </div>
-      
-      <div class="admin-eval-modal-body" style="flex: 1; display: flex; overflow: hidden; background: var(--bg-primary);">
-        <!-- 좌측: 고해상도 작품 감상 공간 -->
-        <div class="admin-eval-img-panel" style="flex: 1.2; display: flex; align-items: center; justify-content: center; padding: 24px; background: #000000; border-right: 1px solid var(--border-color); overflow: hidden; position: relative;">
-          <div id="admin-eval-no-image" class="admin-eval-no-image" style="display: none; font-size: 0.9rem; color: var(--text-muted); font-weight: 700;">작품 이미지 없음</div>
-          <img id="admin-eval-modal-image" src="" alt="공모전 출품작" style="max-width: 100%; max-height: 100%; object-fit: contain; border: 1px solid #1a1a1e;" onerror="this.src='https://placehold.co/400x300/0c0c0e/ffffff?text=Err'">
-        </div>
-        
-        <!-- 우측: 채점 및 수상 지정 공간 -->
-        <div class="admin-eval-form-panel" style="width: 380px; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; background: var(--bg-secondary);">
-          <div class="admin-eval-student-card" style="background: var(--bg-tertiary); padding: 16px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 4px;">
-            <div id="admin-eval-student-info" style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 800; font-family: var(--font-display);">-</div>
-            <div id="admin-eval-student-name" style="font-size: 1.2rem; font-weight: 900; color: var(--text-primary); margin-top: 2px;">-</div>
-            <div style="margin-top: 4px;"><span id="admin-eval-contest-badge" class="admin-badge-contest">-</span></div>
-          </div>
-          
-          <div class="admin-eval-section" style="display: flex; flex-direction: column; gap: 8px;">
-            <label class="admin-eval-label" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); font-weight: 800;">⭐ 5성 별점 심사</label>
-            <div id="admin-eval-stars" class="admin-rating-stars" style="font-size: 1.4rem;">
-              <!-- 동적 별점 -->
-            </div>
-          </div>
-          
-          <div class="admin-eval-section" style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
-            <label class="admin-eval-label" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); font-weight: 800;">📝 스태프 정밀 심사평</label>
-            <textarea id="admin-eval-note-textarea" class="admin-eval-note" placeholder="학생에게 격려가 되는 심사평이나 특이사항을 기록해 주세요..." style="flex: 1; min-height: 120px; font-family: inherit; font-size: 0.8rem;"></textarea>
-            <div id="admin-eval-save-indicator" class="admin-eval-save-indicator" style="font-size: 0.65rem; color: #10b981; font-weight: 800; text-align: right; display: none;">실시간 자동 저장 완료 🟢</div>
-          </div>
-          
-          <div class="admin-eval-section" style="display: flex; flex-direction: column; gap: 8px;">
-            <label class="admin-eval-label" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); font-weight: 800;">🏆 공모전 수상 지정</label>
-            <div style="display: flex; gap: 8px;">
-              <button id="admin-eval-nominate-grand" class="btn-admin-nominate" style="flex: 1; justify-content: center; padding: 10px; font-size: 0.75rem;">🏆 최우수</button>
-              <button id="admin-eval-nominate-gold" class="btn-admin-nominate" style="flex: 1; justify-content: center; padding: 10px; font-size: 0.75rem;">🥈 우수</button>
-              <button id="admin-eval-nominate-none" class="btn-admin-nominate" style="padding: 10px; font-size: 0.75rem;">해제</button>
-            </div>
-          </div>
-          
-          <!-- 퀵 내비게이션 및 단축키 안내 -->
-          <div class="admin-eval-footer" style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: auto; display: flex; flex-direction: column; gap: 10px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px;">
-              <button id="admin-eval-prev-btn" class="btn btn-secondary btn-sm" style="flex: 1; font-size: 0.7rem; font-weight: 800; border-radius: 0; padding: 8px;">◀ 이전 작품 (←)</button>
-              <button id="admin-eval-next-btn" class="btn btn-secondary btn-sm" style="flex: 1; font-size: 0.7rem; font-weight: 800; border-radius: 0; padding: 8px;">다음 작품 (→) ▶</button>
-            </div>
-            <div style="font-size: 0.65rem; color: var(--text-muted); text-align: center; line-height: 1.4; background: var(--bg-tertiary); padding: 8px; border: 1px solid var(--border-color);">
-              💡 <b>단축키 안내</b><br>
-              이전 작품 [←] | 다음 작품 [→] | 별점 채점 [1~5]
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Main JavaScript -->
-  <script src="app.js?v=2.1.7"></script>
+  <script src="app.js?v=2.2.0"></script>
 </body>
 </html>

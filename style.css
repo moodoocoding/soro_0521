@@ -3190,74 +3190,156 @@ body.light-theme .xp-bar-container {
   border-color: var(--text-primary, #ffffff) !important;
 }
 
-/* Star rating input */
-.admin-rating-stars {
-  display: inline-flex;
-  gap: 4px;
-  font-size: 1.1rem;
-}
+/* ====================================================
+   ADMIN CONTEST CARDS & STAR MARKING (v2.2.0 Renewal)
+   ==================================================== */
 
-.admin-star {
-  color: var(--text-muted, #505055);
+/* Contest Control Cards */
+.admin-contest-card {
+  background: var(--bg-secondary, #0c0c0e);
+  border: 1px solid var(--border-color, #2c2c32);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   cursor: pointer;
-  transition: color 0.15s, transform 0.1s;
+  position: relative;
+  transition: transform 0.15s, border-color 0.15s, background 0.15s;
+  overflow: hidden;
 }
 
-.admin-star:hover {
-  transform: scale(1.2);
-  color: #fbbf24;
-}
-
-.admin-star.active {
-  color: #fbbf24;
-}
-
-/* Evaluation textarea */
-.admin-eval-note {
+.admin-contest-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
   width: 100%;
-  padding: 8px 12px;
-  font-size: 0.75rem;
-  border-radius: 0 !important; /* Stark sharp corners */
-  border: 1px solid var(--border-color, #2c2c32);
-  background: var(--bg-primary, #000000);
-  color: var(--text-primary, #ffffff);
-  resize: vertical;
-  min-height: 44px;
-  font-family: inherit;
-  transition: border-color 0.2s;
+  height: 3px;
+  background: var(--border-color, #2c2c32);
+  transition: background 0.2s;
 }
 
-.admin-eval-note:focus {
-  border-color: var(--border-focus, #ffffff);
-  outline: none;
+.admin-contest-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--text-secondary, #909099);
 }
 
-/* Nomination button styling */
-.btn-admin-nominate {
-  padding: 5px 10px;
-  font-size: 0.7rem;
-  font-weight: 800;
-  border-radius: 0 !important; /* Stark sharp corners */
-  border: 1px solid var(--border-color, #2c2c32);
+.admin-contest-card.selected {
+  border-color: var(--text-primary, #ffffff);
   background: var(--bg-tertiary, #161619);
+}
+
+.admin-contest-card.selected::after {
+  background: var(--text-primary, #ffffff);
+}
+
+.admin-contest-card .card-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text-primary, #ffffff);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-contest-card .card-count {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--text-primary, #ffffff);
+  font-family: var(--font-display);
+  line-height: 1;
+}
+
+.admin-contest-card .card-count span {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-secondary, #909099);
+}
+
+/* Toggle Switch */
+.admin-toggle {
+  position: relative;
+  width: 36px;
+  height: 18px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.admin-toggle input { opacity: 0; width: 0; height: 0; }
+
+.admin-toggle .slider {
+  position: absolute;
+  inset: 0;
+  background: #3f3f46;
+  border: 1px solid var(--border-color, #2c2c32);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.admin-toggle .slider::before {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  left: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #71717a;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.admin-toggle input:checked + .slider {
+  background: #166534;
+  border-color: #22c55e;
+}
+
+.admin-toggle input:checked + .slider::before {
+  transform: translateY(-50%) translateX(18px);
+  background: #22c55e;
+}
+
+/* Filter Chips */
+.admin-filter-chip {
+  padding: 6px 14px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  border: 1px solid var(--border-color, #2c2c32);
+  background: transparent;
   color: var(--text-secondary, #909099);
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  transition: all 0.2s;
+  transition: all 0.15s;
 }
 
-.btn-admin-nominate:hover {
-  background: var(--bg-primary, #000000);
+.admin-filter-chip:hover {
+  border-color: var(--text-secondary, #909099);
   color: var(--text-primary, #ffffff);
-  border-color: var(--border-focus, #ffffff);
 }
 
-.btn-admin-nominate.active {
-  background: #f59e0b !important;
-  color: #000000 !important;
-  border-color: #f59e0b !important;
+.admin-filter-chip.active {
+  background: var(--text-primary, #ffffff);
+  color: var(--bg-primary, #000000);
+  border-color: var(--text-primary, #ffffff);
+}
+
+/* Star Marking Button */
+.admin-star-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  color: #3f3f46;
+  transition: color 0.15s, transform 0.1s;
+  line-height: 1;
+}
+
+.admin-star-btn:hover {
+  transform: scale(1.15);
+  color: #fbbf24;
+}
+
+.admin-star-btn.starred {
+  color: #fbbf24;
 }
 
 /* Contest badges */
@@ -3266,7 +3348,6 @@ body.light-theme .xp-bar-container {
   padding: 3px 8px;
   font-size: 0.7rem;
   font-weight: 800;
-  border-radius: 0 !important; /* Stark sharp corners */
   color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -3283,7 +3364,6 @@ body.light-theme .xp-bar-container {
 .admin-table-thumb-wrapper {
   width: 100px;
   height: 75px;
-  border-radius: 0 !important;
   overflow: hidden;
   border: 1px solid var(--border-color, #2c2c32);
   cursor: pointer;
@@ -3292,9 +3372,7 @@ body.light-theme .xp-bar-container {
   transition: border-color var(--transition-fast);
 }
 
-.admin-table-thumb-wrapper:hover {
-  border-color: var(--border-focus, #ffffff);
-}
+.admin-table-thumb-wrapper:hover { border-color: var(--border-focus, #ffffff); }
 
 .admin-table-thumb {
   width: 100%;
@@ -3303,178 +3381,35 @@ body.light-theme .xp-bar-container {
   transition: transform var(--transition-smooth);
 }
 
-.admin-table-thumb-wrapper:hover .admin-table-thumb {
-  transform: scale(1.08);
-}
+.admin-table-thumb-wrapper:hover .admin-table-thumb { transform: scale(1.08); }
 
-/* Award Badges in Admin */
-.admin-award-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 6px;
-  font-size: 0.65rem;
+/* Class Filter Badges */
+.admin-class-badge {
+  padding: 4px 10px;
+  font-size: 0.7rem;
   font-weight: 800;
-  border-radius: 0 !important;
-  font-family: var(--font-display);
-}
-
-.admin-award-badge.grand {
-  background: #f59e0b;
-  color: #000000;
-}
-
-.admin-award-badge.gold {
-  background: #e2e8f0;
-  color: #000000;
-}
-
-/* Responsive adjustments */
-@media (max-width: 1024px) {
-  .admin-drawer-body {
-    flex-direction: column;
-  }
-  .admin-sidebar {
-    width: 100% !important;
-    border-right: none !important;
-    border-bottom: 1px solid var(--border-color, #2c2c32);
-    max-height: 250px;
-    flex-direction: row !important;
-    gap: 30px !important;
-  }
-  .admin-sidebar-section {
-    flex: 1;
-    min-width: 180px;
-  }
-  .admin-sidebar-section:last-child {
-    display: none !important;
-  }
-}
-
-/* ====================================================
-   ADMINISTRATOR OPERATIONS BOARD & EVALUATION MODAL (UX/UI Upgrades)
-   ==================================================== */
-
-/* Operations Board Cards */
-.admin-ops-card {
-  background: var(--bg-secondary, #0c0c0e);
   border: 1px solid var(--border-color, #2c2c32);
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  position: relative;
-  transition: transform var(--transition-fast), border-color var(--transition-fast);
-}
-
-.admin-ops-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--border-focus, #ffffff);
-}
-
-.admin-ops-label {
-  font-size: 0.75rem;
-  font-weight: 800;
+  background: transparent;
   color: var(--text-secondary, #909099);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.15s;
 }
 
-.admin-ops-count {
-  font-size: 1.8rem;
-  font-weight: 900;
-  color: var(--text-primary, #ffffff);
-  font-family: var(--font-display);
-  line-height: 1;
+.admin-class-badge:hover { border-color: var(--text-secondary, #909099); }
+
+.admin-class-badge.active {
+  background: var(--text-primary, #ffffff);
+  color: var(--bg-primary, #000000);
+  border-color: var(--text-primary, #ffffff);
 }
 
-.admin-ops-bar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
+/* Responsive */
+@media (max-width: 1024px) {
+  #admin-contest-cards { grid-template-columns: repeat(3, 1fr) !important; }
 }
 
-/* Submission Stage Badges */
-.admin-status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  font-size: 0.65rem;
-  font-weight: 800;
-  border-radius: 0 !important;
+@media (max-width: 640px) {
+  #admin-contest-cards { grid-template-columns: repeat(2, 1fr) !important; }
 }
-
-.admin-status-badge.received {
-  border: 1px solid #10b981;
-  color: #10b981;
-  background: rgba(16, 185, 129, 0.05);
-}
-
-.admin-status-badge.reviewing {
-  border: 1px solid #f59e0b;
-  color: #f59e0b;
-  background: rgba(245, 158, 11, 0.05);
-}
-
-.admin-status-badge.awarded {
-  border: 1px solid #eab308;
-  color: #eab308;
-  background: rgba(234, 179, 8, 0.1);
-  box-shadow: 0 0 8px rgba(234, 179, 8, 0.15);
-}
-
-/* Evaluation Pop-up Modal (Drawer Extension) */
-.drawer.admin-eval-modal-drawer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-
-.drawer.admin-eval-modal-drawer[aria-hidden="false"] {
-  display: flex !important;
-}
-
-.admin-eval-modal-content {
-  width: 960px !important;
-  max-width: 95vw !important;
-  height: 600px !important;
-  max-height: 85vh !important;
-  border-radius: 0 !important;
-  border: 1px solid var(--border-color, #2c2c32) !important;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6) !important;
-  overflow: hidden;
-  z-index: 1310;
-  display: flex;
-  flex-direction: column;
-}
-
-@media (max-width: 768px) {
-  .admin-eval-modal-content {
-    height: 90vh !important;
-  }
-  .admin-eval-modal-body {
-    flex-direction: column !important;
-    overflow-y: auto !important;
-  }
-  .admin-eval-img-panel {
-    flex: none !important;
-    height: 250px !important;
-    border-right: none !important;
-    border-bottom: 1px solid var(--border-color);
-  }
-  .admin-eval-form-panel {
-    width: 100% !important;
-  }
-}
-
-
-
 
 
