@@ -3305,6 +3305,216 @@ body.light-theme .xp-bar-container {
 }
 
 
+/* 접기/펼치기 토글 버튼 */
+.admin-panel-toggle-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary, #909099);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.admin-panel-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary, #ffffff);
+}
+
+/* 접이식 패널 트랜지션 */
+.admin-contest-grid {
+  max-height: 500px;
+  opacity: 1;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, margin-bottom 0.3s ease;
+}
+.admin-contest-grid.collapsed {
+  max-height: 0;
+  opacity: 0;
+  margin-bottom: -15px; /* 약간의 여백 보정 */
+  pointer-events: none;
+}
+
+/* 테이블 뷰 / 갤러리 뷰 탭 스위처 */
+.admin-view-tab-bar {
+  display: flex;
+  margin-top: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 8px;
+}
+.admin-view-tabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 4px;
+}
+.admin-view-tab {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary, #909099);
+  padding: 6px 16px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.18s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.admin-view-tab:hover {
+  color: var(--text-primary, #ffffff);
+  background: rgba(255, 255, 255, 0.03);
+}
+.admin-view-tab.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary, #ffffff);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* 실시간 데이터 갤러리 뷰 그리드 */
+.admin-gallery-container {
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 4px;
+}
+.admin-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  padding: 4px 0;
+}
+
+/* 갤러리 카드 디자인 */
+.admin-gallery-card {
+  background: linear-gradient(135deg, rgba(22, 22, 25, 0.7) 0%, rgba(12, 12, 14, 0.85) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+.admin-gallery-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+.admin-gallery-card.starred {
+  border-color: rgba(251, 191, 36, 0.4);
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.05);
+}
+.admin-gallery-card.starred::before {
+  content: '★';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 10;
+  color: #fbbf24;
+  font-size: 1.1rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
+/* 갤러리 썸네일 */
+.admin-gallery-thumb-wrapper {
+  aspect-ratio: 1.4;
+  width: 100%;
+  background: #09090b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  position: relative;
+  overflow: hidden;
+}
+.admin-gallery-thumb {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s;
+}
+.admin-gallery-card:hover .admin-gallery-thumb {
+  transform: scale(1.03);
+}
+
+/* 텍스트형/오디오형 작품을 위한 썸네일 대체 카드 */
+.admin-gallery-text-placeholder {
+  padding: 14px;
+  font-size: 0.72rem;
+  color: var(--text-secondary, #909099);
+  line-height: 1.5;
+  text-align: left;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  font-style: italic;
+}
+.admin-gallery-audio-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #a855f7;
+  height: 100%;
+}
+.admin-gallery-audio-icon {
+  font-size: 2.2rem;
+  animation: pulse 2s infinite;
+}
+
+/* 갤러리 메타 정보 */
+.admin-gallery-info {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+.admin-gallery-meta-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.admin-gallery-contest-badge {
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary, #909099);
+}
+.admin-gallery-student {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text-primary, #ffffff);
+}
+.admin-gallery-student span {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-secondary, #909099);
+  margin-left: 3px;
+}
+.admin-gallery-date {
+  font-size: 0.6rem;
+  color: var(--text-secondary, #606066);
+}
+.admin-gallery-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  padding-top: 8px;
+}
+
 /* 2. Right Main Panel */
 .admin-main-panel {
   flex: 1;

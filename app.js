@@ -422,32 +422,11 @@ function getContestStatus(contestOrMonth) {
   const contestMonth = typeof contestOrMonth === "object" ? contestOrMonth.month : (typeof contestOrMonth === "number" ? contestOrMonth : null);
   const contestId = typeof contestOrMonth === "object" ? contestOrMonth.id : (typeof contestOrMonth === "string" ? contestOrMonth : null);
 
-  // 1. 관리자 수동 강제 마감 검사 (Locks가 true인 경우 무조건 closed)
+  // 1. 관리자 수동 제어 우선 검사 (Locks 설정이 명시적으로 존재한다면 절대적 우선순위)
   if (contestId) {
     const locks = JSON.parse(localStorage.getItem("soro_contest_locks") || "{}");
-    if (locks[contestId] === true) {
-      return "closed";
-    }
-
-    // 2. 시작일/마감일 날짜 검사
-    const dates = JSON.parse(localStorage.getItem("soro_contest_dates") || "{}");
-    if (dates[contestId] && dates[contestId].start && dates[contestId].end) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0); // 시간 절사 (날짜만 비교)
-
-      const startDate = new Date(dates[contestId].start);
-      startDate.setHours(0, 0, 0, 0);
-
-      const endDate = new Date(dates[contestId].end);
-      endDate.setHours(23, 59, 59, 999);
-
-      if (today < startDate) {
-        return "pending"; // 시작 전 대기 상태
-      } else if (today > endDate) {
-        return "closed"; // 마감 상태
-      } else {
-        return "active"; // 접수 기간 내 활성화 상태
-      }
+    if (locks[contestId] !== undefined) {
+      return locks[contestId] === true ? "closed" : "active";
     }
   }
 
@@ -5134,6 +5113,7 @@ function openAdminDrawer() {
     }
     
     renderAdminClassSelector();
+    initAdminCollapsiblePanel();
     fetchAndRenderAdminData();
   }
 }
@@ -5229,7 +5209,58 @@ function renderAdminKPIs() {
   }
 }
 
-// 5. Fetch All Submissions in Parallel
+// 4-1. Collapsible Panel State Initializer
+function initAdminCollapsiblePanel() {
+  const isCollapsed = localStorage.getItem("soro_admin_panel_collapsed") === "true";
+  const grid = document.getElementById("admin-contest-cards");
+  const btn = document.getElementById("admin-panel-toggle-btn");
+  if (grid && btn) {
+    if (isCollapsed) {
+      grid.classList.add("collapsed");
+      btn.textContent = "펼치기 🔽";
+    } else {
+      grid.classList.remove("collapsed");
+      btn.textContent = "접기 🔼";
+    }
+  }
+}
+
+// 4-2. Toggle Accordion for Admin Contest Cards Panel
+window.toggleAdminContestPanel = function() {
+  const grid = document.getElementById("admin-contest-cards");
+  const btn = document.getElementById("admin-panel-toggle-btn");
+  if (!grid || !btn) return;
+
+  const isCollapsed = grid.classList.toggle("collapsed");
+  localStorage.setItem("soro_admin_panel_collapsed", isCollapsed ? "true" : "false");
+  btn.textContent = isCollapsed ? "펼기 🔽" : "접기 🔼";
+};
+
+// 4-3. View Mode Switcher (Table vs Gallery)
+let adminCurrentViewMode = "table";
+window.setAdminViewMode = function(mode) {
+  adminCurrentViewMode = mode;
+  const tableView = document.getElementById("admin-table-view-wrapper");
+  const galleryView = document.getElementById("admin-gallery-view-wrapper");
+  const btnTable = document.getElementById("btn-view-table");
+  const btnGallery = document.getElementById("btn-view-gallery");
+
+  if (mode === "table") {
+    if (tableView) tableView.style.display = "block";
+    if (galleryView) galleryView.style.display = "none";
+    if (btnTable) btnTable.classList.add("active");
+    if (btnGallery) btnGallery.classList.remove("active");
+    renderAdminSubmissionsTable();
+  } else {
+    if (tableView) tableView.style.display = "none";
+    if (galleryView) galleryView.style.display = "block";
+    if (btnTable) btnTable.classList.remove("active");
+    if (btnGallery) btnGallery.classList.add("active");
+    renderAdminSubmissionsGallery();
+  }
+};
+
+// 5. Fetch All Submissions (Bulk & Fallback Hybrid Acceleration)
 async function fetchAndRenderAdminData() {
   const tbody = document.getElementById("admin-submissions-list");
   if (!tbody) return;
@@ -5257,25 +5288,49 @@ async function fetchAndRenderAdminData() {
   const activeContestIds = ["keyring", "cuttoon", "library", "transcription", "pixelart", "sound_album"];
   
   try {
-    const fetchPromises = activeContestIds.map(async (cId) => {
-      try {
-        const response = await fetch(GOOGLE_SHEET_API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: JSON.stringify({ action: "getAllSubmissions", contestId: cId })
-        });
-        const result = await response.json();
-        if (result.status === "success" && Array.isArray(result.data)) {
-          return result.data.map(d => ({ ...d, contestId: cId }));
-        }
-      } catch (err) {
-        console.error(`Admin fetch failed for ${cId}:`, err);
+    let isBulkSuccess = false;
+    
+    // Step 1: 선제적 1회 일괄 조회 (Bulk Fetch) 시도
+    try {
+      console.log("[Bulk Fetch] Requesting all contest data...");
+      const response = await fetch(GOOGLE_SHEET_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: JSON.stringify({ action: "getAllSubmissions", contestId: "all" })
+      });
+      const result = await response.json();
+      if (result.status === "success" && Array.isArray(result.data) && result.data.length > 0) {
+        adminAllSubmissions = result.data;
+        isBulkSuccess = true;
+        console.log(`[Bulk Fetch] Successfully loaded ${adminAllSubmissions.length} entries.`);
       }
-      return [];
-    });
+    } catch (bulkErr) {
+      console.warn("[Bulk Fetch] Not supported or failed. Falling back to parallel query:", bulkErr);
+    }
 
-    const results = await Promise.all(fetchPromises);
-    adminAllSubmissions = results.flat();
+    // Step 2: 일괄 조회 실패/구버전일 시 6회 개별 병렬 조회로 폴백 구동
+    if (!isBulkSuccess) {
+      console.log("[Fallback] Requesting parallel individual queries for 6 contests...");
+      const fetchPromises = activeContestIds.map(async (cId) => {
+        try {
+          const response = await fetch(GOOGLE_SHEET_API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: JSON.stringify({ action: "getAllSubmissions", contestId: cId })
+          });
+          const result = await response.json();
+          if (result.status === "success" && Array.isArray(result.data)) {
+            return result.data.map(d => ({ ...d, contestId: cId }));
+          }
+        } catch (err) {
+          console.error(`Admin fetch failed for ${cId}:`, err);
+        }
+        return [];
+      });
+
+      const results = await Promise.all(fetchPromises);
+      adminAllSubmissions = results.flat();
+    }
     
     let fallbackUsed = false;
     if (adminAllSubmissions.length === 0) {
@@ -5295,11 +5350,18 @@ async function fetchAndRenderAdminData() {
     if (fallbackUsed) {
       showToast("원격 서버 연결 지연 → 로컬 백업으로 데이터를 긴급 전환했습니다.", "warning");
     } else {
-      showToast("원격 동기화가 성공적으로 완료되었습니다!", "success");
+      showToast(isBulkSuccess ? "원격 동기화 가속 완료 (1회 일괄 조회 성공)!" : "원격 동기화 완료 (구버전 호환 우회 적용)", "success");
     }
+    
     renderAdminKPIs();
     renderAdminContestCards();
-    renderAdminSubmissionsTable();
+    
+    // 현재 스위처 뷰 모드에 따라 렌더링 분기
+    if (adminCurrentViewMode === "gallery") {
+      renderAdminSubmissionsGallery();
+    } else {
+      renderAdminSubmissionsTable();
+    }
   } catch (globalErr) {
     console.error("Global admin fetch error:", globalErr);
     const localBackups = JSON.parse(localStorage.getItem("soro_submissions") || "[]");
@@ -5312,7 +5374,12 @@ async function fetchAndRenderAdminData() {
     showToast("네트워크 연결 불안정 → 로컬 백업으로 화면을 구성했습니다.", "warning");
     renderAdminKPIs();
     renderAdminContestCards();
-    renderAdminSubmissionsTable();
+    
+    if (adminCurrentViewMode === "gallery") {
+      renderAdminSubmissionsGallery();
+    } else {
+      renderAdminSubmissionsTable();
+    }
   }
 }
 
@@ -5334,13 +5401,12 @@ function deduplicateSubmissions(submissions) {
   return Array.from(map.values());
 }
 
-// 7. Render Contest Control Cards (1x6 Grid Layout & Hybrid Date configuration)
+// 7. Render Contest Control Cards (1x6 Grid Layout & Simple Switch)
 function renderAdminContestCards() {
   const container = document.getElementById("admin-contest-cards");
   if (!container) return;
 
   const locks = JSON.parse(localStorage.getItem("soro_contest_locks") || "{}");
-  const dates = JSON.parse(localStorage.getItem("soro_contest_dates") || "{}");
   const deduped = deduplicateSubmissions(adminAllSubmissions);
   const contestEmojis = { keyring: "🔑", cuttoon: "📰", library: "📚", transcription: "✍️", pixelart: "🎮", sound_album: "🎵" };
   
@@ -5360,23 +5426,12 @@ function renderAdminContestCards() {
     const contest = CONTESTS_DATA.find(c => c.id === cId);
     const count = deduped.filter(s => s.contestId === cId).length;
     
-    // Check locked state (hybrid check: manual lock or closed by date)
-    const isLockedManually = !!locks[cId];
-    const isClosedByDate = getContestStatus(cId) === "closed";
-    const isLocked = isLockedManually || isClosedByDate;
+    // 오직 수동 잠금(locks[cId] === true) 여부에 의해서만 마감(locked) 스타일 결정
+    const isLocked = locks[cId] === true;
 
     const isSelected = adminCurrentContestFilter === cId;
     const glow = brandGlows[cId] || { color: "rgba(255,255,255,0.08)", rgb: "255,255,255" };
     
-    // Period range text parsing
-    const cDates = dates[cId];
-    let periodText = "기간 미지정";
-    if (cDates && cDates.start && cDates.end) {
-      const startShort = cDates.start.substring(5).replace("-", ".");
-      const endShort = cDates.end.substring(5).replace("-", ".");
-      periodText = `${startShort} ~ ${endShort}`;
-    }
-
     html += `
       <div class="admin-contest-card ${isSelected ? 'selected' : ''} ${isLocked ? 'locked' : ''}" 
            data-contest="${cId}" 
@@ -5384,11 +5439,8 @@ function renderAdminContestCards() {
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div class="card-title">${contestEmojis[cId] || ''} ${contest ? contest.title.substring(0, 6) : cId}</div>
           <div style="display: flex; align-items: center; gap: 4px;">
-            <button class="admin-btn-date-trigger" onclick="event.stopPropagation(); toggleDatePopover(event, '${cId}')" title="기간 일정 설정">
-              📅
-            </button>
-            <label class="admin-toggle" onclick="event.stopPropagation();" title="수동 강제 마감">
-              <input type="checkbox" ${!isLockedManually ? 'checked' : ''} onchange="toggleContestLock('${cId}')">
+            <label class="admin-toggle" onclick="event.stopPropagation();" title="공모전 접수 활성화/비활성화">
+              <input type="checkbox" ${!isLocked ? 'checked' : ''} onchange="toggleContestLock('${cId}')">
               <span class="slider"></span>
             </label>
           </div>
@@ -5398,7 +5450,6 @@ function renderAdminContestCards() {
           <span style="font-size: 0.68rem; font-weight: 800; color: ${isLocked ? '#f43f5e' : '#22c55e'};">
             ${isLocked ? '🔒 마감' : '🟢 접수중'}
           </span>
-          <span class="admin-card-period" title="공모전 일정: ${periodText}">${periodText}</span>
         </div>
       </div>
     `;
@@ -5416,7 +5467,12 @@ function renderAdminContestCards() {
         adminCurrentContestFilter = targetContest;
       }
       renderAdminContestCards();
-      renderAdminSubmissionsTable();
+      
+      if (adminCurrentViewMode === "gallery") {
+        renderAdminSubmissionsGallery();
+      } else {
+        renderAdminSubmissionsTable();
+      }
     });
   });
 }
@@ -5429,7 +5485,12 @@ window.toggleContestLock = function(cId) {
   
   // Refresh Admin Grid
   renderAdminContestCards();
-  renderAdminSubmissionsTable();
+  
+  if (adminCurrentViewMode === "gallery") {
+    renderAdminSubmissionsGallery();
+  } else {
+    renderAdminSubmissionsTable();
+  }
   
   // Real-time synchronization to student main page
   if (typeof renderContestGrid === "function") {
@@ -5439,88 +5500,135 @@ window.toggleContestLock = function(cId) {
   showToast(`공모전 접수 제어 상태가 실시간 연계 변경되었습니다.`, "success");
 };
 
-// 8-1. Toggle Popover for date configuration
-window.toggleDatePopover = function(event, cId) {
-  event.stopPropagation();
-  
-  const oldPopover = document.getElementById("admin-date-popover");
-  if (oldPopover) {
-    oldPopover.remove();
-    if (oldPopover.dataset.contest === cId) return; // toggle off same popover
+// 8-3. Render Data Gallery
+function renderAdminSubmissionsGallery() {
+  const container = document.getElementById("admin-gallery-list");
+  if (!container) return;
+
+  const stars = JSON.parse(localStorage.getItem("soro_admin_stars") || "{}");
+
+  // Filter logic (same as Table View)
+  let filtered = deduplicateSubmissions(adminAllSubmissions);
+
+  // Contest filter
+  if (adminCurrentContestFilter !== "all") {
+    filtered = filtered.filter(entry => entry.contestId === adminCurrentContestFilter);
   }
 
-  const dates = JSON.parse(localStorage.getItem("soro_contest_dates") || "{}");
-  const currentDates = dates[cId] || { start: "", end: "" };
+  // Two-Tier Class/Grade filter
+  if (adminCurrentGradeFilter !== "all") {
+    filtered = filtered.filter(entry => parseInt(entry.studentGrade, 10) === parseInt(adminCurrentGradeFilter, 10));
+    if (adminCurrentClassOnlyFilter !== "all") {
+      filtered = filtered.filter(entry => parseInt(entry.studentClass, 10) === parseInt(adminCurrentClassOnlyFilter, 10));
+    }
+  }
 
-  const popover = document.createElement("div");
-  popover.id = "admin-date-popover";
-  popover.className = "admin-date-popover";
-  popover.dataset.contest = cId;
-  
-  const contestColors = {
-    keyring: "59, 130, 246",
-    cuttoon: "16, 185, 129",
-    library: "139, 92, 246",
-    transcription: "245, 158, 11",
-    pixelart: "236, 72, 153",
-    sound_album: "168, 85, 247"
-  };
-  const rgb = contestColors[cId] || "255, 255, 255";
-  popover.style.setProperty("--glow-rgb", rgb);
+  // Search filter
+  if (adminSearchQuery !== "") {
+    filtered = filtered.filter(entry => {
+      const name = entry.studentName ? entry.studentName.toLowerCase() : "";
+      const username = entry.studentUsername ? entry.studentUsername.toLowerCase() : "";
+      const textVal = (entry.data && entry.data.text) ? entry.data.text.toLowerCase() : "";
+      const descVal = (entry.data && entry.data.description) ? entry.data.description.toLowerCase() : "";
+      return name.includes(adminSearchQuery) || username.includes(adminSearchQuery) || textVal.includes(adminSearchQuery) || descVal.includes(adminSearchQuery);
+    });
+  }
 
-  popover.innerHTML = `
-    <div class="admin-date-popover-header">📅 일정 기간 설정</div>
-    <div class="admin-date-popover-row">
-      <label>시작일</label>
-      <input type="date" id="popover-start-date" value="${currentDates.start || ''}" onclick="event.stopPropagation();">
-    </div>
-    <div class="admin-date-popover-row">
-      <label>마감일</label>
-      <input type="date" id="popover-end-date" value="${currentDates.end || ''}" onclick="event.stopPropagation();">
-    </div>
-    <div class="admin-popover-footer">
-      <button class="admin-btn-popover-cancel" onclick="event.stopPropagation(); document.getElementById('admin-date-popover').remove();">취소</button>
-      <button class="admin-btn-popover-save" onclick="event.stopPropagation(); savePopoverDates('${cId}');">적용</button>
-    </div>
-  `;
+  // Star filter
+  if (adminStarFilter === "starred") {
+    filtered = filtered.filter(entry => stars[entry.id]);
+  }
 
-  const card = event.currentTarget.closest(".admin-contest-card");
-  card.appendChild(popover);
-};
-
-// 8-2. Save date settings from popover
-window.savePopoverDates = function(cId) {
-  const startVal = document.getElementById("popover-start-date").value;
-  const endVal = document.getElementById("popover-end-date").value;
-
-  if (startVal && endVal && new Date(startVal) > new Date(endVal)) {
-    showToast("마감일은 시작일보다 빠를 수 없습니다.", "error");
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 60px; color: var(--text-secondary);">
+        조건에 맞는 제출 작품이 없습니다.
+      </div>
+    `;
     return;
   }
 
-  const dates = JSON.parse(localStorage.getItem("soro_contest_dates") || "{}");
-  if (!startVal && !endVal) {
-    delete dates[cId]; // Reset
-  } else {
-    dates[cId] = { start: startVal, end: endVal };
-  }
-  
-  localStorage.setItem("soro_contest_dates", JSON.stringify(dates));
-  
-  const popover = document.getElementById("admin-date-popover");
-  if (popover) popover.remove();
+  const contestEmojis = { keyring: "🔑", cuttoon: "📰", library: "📚", transcription: "✍️", pixelart: "🎮", sound_album: "🎵" };
+  const contestColors = {
+    keyring: "#3b82f6",
+    cuttoon: "#10b981",
+    library: "#8b5cf6",
+    transcription: "#f59e0b",
+    pixelart: "#ec4899",
+    sound_album: "#a855f7"
+  };
 
-  showToast("공모전 접수 기간 설정이 실시간 반영되었습니다.", "success");
-  
-  // Reload layouts
-  renderAdminContestCards();
-  renderAdminSubmissionsTable();
-  
-  // Real-time synchronization to student main page
-  if (typeof renderContestGrid === "function") {
-    renderContestGrid();
-  }
-};
+  let html = "";
+  filtered.forEach(entry => {
+    const isStarred = !!stars[entry.id];
+    const color = contestColors[entry.contestId] || "#ffffff";
+    const emoji = contestEmojis[entry.contestId] || "🎨";
+    
+    // Media preview resolver
+    let thumbHtml = "";
+    if (entry.data && entry.data.image) {
+      thumbHtml = `<img class="admin-gallery-thumb" src="${entry.data.image}" alt="${entry.studentName} 작품" loading="lazy">`;
+    } else if (entry.data && entry.data.text) {
+      thumbHtml = `<div class="admin-gallery-text-placeholder">"${entry.data.text}"</div>`;
+    } else if (entry.contestId === "sound_album") {
+      thumbHtml = `
+        <div class="admin-gallery-audio-placeholder">
+          <span class="admin-gallery-audio-icon">🎵</span>
+          <span style="font-size:0.65rem; color: #a855f7; font-weight:800;">오디오 앨범 출품작</span>
+        </div>
+      `;
+    } else {
+      thumbHtml = `
+        <div class="admin-gallery-audio-placeholder" style="color: #606066;">
+          <span style="font-size:1.5rem;">🎨</span>
+          <span style="font-size:0.65rem;">미디어 없음</span>
+        </div>
+      `;
+    }
+
+    const titleText = (entry.data && entry.data.title) ? entry.data.title : "";
+    const displayDesc = titleText || (entry.data && entry.data.text ? entry.data.text : (entry.data && entry.data.description ? entry.data.description : ""));
+
+    html += `
+      <div class="admin-gallery-card ${isStarred ? 'starred' : ''}" data-id="${entry.id}">
+        <div class="admin-gallery-thumb-wrapper">
+          ${thumbHtml}
+        </div>
+        <div class="admin-gallery-info">
+          <div class="admin-gallery-meta-top">
+            <span class="admin-gallery-contest-badge" style="border-left: 3px solid ${color};">
+              ${emoji} ${entry.contestTitle || entry.contestId}
+            </span>
+            <span class="admin-gallery-date">${entry.timestamp ? entry.timestamp.substring(5, 16) : ''}</span>
+          </div>
+          <div class="admin-gallery-student">
+            ${entry.studentName}
+            <span>${entry.studentGrade}학년 ${entry.studentClass}반 ${entry.studentNumber}번</span>
+          </div>
+          
+          ${displayDesc ? `<p style="margin:4px 0 0 0; font-size:0.68rem; color: var(--text-secondary); display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical; overflow:hidden; line-height:1.4;">${displayDesc}</p>` : ''}
+          
+          <div class="admin-gallery-actions">
+            <!-- 별표 후보 등록 -->
+            <button class="action-btn star-btn" onclick="toggleAdminStar('${entry.id}')" title="심사 후보 지정/해제" style="background: none; border: none; color: ${isStarred ? '#fbbf24' : '#606066'}; cursor: pointer; padding: 4px; font-size: 0.95rem;">
+              ${isStarred ? '★' : '☆'}
+            </button>
+            <!-- 개별 평가 버튼 -->
+            <button class="admin-btn-action" onclick="openAdminEvalModal('${entry.id}')" title="상세 평가" style="padding: 3px 6px; font-size: 0.65rem; border-radius: 4px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: white; cursor: pointer;">
+              🔍 보기
+            </button>
+            <!-- 삭제 버튼 -->
+            <button class="admin-btn-action" onclick="deleteSubmissionByAdmin('${entry.id}')" title="삭제" style="padding: 3px 6px; font-size: 0.65rem; border-radius: 4px; background: rgba(244,63,94,0.1); border: 1px solid rgba(244,63,94,0.2); color: #f43f5e; cursor: pointer;">
+              🗑️
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
 
 // 9. Toggle Star Marking
 window.toggleAdminStar = function(submissionId) {
@@ -5537,6 +5645,11 @@ window.toggleAdminStar = function(submissionId) {
 
 // 10. Render Data Table
 function renderAdminSubmissionsTable() {
+  if (adminCurrentViewMode === "gallery") {
+    renderAdminSubmissionsGallery();
+    return;
+  }
+  
   const tbody = document.getElementById("admin-submissions-list");
   if (!tbody) return;
 
@@ -6003,7 +6116,7 @@ function doPost(e) {
       if (sheet) {
         var data = sheet.getDataRange().getValues();
         for (var i = 1; i < data.length; i++) {
-          if (data[i][1] === filterContestId) {
+          if (filterContestId === "all" || data[i][1] === filterContestId) {
             results.push({
               id: data[i][0],
               contestId: data[i][1],

@@ -489,13 +489,18 @@
         </div>
       </aside>
 
-      <!-- 우측 메인 콘텐츠 패널 -->
+        <!-- 우측 메인 콘텐츠 패널 -->
       <main class="admin-main-panel">
         
         <!-- 우측 상단 헤더 & 닫기 -->
         <div class="admin-main-header">
           <div>
-            <h1 class="admin-main-title">공모전 데이터 센터</h1>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <h1 class="admin-main-title">공모전 데이터 센터</h1>
+              <button id="admin-panel-toggle-btn" class="admin-panel-toggle-btn" onclick="toggleAdminContestPanel()" title="공모전 제어 카드 패널 접기/펼치기">
+                접기 🔼
+              </button>
+            </div>
             <p class="admin-main-subtitle">공모전 시작/마감 제어 및 심사 자료 통합 관리</p>
           </div>
           <button class="admin-drawer-close-btn" id="admin-drawer-close" aria-label="닫기">×</button>
@@ -553,8 +558,20 @@
           </div>
         </div>
 
+        <!-- 테이블 뷰 / 갤러리 뷰 탭 스위처 -->
+        <div class="admin-view-tab-bar">
+          <div class="admin-view-tabs">
+            <button class="admin-view-tab active" id="btn-view-table" onclick="setAdminViewMode('table')">
+              📋 테이블 뷰
+            </button>
+            <button class="admin-view-tab" id="btn-view-gallery" onclick="setAdminViewMode('gallery')">
+              🖼️ 갤러리 뷰
+            </button>
+          </div>
+        </div>
+
         <!-- 실시간 데이터 테이블 -->
-        <div class="admin-table-container">
+        <div class="admin-table-container" id="admin-table-view-wrapper">
           <div class="admin-table-scroll-wrapper">
             <table id="admin-submissions-table">
               <thead>
@@ -576,6 +593,13 @@
           </div>
         </div>
 
+        <!-- 실시간 데이터 갤러리 뷰 -->
+        <div class="admin-gallery-container" id="admin-gallery-view-wrapper" style="display: none;">
+          <div id="admin-gallery-list" class="admin-gallery-grid">
+            <!-- JS에서 동적으로 갤러리 카드 채움 -->
+          </div>
+        </div>
+
       </main>
 
     </div>
@@ -586,6 +610,6 @@
 
 
   <!-- Main JavaScript -->
-  <script src="app.js?v=2.3.0"></script>
+  <script src="app.js?v=2.3.2"></script>
 </body>
 </html>
