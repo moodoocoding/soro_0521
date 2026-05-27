@@ -3570,220 +3570,97 @@ body.light-theme .xp-bar-container {
 }
 
 .admin-contest-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(var(--glow-rgb), 0.3);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 12px rgba(var(--glow-rgb), 0.1);
+  transform: translateY(-1.5px) scale(1.01);
+  border-color: rgba(var(--glow-rgb), 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 8px rgba(var(--glow-rgb), 0.08);
 }
 
 .admin-contest-card.selected {
-  border-color: rgba(var(--glow-rgb), 0.8);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 20px rgba(var(--glow-rgb), 0.2), inset 0 0 10px rgba(var(--glow-rgb), 0.05);
+  transform: translateY(-2px) scale(1.02);
+  border-color: rgba(var(--glow-rgb), 0.7);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 16px rgba(var(--glow-rgb), 0.22);
 }
 
 .admin-contest-card.selected::before {
   background: rgba(var(--glow-rgb), 1);
 }
 
-/* Locked / Closed Contest Overlay style */
+/* 마감(Locked) 시 칙칙한 회색 필터가 아니라 자연스럽고 차분하게 침잠하는 다크 톤 */
 .admin-contest-card.locked {
-  filter: grayscale(60%) brightness(0.65);
+  background: linear-gradient(135deg, rgba(12, 12, 14, 0.6) 0%, rgba(6, 6, 8, 0.7) 100%);
+  border-color: rgba(255, 255, 255, 0.02);
+  opacity: 0.55;
+  box-shadow: none;
 }
-
-.admin-contest-card .card-title {
-  font-size: 0.75rem;
-  font-weight: 800;
-  color: var(--text-primary, #ffffff);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.admin-contest-card .card-count {
-  font-size: 1.3rem;
-  font-weight: 900;
-  color: var(--text-primary, #ffffff);
-  font-family: var(--font-display);
-  line-height: 1;
-}
-
-.admin-contest-card .card-count span {
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--text-secondary, #909099);
-  margin-left: 2px;
-}
-
-/* Period date range label on card */
-.admin-card-period {
-  font-size: 0.62rem;
-  font-weight: 700;
-  color: var(--text-secondary, #909099);
-  margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Mini Calendar popover trigger button */
-.admin-btn-date-trigger {
-  background: none;
-  border: none;
-  color: var(--text-secondary, #909099);
-  cursor: pointer;
-  padding: 4px;
-  font-size: 0.75rem;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.15s, transform 0.1s;
-}
-
-.admin-btn-date-trigger:hover {
-  color: #fbbf24;
-  transform: scale(1.1);
-}
-
-/* Date popover overlay panel */
-.admin-date-popover {
-  position: absolute;
-  top: 105%;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 100;
-  width: 200px;
-  background: rgba(20, 20, 22, 0.98);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 10px rgba(var(--glow-rgb), 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: default;
-}
-
-.admin-date-popover-header {
-  font-size: 0.72rem;
-  font-weight: 800;
-  color: var(--text-primary, #ffffff);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  padding-bottom: 4px;
-  margin-bottom: 2px;
-}
-
-.admin-date-popover-row {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.admin-date-popover-row label {
-  font-size: 0.62rem;
-  font-weight: 800;
-  color: var(--text-secondary, #909099);
-}
-
-.admin-date-popover-row input[type="date"] {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 6px;
-  padding: 4px 6px;
-  color: var(--text-primary, #ffffff);
-  font-size: 0.7rem;
-  font-weight: 700;
-  outline: none;
-}
-
-.admin-date-popover-row input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-  cursor: pointer;
-}
-
-.admin-popover-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 6px;
-  margin-top: 4px;
-}
-
-.admin-btn-popover-save {
-  background: #22c55e;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-size: 0.68rem;
-  font-weight: 800;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-
-.admin-btn-popover-save:hover { opacity: 0.9; }
-
-.admin-btn-popover-cancel {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--text-secondary, #909099);
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-size: 0.68rem;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.admin-btn-popover-cancel:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary, #ffffff);
+.admin-contest-card.locked:hover {
+  transform: none;
+  border-color: rgba(255, 255, 255, 0.03);
+  box-shadow: none;
 }
 
 
-/* Inline Toggle Switch */
-.admin-toggle {
-  position: relative;
-  width: 38px;
-  height: 20px;
+/* 네온 LED 상태 라이트 */
+.admin-led-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #3f3f46; /* 소등(OFF) 시 차분한 그레이 */
+  box-shadow: none;
+  transition: all 0.3s ease;
   display: inline-block;
   flex-shrink: 0;
 }
+.admin-led-dot.active {
+  background-color: var(--led-color);
+  box-shadow: 0 0 10px var(--led-color), 0 0 4px var(--led-color);
+}
 
-.admin-toggle input { opacity: 0; width: 0; height: 0; }
-
-.admin-toggle .slider {
-  position: absolute;
-  inset: 0;
-  background: #27272a;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
+/* 컴팩트 플랫 액티브 제어 버튼 */
+.admin-btn-status-control {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary, #909099);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 800;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  line-height: 1;
 }
 
-.admin-toggle .slider::before {
-  content: '';
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  left: 2px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: #71717a;
-  border-radius: 50%;
-  transition: transform 0.2s, background 0.2s;
+/* 접수 중(Active/ON)인 경우 */
+.admin-btn-status-control.active {
+  background: rgba(34, 197, 94, 0.06);
+  border-color: rgba(34, 197, 94, 0.25);
+  color: #22c55e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.06);
+}
+.admin-btn-status-control.active:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+.admin-btn-status-control.active:hover::after {
+  content: ' 마감';
 }
 
-.admin-toggle input:checked + .slider {
-  background: rgba(34, 197, 94, 0.15);
-  border-color: #22c55e;
+/* 마감(Closed/OFF) 상태 버튼 */
+.admin-btn-status-control.locked {
+  background: rgba(244, 63, 94, 0.04);
+  border-color: rgba(244, 63, 94, 0.2);
+  color: #f43f5e;
 }
-
-.admin-toggle input:checked + .slider::before {
-  transform: translateY(-50%) translateX(18px);
-  background: #22c55e;
+.admin-btn-status-control.locked:hover {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+}
+.admin-btn-status-control.locked:hover::after {
+  content: ' 개시';
 }
 
 

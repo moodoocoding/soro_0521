@@ -5427,26 +5427,26 @@ function renderAdminContestCards() {
 
     const isSelected = adminCurrentContestFilter === cId;
     const glow = brandGlows[cId] || { color: "rgba(255,255,255,0.08)", rgb: "255,255,255" };
-    
+    const ledColor = `rgb(${glow.rgb})`;
     html += `
       <div class="admin-contest-card ${isSelected ? 'selected' : ''} ${isLocked ? 'locked' : ''}" 
            data-contest="${cId}" 
-           style="--glow-color: ${glow.color}; --glow-rgb: ${glow.rgb};">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div class="card-title">${contestEmojis[cId] || ''} ${contest ? contest.title.substring(0, 6) : cId}</div>
-          <div style="display: flex; align-items: center; gap: 4px;">
-            <label class="admin-toggle" onclick="event.stopPropagation();" title="공모전 접수 활성화/비활성화">
-              <input type="checkbox" ${!isLocked ? 'checked' : ''} onchange="toggleContestLock('${cId}')">
-              <span class="slider"></span>
-            </label>
-          </div>
-        </div>
-        <div class="card-count">${count}<span>건</span></div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
-          <span style="font-size: 0.68rem; font-weight: 800; color: ${isLocked ? '#f43f5e' : '#22c55e'};">
-            ${isLocked ? '🔒 마감' : '🟢 접수중'}
+           style="--glow-color: ${glow.color}; --glow-rgb: ${glow.rgb}; display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding: 6px 10px; gap: 6px; min-width: 0;">
+        <div style="display: flex; align-items: center; gap: 6px; overflow: hidden; min-width: 0; flex-grow: 1;">
+          <span class="admin-led-dot ${!isLocked ? 'active' : ''}" style="--led-color: ${ledColor};"></span>
+          <span style="font-weight: 700; font-size: 0.75rem; display: flex; align-items: center; gap: 3px; min-width: 0; color: var(--text-primary, #ffffff);">
+            <span style="flex-shrink: 0;">${contestEmojis[cId] || ''}</span>
+            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${contest ? contest.title.substring(0, 6) : cId}</span>
+          </span>
+          <span style="font-size: 0.68rem; color: var(--text-secondary, #909099); font-weight: 600; flex-shrink: 0;">
+            (${count})
           </span>
         </div>
+        <button class="admin-btn-status-control ${!isLocked ? 'active' : 'locked'}" 
+                onclick="event.stopPropagation(); toggleContestLock('${cId}')"
+                style="flex-shrink: 0;">
+          ${!isLocked ? '🟢 접수중' : '🔒 마감됨'}
+        </button>
       </div>
     `;
   });
