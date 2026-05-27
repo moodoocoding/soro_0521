@@ -3336,44 +3336,6 @@ body.light-theme .xp-bar-container {
   pointer-events: none;
 }
 
-/* 테이블 뷰 / 갤러리 뷰 탭 스위처 */
-.admin-view-tab-bar {
-  display: flex;
-  margin-top: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  padding-bottom: 8px;
-}
-.admin-view-tabs {
-  display: flex;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 3px;
-  gap: 4px;
-}
-.admin-view-tab {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary, #909099);
-  padding: 6px 16px;
-  font-size: 0.75rem;
-  font-weight: 800;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.18s;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.admin-view-tab:hover {
-  color: var(--text-primary, #ffffff);
-  background: rgba(255, 255, 255, 0.03);
-}
-.admin-view-tab.active {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary, #ffffff);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-}
 
 /* 실시간 데이터 갤러리 뷰 그리드 */
 .admin-gallery-container {
@@ -3430,6 +3392,7 @@ body.light-theme .xp-bar-container {
   border-bottom: 1px solid rgba(255, 255, 255, 0.03);
   position: relative;
   overflow: hidden;
+  cursor: zoom-in;
 }
 .admin-gallery-thumb {
   max-width: 100%;
@@ -3520,8 +3483,8 @@ body.light-theme .xp-bar-container {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 28px 32px;
-  gap: 20px;
+  padding: 12px 20px;
+  gap: 12px;
   overflow-y: auto;
   background: #000000;
 }
@@ -3531,20 +3494,20 @@ body.light-theme .xp-bar-container {
   justify-content: space-between;
   align-items: flex-start;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  padding-bottom: 16px;
+  padding-bottom: 8px;
 }
 
 .admin-main-title {
   margin: 0;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 900;
   color: var(--text-primary, #ffffff);
   letter-spacing: -0.03em;
 }
 
 .admin-main-subtitle {
-  margin: 4px 0 0 0;
-  font-size: 0.78rem;
+  margin: 2px 0 0 0;
+  font-size: 0.72rem;
   color: var(--text-secondary, #909099);
 }
 
@@ -3552,13 +3515,13 @@ body.light-theme .xp-bar-container {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--text-secondary, #909099);
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   line-height: 1;
   cursor: pointer;
   transition: all 0.15s;
@@ -3584,10 +3547,10 @@ body.light-theme .xp-bar-container {
   background: linear-gradient(135deg, rgba(20, 20, 22, 0.7) 0%, rgba(10, 10, 12, 0.85) 100%);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 12px;
-  padding: 10px 12px;
+  padding: 6px 10px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   cursor: pointer;
   position: relative;
   transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.25s, box-shadow 0.25s;
@@ -3830,11 +3793,11 @@ body.light-theme .xp-bar-container {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 10px;
   background: rgba(20, 20, 22, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: 12px;
-  padding: 12px 18px;
+  padding: 6px 14px;
 }
 
 .admin-filter-group {

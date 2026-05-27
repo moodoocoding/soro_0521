@@ -5237,7 +5237,7 @@ window.toggleAdminContestPanel = function() {
 };
 
 // 4-3. View Mode Switcher (Table vs Gallery)
-let adminCurrentViewMode = "table";
+let adminCurrentViewMode = "gallery";
 window.setAdminViewMode = function(mode) {
   adminCurrentViewMode = mode;
   const tableView = document.getElementById("admin-table-view-wrapper");
@@ -5564,10 +5564,18 @@ function renderAdminSubmissionsGallery() {
     const color = contestColors[entry.contestId] || "#ffffff";
     const emoji = contestEmojis[entry.contestId] || "🎨";
     
+    // Resolve Image URL & Convert Google Drive Links (Fix broken alt image issue)
+    let imageUrl = entry.data && entry.data.image ? entry.data.image : "";
+    if (imageUrl && imageUrl.includes("drive.google.com")) {
+      imageUrl = getGoogleDriveDirectLink(imageUrl);
+    }
+
     // Media preview resolver
     let thumbHtml = "";
-    if (entry.data && entry.data.image) {
-      thumbHtml = `<img class="admin-gallery-thumb" src="${entry.data.image}" alt="${entry.studentName} 작품" loading="lazy">`;
+    let isImage = false;
+    if (imageUrl) {
+      thumbHtml = `<img class="admin-gallery-thumb" src="${imageUrl}" alt="${entry.studentName} 작품" loading="lazy">`;
+      isImage = true;
     } else if (entry.data && entry.data.text) {
       thumbHtml = `<div class="admin-gallery-text-placeholder">"${entry.data.text}"</div>`;
     } else if (entry.contestId === "sound_album") {
@@ -5591,7 +5599,8 @@ function renderAdminSubmissionsGallery() {
 
     html += `
       <div class="admin-gallery-card ${isStarred ? 'starred' : ''}" data-id="${entry.id}">
-        <div class="admin-gallery-thumb-wrapper">
+        <div class="admin-gallery-thumb-wrapper" 
+             ${isImage ? `onclick="openImageModal('${imageUrl}')" style="cursor: zoom-in;"` : 'style="cursor: default;"'}>
           ${thumbHtml}
         </div>
         <div class="admin-gallery-info">
@@ -5643,152 +5652,9 @@ window.toggleAdminStar = function(submissionId) {
   renderAdminSubmissionsTable();
 };
 
-// 10. Render Data Table
+// 10. Render Submissions (Redirect function to maintain API compatibility)
 function renderAdminSubmissionsTable() {
-  if (adminCurrentViewMode === "gallery") {
-    renderAdminSubmissionsGallery();
-    return;
-  }
-  
-  const tbody = document.getElementById("admin-submissions-list");
-  if (!tbody) return;
-
-  const stars = JSON.parse(localStorage.getItem("soro_admin_stars") || "{}");
-
-  // Always deduplicate (latest 1 per student per contest)
-  let filtered = deduplicateSubmissions(adminAllSubmissions);
-
-  // Contest filter
-  if (adminCurrentContestFilter !== "all") {
-    filtered = filtered.filter(entry => entry.contestId === adminCurrentContestFilter);
-  }
-
-  // Two-Tier Class/Grade filter
-  if (adminCurrentGradeFilter !== "all") {
-    filtered = filtered.filter(entry => parseInt(entry.studentGrade, 10) === parseInt(adminCurrentGradeFilter, 10));
-    if (adminCurrentClassOnlyFilter !== "all") {
-      filtered = filtered.filter(entry => parseInt(entry.studentClass, 10) === parseInt(adminCurrentClassOnlyFilter, 10));
-    }
-  }
-
-  // Search filter
-  if (adminSearchQuery !== "") {
-    filtered = filtered.filter(entry => {
-      const name = (entry.studentName || "").toLowerCase();
-      const bookTitle = entry.data && entry.data["book-title"] ? entry.data["book-title"].toLowerCase() : "";
-      const text = entry.data && entry.data["text"] ? entry.data["text"].toLowerCase() : "";
-      const comment = entry.data && entry.data["comment"] ? entry.data["comment"].toLowerCase() : "";
-      return name.includes(adminSearchQuery) || bookTitle.includes(adminSearchQuery) || text.includes(adminSearchQuery) || comment.includes(adminSearchQuery);
-    });
-  }
-
-  // Star filter
-  if (adminStarFilter === "starred") {
-    filtered = filtered.filter(entry => !!stars[entry.id]);
-  }
-
-  // Sort by date descending
-  filtered.sort((a, b) => parseKoreanDate(b.timestamp) - parseKoreanDate(a.timestamp));
-
-  if (filtered.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="8" style="text-align: center; padding: 50px; color: var(--text-secondary);">
-          🔍 조건에 일치하는 출품작이 없습니다.
-        </td>
-      </tr>
-    `;
-    return;
-  }
-
-  const contestColors = {
-    keyring: "#3b82f6",
-    cuttoon: "#10b981",
-    library: "#8b5cf6",
-    transcription: "#f59e0b",
-    pixelart: "#ec4899",
-    sound_album: "#a855f7"
-  };
-
-  let html = "";
-  filtered.forEach(entry => {
-    const parsedDate = parseKoreanDate(entry.timestamp);
-    const dateStr = `${parsedDate.getMonth() + 1}.${parsedDate.getDate()} ${String(parsedDate.getHours()).padStart(2, '0')}:${String(parsedDate.getMinutes()).padStart(2, '0')}`;
-
-    const contest = CONTESTS_DATA.find(c => c.id === entry.contestId);
-    const contestTitle = contest ? contest.title : entry.contestId;
-    const studentInfo = `${entry.studentGrade}-${entry.studentClass}-${entry.studentNumber}`;
-    const studentName = entry.studentName || "-";
-    const isStarred = !!stars[entry.id];
-    const cColor = contestColors[entry.contestId] || "#ffffff";
-
-    let imageUrl = entry.data && entry.data.image ? entry.data.image : "";
-    if (imageUrl && imageUrl.includes("drive.google.com")) {
-      imageUrl = getGoogleDriveDirectLink(imageUrl);
-    }
-
-    let contentHtml = "";
-    if (entry.contestId === "library") {
-      contentHtml = `
-        <div style="display:flex; align-items: center; gap:12px;">
-          ${imageUrl ? `<div class="admin-table-thumb-wrapper" onclick="openImageModal('${imageUrl}')"><img src="${imageUrl}" class="admin-table-thumb" onerror="this.src='https://placehold.co/100/0c0c0e/ffffff?text=Err'"></div>` : ""}
-          <div style="display:flex; flex-direction:column; gap:3px;">
-            <span style="font-weight:800; color:var(--text-primary); font-size:0.82rem;">📖 ${entry.data["book-title"] || "도서명"}</span>
-            <span style="font-size:0.72rem; color:var(--text-secondary); max-width:400px; word-break:break-all; line-height: 1.4;">"${entry.data["comment"] || ""}"</span>
-          </div>
-        </div>
-      `;
-    } else if (entry.contestId === "sound_album") {
-      const audioUrl = entry.data && entry.data.audio ? entry.data.audio : "";
-      const isBase64 = audioUrl && audioUrl.startsWith("data:");
-      contentHtml = `
-        <div style="display:flex; flex-direction:column; gap:6px;">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.2rem;">🎵</span>
-            ${audioUrl && !isBase64 ? `<audio src="${audioUrl}" controls style="height: 28px; width: 240px;"></audio>` : `<span style="font-size:0.72rem; color:var(--text-secondary);">(로컬 백업 오디오 재생 불가 - 다운로드 저장 권장)</span>`}
-          </div>
-          ${entry.data && entry.data.description ? `<span style="font-size:0.72rem; color:var(--text-secondary); line-height: 1.3;">"${entry.data.description}"</span>` : ""}
-        </div>
-      `;
-    } else if (imageUrl) {
-      contentHtml = `
-        <div style="display:flex; align-items: center; gap:12px;">
-          <div class="admin-table-thumb-wrapper" onclick="openImageModal('${imageUrl}')"><img src="${imageUrl}" class="admin-table-thumb" onerror="this.src='https://placehold.co/100/0c0c0e/ffffff?text=Err'"></div>
-          ${entry.data && entry.data.text ? `<span style="font-size:0.75rem; color:var(--text-secondary); max-width:400px; word-break:break-all; line-height:1.4;">${entry.data.text.substring(0, 100)}</span>` : ""}
-        </div>
-      `;
-    } else if (entry.data && entry.data.text) {
-      contentHtml = `<span style="font-size:0.78rem; color:var(--text-primary); line-height:1.4; word-break:break-all;">${entry.data.text.substring(0, 150)}</span>`;
-    } else {
-      contentHtml = `<span style="color:var(--text-secondary); font-size:0.75rem;">(내용 없음)</span>`;
-    }
-
-    // Indicator inline styling inject
-    html += `
-      <tr style="border-bottom: 1px solid rgba(255,255,255,0.03);" onmouseenter="this.querySelector('.row-indicator').style.backgroundColor='${cColor}'" onmouseleave="this.querySelector('.row-indicator').style.backgroundColor='transparent'">
-        <td class="row-indicator-cell"><div class="row-indicator"></div></td>
-        <td style="text-align:center; padding: 12px 6px;">
-          <button class="admin-star-btn ${isStarred ? 'starred' : ''}" onclick="toggleAdminStar('${entry.id}')">
-            ${isStarred ? '★' : '☆'}
-          </button>
-        </td>
-        <td style="padding:12px 10px; color:var(--text-secondary); font-size:0.72rem; font-family:var(--font-display);">${dateStr}</td>
-        <td style="padding:12px 10px;"><span class="admin-badge-contest ${entry.contestId}">${contestTitle}</span></td>
-        <td style="padding:12px 10px; font-weight:800; font-size:0.78rem; font-family:var(--font-display); color:var(--text-secondary);">${studentInfo}</td>
-        <td style="padding:12px 10px; font-weight:900; font-size:0.82rem; color:var(--text-primary);">${studentName}</td>
-        <td style="padding:12px 10px;">${contentHtml}</td>
-        <td style="text-align:center; padding:12px 10px;">
-          <div style="display:flex; gap:6px; align-items:center; justify-content:center;">
-            ${(imageUrl && !imageUrl.startsWith("data:")) ? `<button class="admin-btn-save" onclick="downloadAdminPostcard('${imageUrl}', '${entry.studentGrade}-${entry.studentClass}_${entry.studentName}')">저장</button>` : ""}
-            ${(entry.contestId === "sound_album" && entry.data.audio && !entry.data.audio.startsWith("data:")) ? `<button class="admin-btn-save" onclick="downloadAdminPostcard('${entry.data.audio}', '음악_${entry.studentGrade}-${entry.studentClass}_${entry.studentName}')">저장</button>` : ""}
-            <button class="admin-btn-delete" onclick="deleteSubmissionByAdmin('${entry.id}', '${entry.contestId}')">삭제</button>
-          </div>
-        </td>
-      </tr>
-    `;
-  });
-
-  tbody.innerHTML = html;
+  renderAdminSubmissionsGallery();
 }
 
 // 11. Export to CSV (Deduplicated, correct URLs, Base64 filter protection, 7 Columns)

@@ -558,43 +558,8 @@
           </div>
         </div>
 
-        <!-- 테이블 뷰 / 갤러리 뷰 탭 스위처 -->
-        <div class="admin-view-tab-bar">
-          <div class="admin-view-tabs">
-            <button class="admin-view-tab active" id="btn-view-table" onclick="setAdminViewMode('table')">
-              📋 테이블 뷰
-            </button>
-            <button class="admin-view-tab" id="btn-view-gallery" onclick="setAdminViewMode('gallery')">
-              🖼️ 갤러리 뷰
-            </button>
-          </div>
-        </div>
-
-        <!-- 실시간 데이터 테이블 -->
-        <div class="admin-table-container" id="admin-table-view-wrapper">
-          <div class="admin-table-scroll-wrapper">
-            <table id="admin-submissions-table">
-              <thead>
-                <tr>
-                  <th style="width: 6px; padding: 0;"></th> <!-- 수직 인디케이터 바 자리 -->
-                  <th style="width: 50px; text-align: center;">★</th>
-                  <th style="width: 100px;">제출일시</th>
-                  <th style="width: 110px;">공모전</th>
-                  <th style="width: 95px;">학년반번호</th>
-                  <th style="width: 80px;">이름</th>
-                  <th>출품 작품 및 내용</th>
-                  <th style="text-align: center; width: 140px;">관리</th>
-                </tr>
-              </thead>
-              <tbody id="admin-submissions-list">
-                <!-- JS에서 동적으로 데이터 테이블 채움 -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
         <!-- 실시간 데이터 갤러리 뷰 -->
-        <div class="admin-gallery-container" id="admin-gallery-view-wrapper" style="display: none;">
+        <div class="admin-gallery-container" id="admin-gallery-view-wrapper">
           <div id="admin-gallery-list" class="admin-gallery-grid">
             <!-- JS에서 동적으로 갤러리 카드 채움 -->
           </div>
@@ -610,6 +575,6 @@
 
 
   <!-- Main JavaScript -->
-  <script src="app.js?v=2.3.2"></script>
+  <script src="app.js?v=2.3.3"></script>
 </body>
 </html>
