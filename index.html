@@ -548,10 +548,15 @@
               <button class="admin-tab-btn" data-contest="transcription">디지털 필사</button>
               <button class="admin-tab-btn" data-contest="pixelart">픽셀아트</button>
               <button class="admin-tab-btn" data-contest="sound_album">사운드 앨범</button>
+              <button class="admin-tab-btn" data-contest="friendship">우정사진</button>
             </div>
             
             <!-- 우측 액션: 검색어 입력 및 엑셀 다운로드 -->
             <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+              <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); cursor: pointer; user-select: none; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 8px; background: var(--bg-secondary);">
+                <input type="checkbox" id="admin-dedup-checkbox" style="width: 14px; height: 14px; accent-color: var(--text-primary);">
+                <span>1인 1작품 최신작 필터링</span>
+              </label>
               <input type="text" id="admin-search-input" placeholder="학생 실명 또는 내용 검색..." style="padding: 8px 14px; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); width: 220px;">
               <button id="admin-export-csv-btn" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 700; padding: 8px 16px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 8px; cursor: pointer;">
                 📥 Excel 추출 (CSV)
@@ -664,6 +669,6 @@
   </div>
 
   <!-- Main JavaScript -->
-  <script src="app.js?v=2.1.4"></script>
+  <script src="app.js?v=2.1.5"></script>
 </body>
 </html>

@@ -4999,7 +4999,20 @@ function parseKoreanDate(dateStr) {
   } catch (e) {
     console.error("parseKoreanDate error for: " + dateStr, e);
   }
-  return new Date(dateStr);
+  
+  const fallbackDate = new Date(dateStr);
+  if (isNaN(fallbackDate.getTime())) {
+    // 혹시 숫자만 모여있는지 검사 (예: 20260527)
+    const onlyNums = dateStr.replace(/\D/g, "");
+    if (onlyNums.length >= 8) {
+      const y = parseInt(onlyNums.substring(0, 4), 10);
+      const m = parseInt(onlyNums.substring(4, 6), 10) - 1;
+      const d = parseInt(onlyNums.substring(6, 8), 10);
+      return new Date(y, m, d);
+    }
+    return new Date(); // 최후의 보루: 에러 억제를 위해 현재 날짜 반환
+  }
+  return fallbackDate;
 }
 
 
@@ -5008,6 +5021,7 @@ let adminAllSubmissions = [];
 let adminCurrentContestFilter = "all";
 let adminCurrentClassFilter = "all"; // Formatted like "all", "3-1", "5-2"
 let adminSearchQuery = "";
+let adminDeduplicateSubmissions = false; // 기본적으로 과거 모든 제출 이력 다 보여주기 (중복 제거 해제)
 let adminFilteredSubmissions = []; // 현재 필터링 및 정렬된 제출물 목록 보관 (모달 내비용)
 let adminActiveEvalIndex = -1; // 현재 모달에서 집중 심사 중인 제출물 인덱스
 let adminEvalKeydownHandler = null; // 단축키 리스너 저장
@@ -5030,6 +5044,15 @@ function initAdminPanel() {
   if (searchInput) {
     searchInput.addEventListener("input", (e) => {
       adminSearchQuery = e.target.value.trim().toLowerCase();
+      renderAdminSubmissionsTable();
+    });
+  }
+
+  const dedupCheckbox = document.getElementById("admin-dedup-checkbox");
+  if (dedupCheckbox) {
+    dedupCheckbox.checked = adminDeduplicateSubmissions;
+    dedupCheckbox.addEventListener("change", (e) => {
+      adminDeduplicateSubmissions = e.target.checked;
       renderAdminSubmissionsTable();
     });
   }
@@ -5185,7 +5208,7 @@ async function fetchAndRenderAdminData() {
     <tr>
       <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-secondary);">
         <div class="spinner" style="margin: 0 auto 12px auto;"></div>
-        <p style="font-weight: 800; color: var(--text-primary);">6대 공모전의 모든 스프레드시트 출품작 데이터를 라이브 수집하는 중...</p>
+        <p style="font-weight: 800; color: var(--text-primary);">7대 공모전의 모든 스프레드시트 출품작 데이터를 라이브 수집하는 중...</p>
       </td>
     </tr>
   `;
@@ -5201,7 +5224,7 @@ async function fetchAndRenderAdminData() {
     return;
   }
 
-  const activeContestIds = ["keyring", "cuttoon", "library", "transcription", "pixelart", "sound_album"];
+  const activeContestIds = ["keyring", "cuttoon", "library", "transcription", "pixelart", "sound_album", "friendship"];
   
   try {
     const fetchPromises = activeContestIds.map(async (cId) => {
@@ -5653,20 +5676,25 @@ function renderAdminSubmissionsTable() {
   const evaluations = JSON.parse(localStorage.getItem("soro_admin_evaluations") || "{}");
   const awards = JSON.parse(localStorage.getItem("soro_admin_awards") || "{}");
 
-  const dedupedMap = new Map();
-  adminAllSubmissions.forEach(entry => {
-    const studentKey = entry.studentUsername ? entry.studentUsername.toLowerCase() : (entry.studentName ? entry.studentName.toLowerCase() : "");
-    const key = `${studentKey}_${entry.contestId}`;
-    if (studentKey) {
-      const existing = dedupedMap.get(key);
-      if (!existing || parseKoreanDate(entry.timestamp) > parseKoreanDate(existing.timestamp)) {
-        dedupedMap.set(key, entry);
+  let filtered = [];
+  if (adminDeduplicateSubmissions) {
+    const dedupedMap = new Map();
+    adminAllSubmissions.forEach(entry => {
+      const studentKey = entry.studentUsername ? entry.studentUsername.toLowerCase() : (entry.studentName ? entry.studentName.toLowerCase() : "");
+      const key = `${studentKey}_${entry.contestId}`;
+      if (studentKey) {
+        const existing = dedupedMap.get(key);
+        if (!existing || parseKoreanDate(entry.timestamp) > parseKoreanDate(existing.timestamp)) {
+          dedupedMap.set(key, entry);
+        }
+      } else {
+        dedupedMap.set(entry.id, entry);
       }
-    } else {
-      dedupedMap.set(entry.id, entry);
-    }
-  });
-  let filtered = Array.from(dedupedMap.values());
+    });
+    filtered = Array.from(dedupedMap.values());
+  } else {
+    filtered = [...adminAllSubmissions];
+  }
 
   if (adminCurrentContestFilter !== "all") {
     filtered = filtered.filter(entry => entry.contestId === adminCurrentContestFilter);

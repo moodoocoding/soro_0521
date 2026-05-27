@@ -3278,6 +3278,7 @@ body.light-theme .xp-bar-container {
 .admin-badge-contest.transcription { background: #f59e0b; border: 1px solid rgba(255,255,255,0.1); }
 .admin-badge-contest.pixelart { background: #ec4899; border: 1px solid rgba(255,255,255,0.1); }
 .admin-badge-contest.sound_album { background: #a855f7; border: 1px solid rgba(255,255,255,0.1); }
+.admin-badge-contest.friendship { background: #38bdf8; border: 1px solid rgba(255,255,255,0.1); }
 
 /* Table Thumbnail Styles */
 .admin-table-thumb-wrapper {
