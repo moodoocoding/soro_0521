@@ -5208,7 +5208,7 @@ async function fetchAndRenderAdminData() {
     <tr>
       <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-secondary);">
         <div class="spinner" style="margin: 0 auto 12px auto;"></div>
-        <p style="font-weight: 800; color: var(--text-primary);">7대 공모전의 모든 스프레드시트 출품작 데이터를 라이브 수집하는 중...</p>
+        <p style="font-weight: 800; color: var(--text-primary);">6대 공모전의 모든 스프레드시트 출품작 데이터를 라이브 수집하는 중...</p>
       </td>
     </tr>
   `;
@@ -5224,7 +5224,7 @@ async function fetchAndRenderAdminData() {
     return;
   }
 
-  const activeContestIds = ["keyring", "cuttoon", "library", "transcription", "pixelart", "sound_album", "friendship"];
+  const activeContestIds = ["keyring", "cuttoon", "library", "transcription", "pixelart", "sound_album"];
   
   try {
     const fetchPromises = activeContestIds.map(async (cId) => {
